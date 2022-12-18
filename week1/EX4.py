@@ -15,7 +15,8 @@ for i in mylist:
     for j in templist:
         if i == j:
             check = True
-            print ('Yes')
 
 if check != True:
     print('No')
+else:
+    print ('Yes')
