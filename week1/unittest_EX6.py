@@ -94,9 +94,214 @@ class MixTenMatrixUnitTest(unittest.TestCase):
     matrix_dimension_input_2 = "4"
     matrix_dataset_12 = "1 2 3 4"
 
-    #third matrix
-    matrix_dimension_input_2 = "5"
-    matrix_dataset_12 = "2 2 2 2 2"
+    #thrid matrix
+    matrix_dimension_input_3 = "5"
+    matrix_dataset_13 = "1 2 3 4 5"
+    matrix_dataset_23 = "6 7 8 9 0"
+    matrix_dataset_33 = "2 4 6 8 0"
+    matrix_dataset_43 = "1 3 5 7 9"
+    matrix_dataset_53 = "1 1 1 1 1"
+
+    #fourth matrix
+    matrix_dimension_input_4 = "5"
+    matrix_dataset_14 = "2 2 2 2 2"
+
+    #4x4 matrix not repeat --- 1 matrix
+    @patch('builtins.input', side_effect=[
+        "1", 
+        matrix_dimension_input_1,
+        matrix_dataset_11,
+        matrix_dataset_21,
+        matrix_dataset_31,
+        matrix_dataset_41])
+    def test_4x4_matrix_not_repeat(self, mock_inputs):
+        check = EX6.MixTenMatrix()
+        self.assertEqual(check, [7])
+    
+    #5x5 matrix not repeat --- 1 matrix
+    @patch('builtins.input', side_effect=[
+        "1", 
+        matrix_dimension_input_3,
+        matrix_dataset_13,
+        matrix_dataset_23,
+        matrix_dataset_33,
+        matrix_dataset_43,
+        matrix_dataset_53])
+    def test_5x5_matrix_not_repeat(self, mock_inputs):
+        check = EX6.MixTenMatrix()
+        self.assertEqual(check, [7])
+    
+    #4x4 matrix repeat --- 1 matrix
+    @patch('builtins.input', side_effect=[
+        "1", 
+        matrix_dimension_input_2,
+        matrix_dataset_12,
+        matrix_dataset_12,
+        matrix_dataset_12,
+        matrix_dataset_12])
+    def test_4x4_matrix_repeat(self, mock_inputs):
+        check = EX6.MixTenMatrix()
+        self.assertEqual(check, [4])
+    
+    #5x5 matrix repeat --- 1 matrix
+    @patch('builtins.input', side_effect=[
+        "1", 
+        matrix_dimension_input_4,
+        matrix_dataset_14,
+        matrix_dataset_14,
+        matrix_dataset_14,
+        matrix_dataset_14,
+        matrix_dataset_14])
+    def test_4x4_matrix_repeat(self, mock_inputs):
+        check = EX6.MixTenMatrix()
+        self.assertEqual(check, [10])
+    
+    #test table amount input
+    @patch('builtins.input', side_effect=[
+        "A", 
+        matrix_dimension_input_4,
+        matrix_dataset_14,
+        matrix_dataset_14,
+        matrix_dataset_14,
+        matrix_dataset_14,
+        matrix_dataset_14])
+    def test_invalid_table_input(self, mock_inputs):
+        check = EX6.MixTenMatrix()
+        self.assertEqual(check, 'Invalid table amount')
+
+    @patch('builtins.input', side_effect=[
+        "-1", 
+        matrix_dimension_input_4,
+        matrix_dataset_14,
+        matrix_dataset_14,
+        matrix_dataset_14,
+        matrix_dataset_14,
+        matrix_dataset_14])
+    def test_invalid2_table_input(self, mock_inputs):
+        check = EX6.MixTenMatrix()
+        self.assertEqual(check, 'Invalid table amount')
+
+    @patch('builtins.input', side_effect=[
+        "", 
+        matrix_dimension_input_4,
+        matrix_dataset_14,
+        matrix_dataset_14,
+        matrix_dataset_14,
+        matrix_dataset_14,
+        matrix_dataset_14])
+    def test_blank_table_input(self, mock_inputs):
+        check = EX6.MixTenMatrix()
+        self.assertEqual(check, 'Invalid table amount')
+    
+    @patch('builtins.input', side_effect=[
+        None, 
+        matrix_dimension_input_4,
+        matrix_dataset_14,
+        matrix_dataset_14,
+        matrix_dataset_14,
+        matrix_dataset_14,
+        matrix_dataset_14])
+    def test_null_table_input(self, mock_inputs):
+        check = EX6.MixTenMatrix()
+        self.assertEqual(check, 'Invalid table amount')
+    
+    #test matrix dimension
+    @patch('builtins.input', side_effect=[
+        "1", 
+        "A",
+        matrix_dataset_14,
+        matrix_dataset_14,
+        matrix_dataset_14,
+        matrix_dataset_14,
+        matrix_dataset_14])
+    def test_invalid_dimension_input(self, mock_inputs):
+        check = EX6.MixTenMatrix()
+        self.assertEqual(check, 'Invalid matrix dimension')
+    
+    @patch('builtins.input', side_effect=[
+        "1", 
+        "-1",
+        matrix_dataset_14,
+        matrix_dataset_14,
+        matrix_dataset_14,
+        matrix_dataset_14,
+        matrix_dataset_14])
+    def test_invalid2_dimension_input(self, mock_inputs):
+        check = EX6.MixTenMatrix()
+        self.assertEqual(check, 'Invalid matrix dimension')
+    
+    @patch('builtins.input', side_effect=[
+        "1", 
+        "",
+        matrix_dataset_14,
+        matrix_dataset_14,
+        matrix_dataset_14,
+        matrix_dataset_14,
+        matrix_dataset_14])
+    def test_blank_dimension_input(self, mock_inputs):
+        check = EX6.MixTenMatrix()
+        self.assertEqual(check, 'Invalid matrix dimension')
+    
+    @patch('builtins.input', side_effect=[
+        "1", 
+        None,
+        matrix_dataset_14,
+        matrix_dataset_14,
+        matrix_dataset_14,
+        matrix_dataset_14,
+        matrix_dataset_14])
+    def test_null_dimension_input(self, mock_inputs):
+        check = EX6.MixTenMatrix()
+        self.assertEqual(check, 'Invalid matrix dimension')
+
+    #test dataset
+    @patch('builtins.input', side_effect=[
+        "1", 
+        matrix_dimension_input_4,
+        "-1 0 1 2 3",
+        matrix_dataset_14,
+        matrix_dataset_14,
+        matrix_dataset_14,
+        matrix_dataset_14])
+    def test_negative_dataset_input(self, mock_inputs):
+        check = EX6.MixTenMatrix()
+        self.assertEqual(check, 'Invalid dataset')
+    
+    @patch('builtins.input', side_effect=[
+        "1", 
+        matrix_dimension_input_4,
+        " ",
+        "",
+        "  ",
+        "    ",
+        "."])
+    def test_blank_dataset_input(self, mock_inputs):
+        check = EX6.MixTenMatrix()
+        self.assertEqual(check, 'Invalid dataset')
+    
+    @patch('builtins.input', side_effect=[
+        "1", 
+        matrix_dimension_input_4,
+        "A B C D A",
+        "E F G H A",
+        "I J K L A",
+        "U P K S E",
+        "K O I M H"])
+    def test_invalid_dataset_input(self, mock_inputs):
+        check = EX6.MixTenMatrix()
+        self.assertEqual(check, 'Invalid dataset')
+    
+    @patch('builtins.input', side_effect=[
+        "1", 
+        matrix_dimension_input_4,
+        None,
+        None,
+        None,
+        None,
+        None])
+    def test_None_dataset_input(self, mock_inputs):
+        check = EX6.MixTenMatrix()
+        self.assertEqual(check, 'Invalid dataset')
 
 if __name__ == '__main__':
     unittest.main()

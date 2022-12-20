@@ -1,22 +1,49 @@
 def MixTenMatrix():
     data_dict = {} # dictionary of matrix
-    temp_list = []; data_list = []; row_list = []; col_list = []
+    temp_list = []; data_list = []; row_list = []; col_list = []; count = []
 
-    table_amount = int(input('table amount: ')) #amount of the matrix
+    table_amount = input('table amount: ') #amount of the matrix
 
+    #catch ValueError and TypeError from table amount input
+    try:
+        table_amount = int(table_amount)
+    except (ValueError, TypeError):
+        return 'Invalid table amount'
     if table_amount <= 0:
         return 'Invalid table amount'
+
     #create matrix with dictionary
     for i in range(table_amount):
-        matrix_dimension = int(input('matrix dimension: ')) # input matrix
+        matrix_dimension = input('matrix dimension: ') # input matrix
+
+        #catch ValueError and TypeError from matrix dimension input
+        try:
+            matrix_dimension = int(matrix_dimension)
+        except (ValueError, TypeError):
+            return 'Invalid matrix dimension'
+        if matrix_dimension <= 0:
+            return 'Invalid matrix dimension'
+
         data_list = []
         for j in range(matrix_dimension):
             matrix_dataset = input('matrix dataset: ') #input data of matrix row by row
             
+            if type(matrix_dataset) != type("A"):
+                return 'Invalid dataset'
+            elif matrix_dataset.strip() == "":
+                return 'Invalid dataset'
             #remove space
             for k in range(len(matrix_dataset)):
                 if matrix_dataset[k] != " ":
-                    temp_list.append(matrix_dataset[k])
+                    #catch ValueError and TypeError from matrix dataset input
+                    try:
+                        num = int(matrix_dataset[k])
+                    except (ValueError, TypeError):
+                        return 'Invalid dataset'
+                    if not (0 <= int(matrix_dataset[k]) <= 9):
+                        return 'Invalid dataset'
+
+                    temp_list.append(num)
         
             data_list.append(temp_list)
             temp_list = []
@@ -67,7 +94,7 @@ def MixTenMatrix():
                 col_list = []
 
         print(count_tr+count_tc)    #result
-    # count = count_tc+count_tr
-    # return count
+        count.append(count_tr+count_tc)
+    return count
 
-# print(mix_ten_matrix())
+# print(MixTenMatrix())
