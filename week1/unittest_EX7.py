@@ -11,7 +11,7 @@ class EqnSolveInputTest(unittest.TestCase):
         def test_txt_file_input(self):
             with open('file.txt') as f:
                 check = EX7.EqnSolve(f)
-                self.assertEqual(check, ['16 200 -10\n', '12\n', '70\n', '1\n', '999\n', '50\n', '20\n', '1000\n', '150\n', '300\n', '200\n', '90\n', '900\n', '40\n', '140\n', '130\n', '30'])W
+                self.assertEqual(check, ['16 200 -10\n', '12\n', '70\n', '1\n', '999\n', '50\n', '20\n', '1000\n', '150\n', '300\n', '200\n', '90\n', '900\n', '40\n', '140\n', '130\n', '30'])
 
 if __name__ == '__main__':
     unittest.main()
