@@ -7,7 +7,7 @@ def FindRepeat(test_list):
     check = False
     send_text = ''
 
-    if test_list == None:
+    if type(test_list) != type([]):
         send_text = 'No'
         print(send_text)
         return send_text
