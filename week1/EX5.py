@@ -1,7 +1,3 @@
-# mylist = [0,-1,2,-3,1,-2]
-# mylist.sort()
-# print(mylist)
-
 def FindZeroSum(mylist):
 
     if type(mylist) != type([]):
@@ -10,6 +6,7 @@ def FindZeroSum(mylist):
     nums_list = []
     sum_list = []
     nums_list_2 = []
+    result = ''
 
     for i in range(len(mylist)):
         for j in range(i+1, len(mylist)):
@@ -25,8 +22,6 @@ def FindZeroSum(mylist):
     nums_list_2.sort()
     nums_list_2.append([])
 
-    result = ''
-
     for i in range(len(nums_list_2)):
         if i == len(nums_list_2)-1:
             result = result[:-1]
@@ -35,7 +30,6 @@ def FindZeroSum(mylist):
             if result == '':
                 result = 'There are no number that can be sum into 0.'
             return result
+
         if nums_list_2[i] != nums_list_2[i+1]:
             result += '(%d, %d, %d),'%(nums_list_2[i][0], nums_list_2[i][1], nums_list_2[i][2])
-
-# FindZeroSum(mylist)
