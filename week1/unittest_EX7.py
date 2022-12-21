@@ -4,14 +4,39 @@ from unittest.mock import patch, mock_open
 
 class EqnSolveInputTest(unittest.TestCase):
     
-    txt_file = '16 200 -10\n12\n70\n1\n999\n50\n20\n1000\n150\n300\n200\n90\n900\n40\n140\n130\n30'
+    txt_file = """16 200 -10
+    12
+    70
+    1
+    999
+    50
+    20
+    1000
+    150
+    300
+    200
+    90
+    900
+    40
+    140
+    130
+    30"""
 
     #check file input
-    with patch('builtins.open', mock_open(read_data= txt_file)):
-        def test_txt_file_input(self):
-            with open('file.txt') as f:
-                check = EX7.EqnSolve(f)
-                self.assertEqual(check, ['16 200 -10\n', '12\n', '70\n', '1\n', '999\n', '50\n', '20\n', '1000\n', '150\n', '300\n', '200\n', '90\n', '900\n', '40\n', '140\n', '130\n', '30'])
+    def test_txt_file_input(self):
+        with patch('builtins.open', mock_open(read_data= self.txt_file)) as f:
+            check = EX7.EqnSolve('/dev/null') #fake file path
+            self.assertEqual(check, [50, 150, 20, 70, 90, 40, 130, 30])
+    
+    def test_invalid_txt_file_input(self):
+        with patch('builtins.open', mock_open(read_data= self.txt_file)) as f:
+            check = EX7.EqnSolve([1])
+            self.assertEqual(check, 'Invalid file name')
+
+    def test_None_txt_file_input(self):
+        with patch('builtins.open', mock_open(read_data= self.txt_file)) as f:
+            check = EX7.EqnSolve(None)
+            self.assertEqual(check, 'Invalid file name')
 
 if __name__ == '__main__':
     unittest.main()

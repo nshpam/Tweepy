@@ -1,15 +1,13 @@
 #EX 7
 
-def EqnSolve(myfile):
+def EqnSolve(file_name):
     A = []
     data_dict = {}
 
-    try:
-        myfile = myfile.readlines()
-    except (TypeError, ValueError):
-        return 'Invalid file type'
-    # myfile = open("file.txt", "r").readlines()
-    # print(myfile)
+    if type(file_name) != type('A'):
+        return 'Invalid file name'
+
+    myfile = open(file_name, "r").readlines()
 
     #create a list of data from file.txt
     for i in range(len(myfile)):
@@ -40,10 +38,11 @@ def EqnSolve(myfile):
                             data_dict['x7'] = A[j]
                             data_dict['x8'] = A[k]
 
+    A = []
+
     #output
     for i in range(len(data_dict)):
+        A.append(list(data_dict.values())[i])
         print(list(data_dict.values())[i])
     
-    return myfile
-
-# EqnSolve()
+    return A
