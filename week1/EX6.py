@@ -1,3 +1,22 @@
+#summation algorithm for row and column
+def sum_row(row_matrix, size):
+    result = 0
+    count = 0
+
+    #iterate row element by size
+    for j in range(size):
+        result = int(row_matrix[j])
+
+        #iterate row element that is not j
+        for k in range(j+1,size):
+            result += int(row_matrix[k])
+
+            #sum element until result is 10
+            if result == 10:
+                count += 1
+                break
+    return count
+
 def MixTenMatrix():
     data_dict = {} # dictionary of matrix
     temp_list = []; data_list = []; row_list = []; col_list = []; count = []
@@ -49,18 +68,7 @@ def MixTenMatrix():
             temp_list = []
         data_dict[i] = data_list
         
-    #summation algorithm
-    def sum_row(row_matrix, size):
-        result = 0
-        count = 0
-        for j in range(size):
-            result = int(row_matrix[j])
-            for k in range(j+1,size):
-                result += int(row_matrix[k])
-                if result == 10:
-                    count += 1
-                    break
-        return count
+    
 
     #matrix calculation
     for i in range(len(data_dict)):
