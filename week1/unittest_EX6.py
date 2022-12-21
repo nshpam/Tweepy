@@ -2,6 +2,7 @@ import EX6
 import unittest
 from unittest.mock import patch
 
+#mock input test
 class MixTenMatrixInputTest(unittest.TestCase):
 
     #first matrix
@@ -82,7 +83,9 @@ class MixTenMatrixInputTest(unittest.TestCase):
             matrix_42 == '2 2 2 2 2' and
             matrix_52 == '2 2 2 2 2')     
 
+#test output
 class MixTenMatrixUnitTest(unittest.TestCase):
+
     #first matrix
     matrix_dimension_input_1 = "4"
     matrix_dataset_11 = "1 3 5 7"
@@ -157,6 +160,8 @@ class MixTenMatrixUnitTest(unittest.TestCase):
         self.assertEqual(check, [10])
     
     #test table amount input
+
+    #can't convert to int
     @patch('builtins.input', side_effect=[
         "A", 
         matrix_dimension_input_4,
@@ -169,6 +174,7 @@ class MixTenMatrixUnitTest(unittest.TestCase):
         check = EX6.MixTenMatrix()
         self.assertEqual(check, 'Invalid table amount')
 
+    #negative integer
     @patch('builtins.input', side_effect=[
         "-1", 
         matrix_dimension_input_4,
@@ -181,6 +187,7 @@ class MixTenMatrixUnitTest(unittest.TestCase):
         check = EX6.MixTenMatrix()
         self.assertEqual(check, 'Invalid table amount')
 
+    #blank
     @patch('builtins.input', side_effect=[
         "", 
         matrix_dimension_input_4,
@@ -193,6 +200,7 @@ class MixTenMatrixUnitTest(unittest.TestCase):
         check = EX6.MixTenMatrix()
         self.assertEqual(check, 'Invalid table amount')
     
+    #none
     @patch('builtins.input', side_effect=[
         None, 
         matrix_dimension_input_4,
@@ -206,6 +214,8 @@ class MixTenMatrixUnitTest(unittest.TestCase):
         self.assertEqual(check, 'Invalid table amount')
     
     #test matrix dimension
+
+    #can't convert to int
     @patch('builtins.input', side_effect=[
         "1", 
         "A",
@@ -218,6 +228,7 @@ class MixTenMatrixUnitTest(unittest.TestCase):
         check = EX6.MixTenMatrix()
         self.assertEqual(check, 'Invalid matrix dimension')
     
+    #negative integer
     @patch('builtins.input', side_effect=[
         "1", 
         "-1",
@@ -230,6 +241,7 @@ class MixTenMatrixUnitTest(unittest.TestCase):
         check = EX6.MixTenMatrix()
         self.assertEqual(check, 'Invalid matrix dimension')
     
+    #blank 
     @patch('builtins.input', side_effect=[
         "1", 
         "",
@@ -242,6 +254,7 @@ class MixTenMatrixUnitTest(unittest.TestCase):
         check = EX6.MixTenMatrix()
         self.assertEqual(check, 'Invalid matrix dimension')
     
+    #none
     @patch('builtins.input', side_effect=[
         "1", 
         None,
@@ -254,7 +267,9 @@ class MixTenMatrixUnitTest(unittest.TestCase):
         check = EX6.MixTenMatrix()
         self.assertEqual(check, 'Invalid matrix dimension')
 
-    #test dataset
+    #test dataset input
+
+    #dataset element is not 0-9
     @patch('builtins.input', side_effect=[
         "1", 
         matrix_dimension_input_4,
@@ -267,6 +282,7 @@ class MixTenMatrixUnitTest(unittest.TestCase):
         check = EX6.MixTenMatrix()
         self.assertEqual(check, 'Invalid dataset')
     
+    #blank dataset element
     @patch('builtins.input', side_effect=[
         "1", 
         matrix_dimension_input_4,
@@ -279,6 +295,7 @@ class MixTenMatrixUnitTest(unittest.TestCase):
         check = EX6.MixTenMatrix()
         self.assertEqual(check, 'Invalid dataset')
     
+    #alphabet dataset element
     @patch('builtins.input', side_effect=[
         "1", 
         matrix_dimension_input_4,
@@ -291,6 +308,7 @@ class MixTenMatrixUnitTest(unittest.TestCase):
         check = EX6.MixTenMatrix()
         self.assertEqual(check, 'Invalid dataset')
     
+    #none dataset element
     @patch('builtins.input', side_effect=[
         "1", 
         matrix_dimension_input_4,
