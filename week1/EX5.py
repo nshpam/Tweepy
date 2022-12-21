@@ -1,3 +1,4 @@
+#Find three sum problem 
 def FindZeroSum(mylist):
 
     if type(mylist) != type([]):
