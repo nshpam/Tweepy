@@ -31,7 +31,7 @@ def MixTenMatrix():
     if table_amount <= 0:
         return 'Invalid table amount'
 
-    #create matrix with dictionary
+    #iterate each matrix from table
     for i in range(table_amount):
         matrix_dimension = input('matrix dimension: ') # input matrix
 
@@ -44,13 +44,14 @@ def MixTenMatrix():
             return 'Invalid matrix dimension'
 
         data_list = []
+        #iterate each dataset
         for j in range(matrix_dimension):
             matrix_dataset = input('matrix dataset: ') #input data of matrix row by row
             
-            if type(matrix_dataset) != type("A"):
+            #catch TypeError from matrix dataset input
+            if type(matrix_dataset) != type("A") or matrix_dataset.strip() == "":
                 return 'Invalid dataset'
-            elif matrix_dataset.strip() == "":
-                return 'Invalid dataset'
+
             #remove space
             for k in range(len(matrix_dataset)):
                 if matrix_dataset[k] != " ":
@@ -67,16 +68,15 @@ def MixTenMatrix():
             data_list.append(temp_list)
             temp_list = []
         data_dict[i] = data_list
-        
-    
 
     #matrix calculation
+    #iterate each element in dataset
     for i in range(len(data_dict)):
         
         matrix = data_dict[i]
         
         #reset count
-        count_col = 0; count_row = 0; count_tr = 0; count_tc = 0;
+        count_col = 0; count_row = 0; count_tr = 0; count_tc = 0
         
         while count_col != (len(matrix)):
             
@@ -101,8 +101,9 @@ def MixTenMatrix():
                 count_tc += sum_row(col_list, len(matrix))
                 col_list = []
 
-        print(count_tr+count_tc)    #result
+        #result
+        print(count_tr+count_tc)
+
+        #for unittest
         count.append(count_tr+count_tc)
     return count
-
-# print(MixTenMatrix())
