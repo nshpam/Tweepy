@@ -57,4 +57,5 @@ def FindRepeat(test_list):
         send_text = 'Yes : There are %d repeat numbers. The repeated indexes are %s'%(count_repeat, str(index_list))
         print (send_text)
     
+    #for unittest
     return send_text
