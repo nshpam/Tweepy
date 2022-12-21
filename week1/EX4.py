@@ -1,3 +1,5 @@
+#EX 4
+
 #Find the repeat number from the list
 #type of test_list is list
 def FindRepeat(test_list):

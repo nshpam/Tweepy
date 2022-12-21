@@ -1,3 +1,5 @@
+#EX 6
+
 #summation algorithm for row and column
 def sum_row(row_matrix, size):
     result = 0
