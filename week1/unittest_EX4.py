@@ -57,5 +57,6 @@ class FindRepeatUnitTest(unittest.TestCase):
         check = EX4.FindRepeat(None)
         assert check == 'No'
 
+#run this code if and only if it's the main file
 if __name__ == '__main__':
     unittest.main()

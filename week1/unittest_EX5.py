@@ -47,5 +47,6 @@ class FindZeroSumUnitTest(unittest.TestCase):
         check = EX5.FindZeroSum('')
         assert check == 'Invalid data type'
 
+#run this code if and only if it's the main file
 if __name__ == '__main__':
     unittest.main()

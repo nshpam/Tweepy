@@ -321,5 +321,6 @@ class MixTenMatrixUnitTest(unittest.TestCase):
         check = EX6.MixTenMatrix()
         self.assertEqual(check, 'Invalid dataset')
 
+#run this code if and only if it's the main file
 if __name__ == '__main__':
     unittest.main()
