@@ -13,5 +13,5 @@ collection_name = "tweets" #collection name
 search_word = '#รีวิว' #search word
 search_mode = "extended" #search mode
 search_type = "recent" #serach type ( recent | popular | mixed )
-num_tweet = 10 #search limit
+num_tweet = 20 #search limit
 local_timezone = "Thailand/Bangkok" #local timezones
