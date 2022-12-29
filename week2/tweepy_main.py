@@ -2,6 +2,7 @@ import tweepy
 import pymongo
 from dateutil import tz
 import config
+import datetime
 
 #connect to mongodb with pymongo
 myclient = pymongo.MongoClient(config.mongo_client)
@@ -13,6 +14,9 @@ mycol = mydb[config.collection_name]
 #convert timezone from UTC to GMT
 #fixed time zone
 def convert_timezone(from_zone, to_zone, convert_date):
+   if type(convert_date) != type(datetime.datetime.utcnow()):
+      x = 'Timezone type is not datetime'
+      return x
    #convert timezone and change format into day-month-year | hour-minute
    convert_date = convert_date.replace(tzinfo=from_zone).astimezone(to_zone).strftime('%d-%m-%Y | %H:%M')
    return convert_date
@@ -77,7 +81,7 @@ def search_twiter(api):
       print(tweet_object)
 
       #insert to database
-      insert_database(tweet_object, mycol)
+      # insert_database(tweet_object, mycol)
 
       #count Tweet that is inserted
       count_tweets+=1
