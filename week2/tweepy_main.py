@@ -17,6 +17,12 @@ def convert_timezone(from_zone, to_zone, convert_date):
    if type(convert_date) != type(datetime.datetime.utcnow()):
       x = 'Timezone type is not datetime'
       return x
+   if type(from_zone) != type(tz.gettz('UTC')):
+      y = 'Timezone type is not timezone'
+      return y
+   if type(to_zone) != type(tz.gettz('UTC')):
+      z = 'Timezone type is not timezone'
+      return z
    #convert timezone and change format into day-month-year | hour-minute
    convert_date = convert_date.replace(tzinfo=from_zone).astimezone(to_zone).strftime('%d-%m-%Y | %H:%M')
    return convert_date
