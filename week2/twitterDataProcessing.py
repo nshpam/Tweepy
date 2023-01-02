@@ -1,6 +1,10 @@
 import pandas as pd
 import pymongo
 import config
+import requests
+#import Api LexTo+
+Apikey = 'Ex0WSb2UFAyfDXRU8vLwkeR04N6e58Tq'
+url = 'https://api.aiforthai.in.th/lextoplus'
 
 #connect to mongodb with pymongo
 myclient = pymongo.MongoClient(config.mongo_client)
