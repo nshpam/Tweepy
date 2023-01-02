@@ -9,8 +9,8 @@ myclient = pymongo.MongoClient(config.mongo_client)
 mydb = myclient[config.database_name]
 #collection name
 mycol = mydb[config.collection_name]
-
-cursor = mycol.find()
+#select only text
+cursor = mycol.find({},{ "_id": 0, "text": 1})
 
 for doc in cursor:
     print(doc)
