@@ -24,7 +24,7 @@ class  ConvertTimezoneTest(unittest.TestCase):
         
     def test_ConvertDateInputTypeDatetime(self):
         fromZoneUTC = tz.gettz('UTC')
-        toZoneUTC = tz.gettz('Asia/Bangkok')
+        toZoneUTC = tz.gettz('Thailand/Bangkok')
         fromZoneDate = datetime.utcnow()
         check = tweepy_main.convert_timezone(fromZoneUTC, toZoneUTC, fromZoneDate)
         assert check == fromZoneDate.replace(tzinfo=fromZoneUTC).astimezone(toZoneUTC).strftime('%d-%m-%Y | %H:%M')

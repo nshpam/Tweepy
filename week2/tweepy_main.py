@@ -20,7 +20,7 @@ def convert_timezone(from_zone, to_zone, convert_date):
    if type(from_zone) != type(tz.gettz('UTC')):
       y = 'Timezone type is not timezone'
       return y
-   if type(to_zone) != type(tz.gettz('UTC')):
+   if type(to_zone) != type(tz.gettz('Thailand/Bangkok')):
       z = 'Timezone type is not timezone'
       return z
    #convert timezone and change format into day-month-year | hour-minute
@@ -43,6 +43,9 @@ def connect_twitter():
    api = tweepy.API(auth)
    return api
 
+# def open_db(id, ):
+   
+
 def search_twiter(api):
 
    #use Cursor to serach
@@ -64,6 +67,10 @@ def search_twiter(api):
 
    #iterate the Tweet in tweets_list
    for tweet in tweets_list:
+
+      #tweet id
+      tweet_id = tweet.id
+
       #tweet author
       tweet_username = tweet.user.screen_name
 
@@ -79,6 +86,9 @@ def search_twiter(api):
 
       #convert time zone from UTC to GMT+7
       tweet_date = convert_timezone(from_zone, to_zone, tweet_date)
+      tweet_date = tweet_date.split(' | ')
+      tweet_time = tweet_date[1]
+      tweet_date = tweet_date[0]
 
       #get tweet text
       try:
@@ -86,10 +96,12 @@ def search_twiter(api):
       except AttributeError:
          tweet_text = tweet.full_text
       
-      #create tweet object
+      # create tweet object
       tweet_object = {
+         'id' : tweet_id,
          'username' : tweet_username, 
-         'date' : tweet_date, 
+         'date' : tweet_date,
+         'time' : tweet_time,
          'text' : tweet_text,
          'favorite_count' : fav_count,
          'retweet_count' : retweet_count }
