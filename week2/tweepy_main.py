@@ -3,6 +3,7 @@ import pymongo
 from dateutil import tz
 import config
 import datetime
+import json
 
 #connect to mongodb with pymongo
 myclient = pymongo.MongoClient(config.mongo_client)
@@ -108,7 +109,7 @@ class PullTwitterData():
          print(tweet_object)
 
          #insert to database
-         # insert_database(tweet_object, mycol)
+         self.insert_database(tweet_object, mycol)
 
          #count Tweet that is inserted
          count_tweets+=1
