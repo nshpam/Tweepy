@@ -10,7 +10,7 @@ database_name = "twitter_data" #database name
 collection_name = "tweets" #collection name
 
 #search settings
-search_word = '#รีวิว' #search word
+search_word = '#รีวิวหนัง' #search word
 search_mode = "extended" #search mode
 search_type = "recent" #serach type ( recent | popular | mixed )
 num_tweet = 20 #search limit
