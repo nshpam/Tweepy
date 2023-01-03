@@ -70,6 +70,13 @@ def search_twiter(api):
       #tweet date
       tweet_date = tweet.created_at
 
+      #favorite count
+      fav_count = tweet.favorite_count
+
+
+      #retweet count
+      retweet_count = tweet.retweet_count
+
       #convert time zone from UTC to GMT+7
       tweet_date = convert_timezone(from_zone, to_zone, tweet_date)
 
@@ -83,7 +90,9 @@ def search_twiter(api):
       tweet_object = {
          'username' : tweet_username, 
          'date' : tweet_date, 
-         'text' : tweet_text}
+         'text' : tweet_text,
+         'favorite_count' : fav_count,
+         'retweet_count' : retweet_count }
       print(tweet_object)
 
       #insert to database
