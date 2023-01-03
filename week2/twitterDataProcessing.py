@@ -4,7 +4,8 @@ import config
 import requests
 #import Api LexTo+
 Apikey = 'Ex0WSb2UFAyfDXRU8vLwkeR04N6e58Tq' 
-url = 'https://api.aiforthai.in.th/tlexplus' #Host
+# url = 'https://api.aiforthai.in.th/tlexplus' 
+url = 'https://api.aiforthai.in.th/lextoplus' #Host 
 #connect to mongodb with pymongo
 myclient = pymongo.MongoClient(config.mongo_client)
 
