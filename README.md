@@ -1,7 +1,7 @@
 # Software-Dev2
 by  
 
-    Jarawee
+    Jarawee Trongsiriwut 6401012630035
     Sirapa Sangna 6401012620218
 
 Assignment
