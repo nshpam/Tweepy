@@ -3,6 +3,12 @@ import config
 import requests
 import json
 
+from pythainlp.corpus import thai_stopwords
+import nltk 
+nltk.download('stopwords')
+from nltk.corpus import stopwords
+from nltk import WordNetLemmatizer
+from nltk.stem.porter import *
 
 #connect to mongodb with pymongo
 myclient = pymongo.MongoClient(config.mongo_client)
@@ -30,12 +36,16 @@ class ConnectLextoPlus():
 
         for i in range(len(raw_json['types'])):
                 if raw_json['types'][i] == 0 or raw_json['types'][i] == 1 or raw_json['types'][i] == 2:
+                    # if raw_json['types'][i] in ['0','1','2','3','4','5','6','7','8','9']:
+                    #     continue
                     if raw_json['tokens'][i].strip() != '':
-                        self.temp_filtered.append(raw_json['tokens'][i].strip())
+                        self.temp_filtered.append(raw_json['tokens'][i].strip().lower())
+                    
         self.filtered.append(self.temp_filtered)
         self.temp_filtered = []
         return self.filtered
-
+    
+# Read file from database
     def LextoSetup(self):
         
         for doc in cursor:
@@ -65,7 +75,48 @@ class ConnectLextoPlus():
 
         return self.filtered 
 
-if __name__ == '__main__':
-   print('filtered', ConnectLextoPlus().LextoSetup())  
+# Removing noise from the data
     
+    def cleanThaiStopword(self, sentence):
+        stop_word = list(thai_stopwords())
+        result = []
+        for word in sentence:
+            if word not in stop_word:
+                result.append(word)
+        return result
+        
+    def cleanEnglishStopword(self, sentence):
+        stop_words = stopwords.words('english')
+        result = []
+        for word in sentence:
+            if word.lower() not in stop_words:
+                result.append(word)
+        return result
+    
+    # Normalizing English words
+    def NormalizingEnglishword(self, sentence):
+        lemmatizer = WordNetLemmatizer()
+        nltk_lemma_list = []
+        pos_list = ['n','v','a','r','s']
+        for word in sentence:
+            if word != '':
+                for mode in pos_list:
+                    temp = lemmatizer.lemmatize(word,pos=mode)
+                    word = temp
+                    
+                nltk_lemma_list.append(temp)
+        return nltk_lemma_list
+    
+        
+if __name__ == '__main__':
+#     # print('filtered', ConnectLextoPlus().LextoSetup())  
+    list_thaiword = ConnectLextoPlus().LextoSetup()
+    # print(list_thaiword)
+    for word in list_thaiword:
+        print(ConnectLextoPlus().cleanThaiStopword(word))
+    for word in list_thaiword:
+        word = ConnectLextoPlus().cleanEnglishStopword(word)
+        print(ConnectLextoPlus().NormalizingEnglishword(word))
+        
+          
     
