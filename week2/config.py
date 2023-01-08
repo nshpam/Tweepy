@@ -10,12 +10,13 @@ database_name = "twitter_data" #database name
 collection_name = "tweets" #collection name
 
 #search settings
-search_word = '#รีวิวหนัง' #search word
+search_word = '#BORNPINKinBANGKOK_Day2' #search word
 search_mode = "extended" #search mode
 search_type = "recent" #serach type ( recent | popular | mixed )
 num_tweet = 20 #search limit
 local_timezone = "Thailand/Bangkok" #local timezones
 
 #task settings
-task_period = 5 #seconds
+task_period = 5 #minutes
 task_delay = 1 #seconds
+

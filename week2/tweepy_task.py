@@ -29,36 +29,39 @@ class ConnectTwitterData():
 
 class TweetWorker():
 
-    def run_task(self,task):
+    def run_task(self,task_to_do):
 
-        # while True:
+            mylist = ConnectTwitterData.connect_twitter()
             #start time
             tic = time.perf_counter()
 
             #create thread
             # thread = Thread(target=task ,args=(1.5))
 
-            thread = Thread(target=task)
+            thread = Thread(target=task_to_do, args=(mylist,))
 
             #start the thread
             thread.start()
-
             thread.join()
 
             #stop time
             toc = time.perf_counter()
 
             #display total time
-            print(f"Run all task (use thread) in {toc - tic:0.4f} seconds")
+            print(f"RUN TIME : {toc - tic:0.4f} seconds")
 
             #timestamp
-            print('[',tweepy_main.PullTwitterData().convert_timezone(tz.gettz('UTC'), tz.gettz(config.local_timezone), datetime.datetime.now()),']')
+            print('TIMESTAMP : [',tweepy_main.PullTwitterData().convert_timezone(tz.gettz('UTC'), tz.gettz(config.local_timezone), datetime.datetime.now()),']')
 
 if __name__ == '__main__':
 
-    schedule.every(config.task_period).seconds.do(lambda: TweetWorker().run_task(tweepy_main.PullTwitterData().search_twiter(ConnectTwitterData.connect_twitter())))
+    schedule.every(config.task_period).minutes.do(lambda: TweetWorker().run_task(tweepy_main.PullTwitterData().search_twitter))
 
+    # TweetWorker().run_task(tweepy_main.PullTwitterData().search_twitter)
+
+    #start the schedule
     while True:
         schedule.run_pending()
         time.sleep(config.task_delay)
+        # print(TweetWorker().value)
     
