@@ -1,11 +1,11 @@
 import pymongo
 import config
 import requests
-import json
 
 from pythainlp.corpus import thai_stopwords
 import nltk 
-nltk.download('stopwords')
+# nltk.download('stopwords')
+# nltk.download('wordnet')
 from nltk.corpus import stopwords
 from nltk import WordNetLemmatizer
 from nltk.stem.porter import *
@@ -29,49 +29,52 @@ class ConnectLextoPlus():
 
     def FilteredFromLexto(self, raw_json):
 
-        # print(raw_json)
-
         if raw_json == 0:
             return '0'
 
         for i in range(len(raw_json['types'])):
                 if raw_json['types'][i] == 0 or raw_json['types'][i] == 1 or raw_json['types'][i] == 2:
-                    # if raw_json['types'][i] in ['0','1','2','3','4','5','6','7','8','9']:
-                    #     continue
                     if raw_json['tokens'][i].strip() != '':
                         self.temp_filtered.append(raw_json['tokens'][i].strip().lower())
                     
         self.filtered.append(self.temp_filtered)
         self.temp_filtered = []
         return self.filtered
+
+    def FilterUrl(self, raw_list):
+        raw_split = raw_list.split()
+        no_url_json = ''
+                
+        for i in range(len(raw_split)):
+            try:
+                raw_split[i].index('https://')
+            except ValueError:
+                no_url_json += ' '+ self.FilterNum(raw_split[i])
+        return no_url_json
+
+    def FilterNum(self, raw_text):
+        raw_text = ''.join(filter(lambda x: not x.isdigit(), raw_text))
+        return raw_text
+
     
 # Read file from database
     def LextoSetup(self):
         
         for doc in cursor:
-            
-            # print(doc)
+
+            doc['text'] = self.FilterUrl(doc['text'])
             doc_dict = dict(doc)
 
-            # return doc_dict
             doc_dict['norm'] = '1'
-            # return doc_dict
             
             headers = {'Apikey': self.Apikey}
             res = requests.get(self.url,params=doc,headers=headers)
 
+            if res.text != '':
 
-            try:
                 raw = res.json()
-                # print(raw)
-            except json.JSONDecodeError:
-                self.FilteredFromLexto(0)
-
-
-            self.filtered = self.FilteredFromLexto(raw)
-
-            # Close the connection to MongoDB when you're done.
-            myclient.close()
+           
+                self.filtered = self.FilteredFromLexto(raw)
 
         return self.filtered 
 
@@ -110,13 +113,20 @@ class ConnectLextoPlus():
         
 if __name__ == '__main__':
 #     # print('filtered', ConnectLextoPlus().LextoSetup())  
-    list_thaiword = ConnectLextoPlus().LextoSetup()
-    # print(list_thaiword)
-    for word in list_thaiword:
-        print(ConnectLextoPlus().cleanThaiStopword(word))
-    for word in list_thaiword:
+    tweet_list = ConnectLextoPlus().LextoSetup()
+
+    print('count :',tweet_list)
+
+    # Close the connection to MongoDB when you're done.
+    myclient.close()
+    print(tweet_list)
+    for word in tweet_list:
+        word = ConnectLextoPlus().cleanThaiStopword(word)
         word = ConnectLextoPlus().cleanEnglishStopword(word)
         print(ConnectLextoPlus().NormalizingEnglishword(word))
+    # for word in tweet_list:
+        
+        
         
           
     

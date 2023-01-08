@@ -3,7 +3,6 @@ import pymongo
 from dateutil import tz
 import config
 import datetime
-import json
 
 #connect to mongodb with pymongo
 myclient = pymongo.MongoClient(config.mongo_client)
