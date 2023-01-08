@@ -15,3 +15,7 @@ search_mode = "extended" #search mode
 search_type = "recent" #serach type ( recent | popular | mixed )
 num_tweet = 20 #search limit
 local_timezone = "Thailand/Bangkok" #local timezones
+
+#task settings
+task_period = 5 #seconds
+task_delay = 1 #seconds

@@ -1,11 +1,11 @@
-import concurrent.futures
 import tweepy_main
 import config
 import tweepy   
-from tqdm import tqdm
 import time
 from threading import Thread
 import schedule
+import datetime
+from dateutil import tz
 
 class ConnectTwitterData():
 
@@ -28,9 +28,6 @@ class ConnectTwitterData():
         return api
 
 class TweetWorker():
-    
-    def test(self):
-        print('doing task')
 
     def run_task(self,task):
 
@@ -41,47 +38,27 @@ class TweetWorker():
             #create thread
             # thread = Thread(target=task ,args=(1.5))
 
-            # print('starting task')
             thread = Thread(target=task)
-
-            # thread = Timer(5, Thread(target=task))
 
             #start the thread
             thread.start()
 
             thread.join()
 
-            # print('finish task')
-
             #stop time
-
             toc = time.perf_counter()
+
+            #display total time
             print(f"Run all task (use thread) in {toc - tic:0.4f} seconds")
 
-        # return thread
-
-        # thread.cancel()
-        #wait for the thread to finish
-        # thread.join()
-        
-# def test():
-#     print('doing task')
+            #timestamp
+            print('[',tweepy_main.PullTwitterData().convert_timezone(tz.gettz('UTC'), tz.gettz(config.local_timezone), datetime.datetime.now()),']')
 
 if __name__ == '__main__':
 
-    schedule.every(5).seconds.do(lambda: TweetWorker().run_task(tweepy_main.PullTwitterData().search_twiter(ConnectTwitterData.connect_twitter())))
-    # schedule.every(1).minutes.do(TweetWorker().run_task(tweepy_main.PullTwitterData().search_twiter(ConnectTwitterData.connect_twitter())))
+    schedule.every(config.task_period).seconds.do(lambda: TweetWorker().run_task(tweepy_main.PullTwitterData().search_twiter(ConnectTwitterData.connect_twitter())))
 
     while True:
         schedule.run_pending()
-        time.sleep(1)
-
-    # tweepy_main.PullTwitterData().search_twiter(ConnectTwitterData.connect_twitter())
-
-    # timer.start()
-    # print('Threading started')  
-    # time.sleep(10)#It gets suspended for the given number of seconds  
-    # print('Threading finishing')  
-    # timer.cancel()
-
+        time.sleep(config.task_delay)
     
