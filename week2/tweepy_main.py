@@ -3,6 +3,9 @@ import pymongo
 from dateutil import tz
 import config
 import datetime
+import tweepy_task
+import time
+from threading import Thread
 
 #connect to mongodb with pymongo
 myclient = pymongo.MongoClient(config.mongo_client)
@@ -22,7 +25,7 @@ class ConnectTwitterData():
       api = tweepy.API(auth)
       return api
 
-class PullTwitterData():
+class PullTwitterData(Thread):
    #convert timezone from UTC to GMT
    #fixed time zone
    def convert_timezone(self, from_zone, to_zone, convert_date):
@@ -105,7 +108,7 @@ class PullTwitterData():
             'text' : tweet_text,
             'favorite_count' : fav_count,
             'retweet_count' : retweet_count }
-         print(tweet_object)
+         # print(tweet_object)
 
          #insert to database
          self.insert_database(tweet_object, mycol)
@@ -114,7 +117,17 @@ class PullTwitterData():
          count_tweets+=1
 
       finish_text = 'total twitter : %d'%count_tweets
-      return finish_text
 
-if __name__ == '__main__':
-   PullTwitterData().search_twiter(ConnectTwitterData.connect_twitter())  
+      print(finish_text)
+      # return finish_text
+
+# if __name__ == '__main__':
+#    #start time
+#    tic = time.perf_counter()
+
+#    PullTwitterData().search_twiter(ConnectTwitterData.connect_twitter())  
+
+#    #stop time
+#    toc = time.perf_counter()
+
+#    print(f"Run all task in {toc - tic:0.4f} seconds")
