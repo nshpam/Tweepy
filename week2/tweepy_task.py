@@ -29,16 +29,15 @@ class ConnectTwitterData():
 
 class TweetWorker():
 
-    def run_task(self,task_to_do):
+    def run_task(self,task_to_do, task_args):
 
-            mylist = ConnectTwitterData.connect_twitter()
             #start time
             tic = time.perf_counter()
 
             #create thread
             # thread = Thread(target=task ,args=(1.5))
-
-            thread = Thread(target=task_to_do, args=(mylist,))
+            # localstorage = local()
+            thread = Thread(target=task_to_do, args=(task_args,))
 
             #start the thread
             thread.start()
@@ -55,8 +54,25 @@ class TweetWorker():
 
 if __name__ == '__main__':
 
-    schedule.every(config.task_period).minutes.do(lambda: TweetWorker().run_task(tweepy_main.PullTwitterData().search_twitter))
+    # schedule.every(config.task_period).seconds.do(lambda: TweetWorker().run_task(tweepy_main.PullTwitterData().search_twitter))
 
+
+    TweepyObject = tweepy_main.PullTwitterData()
+
+    schedule.every(config.task_period).seconds.do(lambda: TweetWorker().run_task(TweepyObject.search_twitter,ConnectTwitterData.connect_twitter()))
+
+    # TweetWorker().run_task(TweepyObject)
+
+    # TweetWorker().run_task(TweepyObject.initialize_id)
+    # TweetWorker().run_task(TweepyObject.search_twitter,ConnectTwitterData.connect_twitter())
+    # print(TweepyObject.set_id)
+    # TweetWorker().run_task(TweepyObject.search_twitter,ConnectTwitterData.connect_twitter())
+    # TweetWorker().run_task(TweepyObject.search_twitter,ConnectTwitterData.connect_twitter())
+    # TweetWorker().run_task(TweepyObject.search_twitter,ConnectTwitterData.connect_twitter())
+    # TweetWorker().run_task(TweepyObject.db_action)
+
+    # time.sleep(config.task_delay)
+    # TweetWorker().run_task(tweepy_main.PullTwitterData().search_twitter)
     # TweetWorker().run_task(tweepy_main.PullTwitterData().search_twitter)
 
     #start the schedule
