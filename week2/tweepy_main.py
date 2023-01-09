@@ -1,48 +1,63 @@
-import tweepy
-import pymongo
-from dateutil import tz
-import config
-import datetime
+#import file
+import config 
 
-#connect to mongodb with pymongo
+#import library
+import tweepy     #use for twitter scrapping
+import pymongo    #use for connecting to mongodb
+from dateutil import tz #use for timezone converting
+import datetime   #use for timezone converting
+
+#you can edit mongodb server, database name, collection name in file name "config.py"
+
+#connect to mongodb server with pymongo
 myclient = pymongo.MongoClient(config.mongo_client)
-#database name
+#choose database name
 mydb = myclient[config.database_name]
-#collection name
+#choose collection name
 mycol = mydb[config.collection_name]
 
+#scrap twitter data from Twitter API
 class PullTwitterData(object):
 
-   def __init__(self, insertion=False, tweet_list=[]):
-      self.insertion = insertion
-      self.tweet_list = tweet_list
+   #initialize variable
+   def __init__(self, tweets_list=[]):
+      self.tweets_list = tweets_list
 
    #convert timezone from UTC to GMT
-   #fixed time zone
+   #you can edit the pair of timezone you want in file name "config.py"
    def convert_timezone(self, from_zone, to_zone, convert_date):
+
+      #in case that convert_date not datatime
       if type(convert_date) != type(datetime.datetime.utcnow()):
-         x = 'Timezone type is not datetime'
-         return x
+         time_err_1 = 'Timezone type is not datetime'
+         return time_err_1
+      
+      #in case that from_zone not timezone
       if type(from_zone) != type(tz.gettz('UTC')):
-         y = 'Timezone type is not timezone'
-         return y
+         time_err_2 = 'Timezone type is not timezone'
+         return time_err_2
+      
+      #in case that to_zone not timezone
       if type(to_zone) != type(tz.gettz('Thailand/Bangkok')):
-         z = 'Timezone type is not timezone'
-         return z
+         time_err_3 = 'Timezone type is not timezone'
+         return time_err_3
+
       #convert timezone and change format into day-month-year | hour-minute
       convert_date = convert_date.replace(tzinfo=from_zone).astimezone(to_zone).strftime('%d-%m-%Y | %H:%M')
       return convert_date
 
-   # update database
+   # update database base on tweet id
    def update_database(self, collection_variable, tweet_id, update_fav, update_retweet):
-      for doc in mycol.find({"id":str(tweet_id)}):
-         if tweet_id == doc['id']:
-            new_values = {"$set":{
-               "favorite_count": update_fav,
-               "retweet_count": update_retweet}}
-            cmd = collection_variable.update_one({"id":tweet_id}, new_values)
-            return cmd
       
+      #value for update
+      new_values = {"$set":{
+      "favorite_count": update_fav,
+      "retweet_count": update_retweet}}
+
+      #update database base on id
+      cmd = collection_variable.update_one({"id":tweet_id}, new_values)
+
+      return cmd
 
    #insert object into database
    def insert_database(self, data, collection_variable):
@@ -53,6 +68,7 @@ class PullTwitterData(object):
          
       return cmd
 
+   #scarp twitter
    def search_twitter(self, api):
 
       #use Cursor to serach
@@ -67,7 +83,9 @@ class PullTwitterData(object):
       #create a list of Tweets
       self.tweets_list = [tweet for tweet in tweets]
 
+      #count tweet
       count_tweets = 0
+
       #timezone of your variable
       from_zone = tz.gettz('UTC')
       #timezone you want to convert
@@ -91,13 +109,20 @@ class PullTwitterData(object):
          #retweet count
          retweet_count = tweet.retweet_count
 
+         #query id in database
          cursor = mycol.find({"id":tweet_id})
 
+         #if found then update data
          if list(cursor) != []:
             print('Update duplicate ID :', tweet_id)
+
+            #update retweets, favorites
             self.update_database(mycol, tweet_id, fav_count, retweet_count)
+
+            #count tweets that are updated
             count_tweets+=1
 
+            #close database
             myclient.close()
             
             continue
@@ -105,6 +130,7 @@ class PullTwitterData(object):
             print('Insert ID :', tweet_id)
 
             #convert time zone from UTC to GMT+7
+            #format the date
             tweet_date = self.convert_timezone(from_zone, to_zone, tweet_date)
             tweet_date = tweet_date.split(' | ')
             tweet_time = tweet_date[1]
@@ -128,11 +154,14 @@ class PullTwitterData(object):
 
             #insert to database
             self.insert_database(tweet_object, mycol)
+
+            #close database
             myclient.close()
 
          #count Tweet that is inserted
          count_tweets+=1
 
+      #finish text for unittest
       finish_text = 'TOTAL TWITTER : %d'%count_tweets
 
       print(finish_text)
