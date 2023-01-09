@@ -11,26 +11,11 @@ mydb = myclient[config.database_name]
 #collection name
 mycol = mydb[config.collection_name]
 
-cursor = mycol.find({},{ "_id": 0, "id": 1})
+class PullTwitterData(object):
 
-class PullTwitterData():
-
-   def __init__(self, insertion=False, tweet_list=[], set_id=set()):
+   def __init__(self, insertion=False, tweet_list=[]):
       self.insertion = insertion
       self.tweet_list = tweet_list
-      self.set_id = set_id
-
-      self.initialize_id()
-
-   def initialize_id(self):
-      # print(cursor)
-      for doc in cursor:
-         # print(doc)
-         
-         self.set_id.add(doc['id'])
-      
-      # print(self.set_id)
-      
 
    #convert timezone from UTC to GMT
    #fixed time zone
@@ -48,9 +33,9 @@ class PullTwitterData():
       convert_date = convert_date.replace(tzinfo=from_zone).astimezone(to_zone).strftime('%d-%m-%Y | %H:%M')
       return convert_date
 
-   #update database
+   # update database
    def update_database(self, collection_variable, tweet_id, update_fav, update_retweet):
-      for doc in cursor:
+      for doc in mycol.find({"id":str(tweet_id)}):
          if tweet_id == doc['id']:
             new_values = {"$set":{
                "favorite_count": update_fav,
@@ -88,13 +73,11 @@ class PullTwitterData():
       #timezone you want to convert
       to_zone = tz.gettz(config.local_timezone)
 
-      # print(len(self.tweets_list))
-
       #iterate the Tweet in tweets_list
       for tweet in self.tweets_list:
 
          #tweet id
-         tweet_id = tweet.id
+         tweet_id = str(tweet.id)
 
          #tweet author
          tweet_username = tweet.user.screen_name
@@ -108,13 +91,18 @@ class PullTwitterData():
          #retweet count
          retweet_count = tweet.retweet_count
 
+         cursor = mycol.find({"id":tweet_id})
 
-         if str(tweet_id) in self.set_id:
-            print('Update duplicate ID', tweet_id)
+         if list(cursor) != []:
+            print('Update duplicate ID :', tweet_id)
             self.update_database(mycol, tweet_id, fav_count, retweet_count)
+            count_tweets+=1
+
+            myclient.close()
+            
             continue
          else:
-            print('insertion begin')
+            print('Insert ID :', tweet_id)
 
             #convert time zone from UTC to GMT+7
             tweet_date = self.convert_timezone(from_zone, to_zone, tweet_date)
@@ -130,7 +118,7 @@ class PullTwitterData():
             
             # create tweet object
             tweet_object = {
-               'id' : str(tweet_id),
+               'id' : tweet_id,
                'username' : tweet_username, 
                'date' : tweet_date,
                'time' : tweet_time,
@@ -148,5 +136,5 @@ class PullTwitterData():
       finish_text = 'TOTAL TWITTER : %d'%count_tweets
 
       print(finish_text)
-
+   
       return finish_text

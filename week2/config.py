@@ -13,10 +13,10 @@ collection_name = "tweets" #collection name
 search_word = '#รีวิวหนัง' #search word
 search_mode = "extended" #search mode
 search_type = "recent" #serach type ( recent | popular | mixed )
-num_tweet = 20 #search limit
+num_tweet = 100 #search limit
 local_timezone = "Thailand/Bangkok" #local timezones
 
 #task settings
-task_period = 5 #minutes
+task_period = 10 #minutes
 task_delay = 1 #seconds
 

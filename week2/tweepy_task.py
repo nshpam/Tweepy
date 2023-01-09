@@ -11,19 +11,11 @@ class ConnectTwitterData():
 
     def connect_twitter():
 
-        #start time
-        # tic = time.perf_counter()
-
         #input the tokens
         auth = tweepy.OAuth1UserHandler(
             config.consumer_key, config.consumer_secret, config.access_token, config.access_token_secret
         )
         api = tweepy.API(auth)
-
-        #stop time
-        # toc = time.perf_counter()
-
-        # print(f"Run connect_twitter in {toc - tic:0.4f} seconds")
 
         return api
 
@@ -54,30 +46,12 @@ class TweetWorker():
 
 if __name__ == '__main__':
 
-    # schedule.every(config.task_period).seconds.do(lambda: TweetWorker().run_task(tweepy_main.PullTwitterData().search_twitter))
-
-
-    TweepyObject = tweepy_main.PullTwitterData()
-
-    schedule.every(config.task_period).seconds.do(lambda: TweetWorker().run_task(TweepyObject.search_twitter,ConnectTwitterData.connect_twitter()))
-
-    # TweetWorker().run_task(TweepyObject)
-
-    # TweetWorker().run_task(TweepyObject.initialize_id)
-    # TweetWorker().run_task(TweepyObject.search_twitter,ConnectTwitterData.connect_twitter())
-    # print(TweepyObject.set_id)
-    # TweetWorker().run_task(TweepyObject.search_twitter,ConnectTwitterData.connect_twitter())
-    # TweetWorker().run_task(TweepyObject.search_twitter,ConnectTwitterData.connect_twitter())
-    # TweetWorker().run_task(TweepyObject.search_twitter,ConnectTwitterData.connect_twitter())
-    # TweetWorker().run_task(TweepyObject.db_action)
-
-    # time.sleep(config.task_delay)
-    # TweetWorker().run_task(tweepy_main.PullTwitterData().search_twitter)
-    # TweetWorker().run_task(tweepy_main.PullTwitterData().search_twitter)
+    schedule.every(config.task_period).seconds.do(lambda: TweetWorker().run_task(
+        tweepy_main.PullTwitterData().search_twitter,
+        ConnectTwitterData.connect_twitter()
+        ))
 
     #start the schedule
     while True:
         schedule.run_pending()
         time.sleep(config.task_delay)
-        # print(TweetWorker().value)
-    

@@ -1,19 +1,21 @@
-from datetime import datetime
-from dateutil import tz
-import tweepy_main
-fromZoneUTC = tz.gettz('UTC')
-toZoneUTC = tz.gettz('Asia/Bangkok')
-    
-fromZoneDate = datetime.utcnow()
-toZoneDate = fromZoneDate.replace(tzinfo=fromZoneUTC)
+import pymongo
+import config
 
-convertDate = toZoneDate.astimezone(toZoneUTC)
+#connect to mongodb with pymongo
+myclient = pymongo.MongoClient(config.mongo_client)
+#database name
+mydb = myclient[config.database_name]
+#collection name
+mycol = mydb[config.collection_name]
 
-# from_time = '20:46'
-# print(type(fromZoneDate))
-# print(type(from_time))
-# print(type(convertDate))
-# check = type(tweepy_main.convert_timezone(fromZoneUTC, toZoneUTC, fromZoneDate))
-# print(check)
-print(type(fromZoneDate.replace(tzinfo=fromZoneUTC).astimezone(toZoneUTC).strftime('%d-%m-%Y | %H:%M')))
-print(type(datetime.utcnow()))
+cursor = mycol.find({"id":"16121091879454124304"})
+# cursor = mycol.find({"id":"1612109187949154304"})
+
+have = False
+
+# print(cursor)
+print(list(cursor))
+
+
+
+print(have)
