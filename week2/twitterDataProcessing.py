@@ -170,7 +170,3 @@ if __name__ == '__main__':
     print('TOTAL TWITTER :',len(tweet_list))
 
     myclient.close()
-        
-        
-          
-    
