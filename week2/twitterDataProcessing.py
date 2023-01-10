@@ -1,6 +1,8 @@
 import pymongo
 import config
 import requests
+import time
+import tweepy_main
 
 from pythainlp.corpus import thai_stopwords
 import nltk 
@@ -16,19 +18,18 @@ myclient = pymongo.MongoClient(config.mongo_client)
 #database name
 mydb = myclient[config.database_name]
 # #collection name
-mycol = mydb[config.collection_name]
+mycol_1 = mydb[config.collection_name]
+mycol_2 = mydb[config.collection_name_2]
 # #select only text
-cursor = mycol.find({},{ "_id": 0, "text": 1})
+cursor = mycol_1.find({},{ "_id": 0, "text": 1})
 
-class ConnectLextoPlus():
-    #import Api LexTo+
-    Apikey = 'Ex0WSb2UFAyfDXRU8vLwkeR04N6e58Tq' 
-    url = 'https://api.aiforthai.in.th/lextoplus'
-    filtered = []
-    temp_filtered = []
+class FilterData():
+
+    def __init__(self, filtered=[], temp_filtered=[]):
+        self.filtered = filtered
+        self.temp_filtered = temp_filtered
 
     def FilteredFromLexto(self, raw_json):
-
         if raw_json == 0:
             return '0'
 
@@ -41,43 +42,56 @@ class ConnectLextoPlus():
         self.temp_filtered = []
         return self.filtered
 
-    def FilterUrl(self, raw_list):
-        raw_split = raw_list.split()
-        no_url_json = ''
-                
-        for i in range(len(raw_split)):
+    def FilterUrlAndFilterNum(self, raw_list):
+
+        raw_list = raw_list.split()
+        clean_json = ''
+
+        for i in range(len(raw_list)):
             try:
-                raw_split[i].index('https://')
+                self.FilterUrl(raw_list[i])
             except ValueError:
-                no_url_json += ' '+ self.FilterNum(raw_split[i])
-        return no_url_json
+                clean_json += ' '+ self.FilterNum(raw_list[i])
+        return clean_json
+
+    def FilterUrl(self, raw_url):
+        raw_url = raw_url.index('https://')
+        return raw_url
 
     def FilterNum(self, raw_text):
         raw_text = ''.join(filter(lambda x: not x.isdigit(), raw_text))
         return raw_text
 
+class Tokenization():
     
 # Read file from database
-    def LextoSetup(self):
-        
-        for doc in cursor:
+    def LextoPlusTokenization(self, api_key, url):
+        print('Start Tokenization')
+        #start the timer
+        tic = time.perf_counter()
 
-            doc['text'] = self.FilterUrl(doc['text'])
+        filtered = []
+        for doc in cursor:
+            doc['text'] = FilterData().FilterUrlAndFilterNum(doc['text'])
             doc_dict = dict(doc)
 
             doc_dict['norm'] = '1'
             
-            headers = {'Apikey': self.Apikey}
-            res = requests.get(self.url,params=doc,headers=headers)
+            headers = {'Apikey': api_key}
+            res = requests.get(url,params=doc,headers=headers)            
 
-            if res.text != '':
-
+            if res.text != '' and res.status_code==200:
                 raw = res.json()
-           
-                self.filtered = self.FilteredFromLexto(raw)
+                filtered = FilterData().FilteredFromLexto(raw)
 
-        return self.filtered 
+        #stop the timer
+        toc = time.perf_counter()
 
+        #display total work time of this thread
+        print(f"RUN TIME : {toc - tic:0.4f} seconds")
+        return filtered
+
+class CleanThaiAndEng():
 # Removing noise from the data
     
     def cleanThaiStopword(self, sentence):
@@ -96,6 +110,8 @@ class ConnectLextoPlus():
                 result.append(word)
         return result
     
+class Normailize():
+
     # Normalizing English words
     def NormalizingEnglishword(self, sentence):
         lemmatizer = WordNetLemmatizer()
@@ -110,22 +126,50 @@ class ConnectLextoPlus():
                 nltk_lemma_list.append(temp)
         return nltk_lemma_list
     
+class CreateDatabaseObject():
+
+    def create_db_object(self, cleaned_list):
+
+        db_object = {
+            'sentiment_data': cleaned_list
+        }
+
+        return db_object
+    
         
 if __name__ == '__main__':
-#     # print('filtered', ConnectLextoPlus().LextoSetup())  
-    tweet_list = ConnectLextoPlus().LextoSetup()
 
-    print('count :',tweet_list)
+    tweet_list = Tokenization().LextoPlusTokenization(
+        config.LextoPlus_API_key,
+        config.LextoPlus_URL
+    )
 
+    print('TOTAL TWITTER :',len(tweet_list))
+    
     # Close the connection to MongoDB when you're done.
-    myclient.close()
-    print(tweet_list)
+    
+
+    print('Start Word Cleaning and Word Normalization')
+    
+    tic = time.perf_counter()
     for word in tweet_list:
-        word = ConnectLextoPlus().cleanThaiStopword(word)
-        word = ConnectLextoPlus().cleanEnglishStopword(word)
-        print(ConnectLextoPlus().NormalizingEnglishword(word))
-    # for word in tweet_list:
-        
+        word = CleanThaiAndEng().cleanThaiStopword(word)
+        word = CleanThaiAndEng().cleanEnglishStopword(word)
+        word = Normailize().NormalizingEnglishword(word)
+
+        tweepy_main.PullTwitterData().insert_database(
+            CreateDatabaseObject().create_db_object(word), 
+            mycol_2)
+    
+    #stop the timer
+    toc = time.perf_counter()
+
+    #display total work time of this thread
+    print(f"RUN TIME : {toc - tic:0.4f} seconds")
+
+    print('TOTAL TWITTER :',len(tweet_list))
+
+    myclient.close()
         
         
           

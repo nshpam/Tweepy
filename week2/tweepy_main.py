@@ -20,8 +20,9 @@ mycol = mydb[config.collection_name]
 class PullTwitterData(object):
 
    #initialize variable
-   def __init__(self, tweets_list=[]):
+   def __init__(self, tweets_list=[], tweet_object={}):
       self.tweets_list = tweets_list
+      self.tweet_object = tweet_object
 
    #convert timezone from UTC to GMT
    #you can edit the pair of timezone you want in file name "config.py"
@@ -58,6 +59,20 @@ class PullTwitterData(object):
       cmd = collection_variable.update_one({"id":tweet_id}, new_values)
 
       return cmd
+
+   #create tweet object for database insertion
+   def create_tweet_object(self,id,username,date,time,text,fav_count,retw_count):
+      self.tweet_object = {
+         'id' : id,
+         'username' : username, 
+         'date' : date,
+         'time' : time,
+         'text' : text,
+         'favorite_count' : fav_count,
+         'retweet_count' : retw_count }
+      
+      return self.tweet_object
+
 
    #insert object into database
    def insert_database(self, data, collection_variable):
@@ -109,6 +124,22 @@ class PullTwitterData(object):
          #retweet count
          retweet_count = tweet.retweet_count
 
+         #get tweet text
+         try:
+            tweet_text = tweet.retweeted_status.full_text
+         except AttributeError:
+            tweet_text = tweet.full_text
+
+         #convert time zone from UTC to GMT+7
+         #format the date
+         tweet_date = self.convert_timezone(from_zone, to_zone, tweet_date)
+         tweet_date = tweet_date.split(' | ')
+         tweet_time = tweet_date[1]
+         tweet_date = tweet_date[0]
+
+         #create tweet object
+         self.create_tweet_object(tweet_id,tweet_username,tweet_date,tweet_time,tweet_text,fav_count,retweet_count)
+
          #query id in database
          cursor = mycol.find({"id":tweet_id})
 
@@ -129,31 +160,8 @@ class PullTwitterData(object):
          else:
             print('Insert ID :', tweet_id)
 
-            #convert time zone from UTC to GMT+7
-            #format the date
-            tweet_date = self.convert_timezone(from_zone, to_zone, tweet_date)
-            tweet_date = tweet_date.split(' | ')
-            tweet_time = tweet_date[1]
-            tweet_date = tweet_date[0]
-
-            #get tweet text
-            try:
-               tweet_text = tweet.retweeted_status.full_text
-            except AttributeError:
-               tweet_text = tweet.full_text
-            
-            # create tweet object
-            tweet_object = {
-               'id' : tweet_id,
-               'username' : tweet_username, 
-               'date' : tweet_date,
-               'time' : tweet_time,
-               'text' : tweet_text,
-               'favorite_count' : fav_count,
-               'retweet_count' : retweet_count }
-
             #insert to database
-            self.insert_database(tweet_object, mycol)
+            self.insert_database(self.tweet_object, mycol)
 
             #close database
             myclient.close()
