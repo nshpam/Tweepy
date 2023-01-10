@@ -62,9 +62,6 @@ class TweetWorker():
 
             #timestamp
             print('TIMESTAMP : [',tweepy_main.PullTwitterData().convert_timezone(tz.gettz('UTC'), tz.gettz(config.local_timezone), datetime.datetime.now()),']')
-
-            # self.terminate_thread()
-
         
     def terminate_thread(self):
         thread_exit = ''
@@ -90,37 +87,28 @@ if __name__ == '__main__':
     #create the schedule
     #schedule for scarp the twitter every 10 minutes
     #you can edit the period and number of scraping tweet in file name "config.py"
-    # schedule.every(config.task_period).seconds.do(lambda: TweetWorker().run_thread(
-    #     tweepy_main.PullTwitterData().search_twitter,
-    #     'scraping_task',
-    #     ConnectTwitterData.connect_twitter()
-    #     )).tag('scrap_twitter_task')
+    schedule.every(config.task_period).seconds.do(lambda: TweetWorker().run_thread(
+        tweepy_main.PullTwitterData().search_twitter,
+        'scraping_task',
+        ConnectTwitterData.connect_twitter()
+        )).tag('scrap_twitter_task')
     
     # # schedule.every(config.task_period).seconds.do(lambda: TweetWorker().terminate_thread).tag('terminate_thread')
 
     # #start the schedule
     # #ctrl+c in the terminal to stop the task
-    # while True:
+    while True:
 
-    #     if TweetWorker().terminate_thread():
-    #         break
-    #     #do the task
-    #     schedule.run_pending()
-    #     # schedule.run_all(delay_seconds=1)
+        if TweetWorker().terminate_thread():
+            break
+        #do the task
+        schedule.run_pending()
+        # schedule.run_all(delay_seconds=1)
 
-    #     #delay 1 second 
-    #     #you can edit the delay in file name "config.py"
-    #     time.sleep(config.task_delay)
+        #delay 1 second 
+        #you can edit the delay in file name "config.py"
+        time.sleep(config.task_delay)
 
-    # print('Start Tokenization')
-    # TweetWorker().run_thread(
-    #     twitterDataProcessing.Tokenization().LextoPlusTokenization,
-    #     'tokenization_task',
-    #     config.LextoPlus_API_key,
-    #     config.LextoPlus_URL
-    # )
-
-    # print('\nStart Tokenization (no thread)')
     exec(open("./twitterDataProcessing.py").read())
 
     
