@@ -14,7 +14,7 @@ collection_name_2 = "tokenization" #collection name for clean data
 search_word = '#รีวิวหนัง' #search word
 search_mode = "extended" #search mode
 search_type = "recent" #serach type ( recent | popular | mixed )
-num_tweet = 5 #search limit
+num_tweet = 20 #search limit
 local_timezone = "Thailand/Bangkok" #local timezones
 
 #task settings
@@ -25,3 +25,4 @@ task_terminate_timeout = 5 #seconds
 #Lexto+ settings
 LextoPlus_API_key = 'Ex0WSb2UFAyfDXRU8vLwkeR04N6e58Tq' 
 LextoPlus_URL = 'https://api.aiforthai.in.th/lextoplus'
+LextoPlus_Norm = '1' #normalization activation ( 0 deactivate | 1 activate )

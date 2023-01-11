@@ -1,5 +1,5 @@
 #import file
-import config 
+import config #contain configuration of the application
 
 #import library
 import tweepy     #use for twitter scrapping

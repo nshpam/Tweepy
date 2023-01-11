@@ -31,11 +31,9 @@ class ConnectTwitterData():
 #Use thread to deal with the intesive-task for better performance
 class TweetWorker():
 
+    #initialize variables
     def __init__(self, exit_task=False):
         self.exit_task = exit_task
-    
-    def terminate_check(self):
-        return self.exit_task
 
     #First thread for running search task
     def run_thread(self, task_to_do, thread_name, *task_args):
@@ -63,18 +61,23 @@ class TweetWorker():
             #timestamp
             print('TIMESTAMP : [',tweepy_main.PullTwitterData().convert_timezone(tz.gettz('UTC'), tz.gettz(config.local_timezone), datetime.datetime.now()),']')
         
+    #terminate the thread
     def terminate_thread(self):
         thread_exit = ''
 
         try: 
+            #termination input
             thread_exit = inputimeout(prompt="Terminate Thread? (Y/n)", timeout=config.task_terminate_timeout)
 
+            #terminate if input is Y
             if thread_exit.strip() == 'Y':
                 self.exit_task = True
+            #continue if input is not Y
             else:
                 self.exit_task = False
             return self.exit_task
 
+        #time over continue doing task
         except Exception:
             print('Time Over!')
 
@@ -93,22 +96,21 @@ if __name__ == '__main__':
         ConnectTwitterData.connect_twitter()
         )).tag('scrap_twitter_task')
     
-    # # schedule.every(config.task_period).seconds.do(lambda: TweetWorker().terminate_thread).tag('terminate_thread')
-
-    # #start the schedule
-    # #ctrl+c in the terminal to stop the task
+    #start the schedule
+    #ctrl+c in the terminal to stop the task
     while True:
 
+        #terminate thread
         if TweetWorker().terminate_thread():
             break
         #do the task
         schedule.run_pending()
-        # schedule.run_all(delay_seconds=1)
 
         #delay 1 second 
         #you can edit the delay in file name "config.py"
         time.sleep(config.task_delay)
 
+    #tokenization, normalization, stemming, 
     exec(open("./twitterDataProcessing.py").read())
 
     
