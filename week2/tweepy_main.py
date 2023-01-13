@@ -1,5 +1,6 @@
 #import file
 import config #contain configuration of the application
+import tweepy_task
 
 #import library
 import tweepy     #use for twitter scrapping
@@ -14,15 +15,17 @@ myclient = pymongo.MongoClient(config.mongo_client)
 #choose database name
 mydb = myclient[config.database_name]
 #choose collection name
-mycol = mydb[config.collection_name]
+# mycol = mydb[config.collection_name]
+mycol = mydb[config.collection_name_4]
 
 #scrap twitter data from Twitter API
 class PullTwitterData(object):
 
    #initialize variable
-   def __init__(self, tweets_list=[], tweet_object={}):
+   def __init__(self, tweets_list=[], tweet_object={}, count_tweets=0):
       self.tweets_list = tweets_list
       self.tweet_object = tweet_object
+      self.count_tweets = count_tweets
 
    #convert timezone from UTC to GMT
    #you can edit the pair of timezone you want in file name "config.py"
@@ -82,24 +85,44 @@ class PullTwitterData(object):
       cmd = collection_variable.insert_one(data)
          
       return cmd
+   
+   def database_action(self, id, username, date, time, text, fav_count, retweet_count):
+      cursor = mycol.find({"id":id})
 
-   #scarp twitter
-   def search_twitter(self, api):
+      #if found then update data
+      if list(cursor) != []:
+         print('Update duplicate ID :', id)
 
-      #use Cursor to serach
-      #tweepy.Cursor(search API, word + filter, search mode, search type).items(search limit)
-      tweets = tweepy.Cursor(
-         api.search_tweets ,
-         q=config.search_word + ' -filter:retweets', 
-         tweet_mode=config.search_mode,
-         result_type=config.search_type
-         ).items(config.num_tweet)
+         #update retweets, favorites
+         self.update_database(mycol, id, fav_count, retweet_count)
 
-      #create a list of Tweets
-      self.tweets_list = [tweet for tweet in tweets]
+         #count tweets that are updated
+         self.count_tweets+=1
 
+         #close database
+         myclient.close()
+            
+      else:
+
+         #create tweet object
+         self.create_tweet_object(id,username,date,time,text,fav_count,retweet_count)
+
+         print('Insert ID :', id)
+
+         #insert to database
+         self.insert_database(self.tweet_object, mycol)
+
+         #close database
+         myclient.close()
+
+         #count Tweet that is inserted
+         self.count_tweets+=1
+      
+      return self.count_tweets
+   
+   def twitter_scarpping(self, tweets_data):
       #count tweet
-      count_tweets = 0
+      self.count_tweets = 0
 
       #timezone of your variable
       from_zone = tz.gettz('UTC')
@@ -137,41 +160,40 @@ class PullTwitterData(object):
          tweet_time = tweet_date[1]
          tweet_date = tweet_date[0]
 
-         #create tweet object
-         self.create_tweet_object(tweet_id,tweet_username,tweet_date,tweet_time,tweet_text,fav_count,retweet_count)
+         self.database_action(tweet_id,tweet_username,tweet_date,tweet_time,tweet_text,fav_count,retweet_count)
 
-         #query id in database
-         cursor = mycol.find({"id":tweet_id})
 
-         #if found then update data
-         if list(cursor) != []:
-            print('Update duplicate ID :', tweet_id)
+   #scarp twitter
+   def search_twitter(self, api):
 
-            #update retweets, favorites
-            self.update_database(mycol, tweet_id, fav_count, retweet_count)
+      #use Cursor to serach
+      #tweepy.Cursor(search API, word + filter, search mode, search type).items(search limit)
+      tweets = tweepy.Cursor(
+         api.search_tweets ,
+         q=config.search_word + ' -filter:retweets', 
+         tweet_mode=config.search_mode,
+         result_type=config.search_type
+         ).items(config.num_tweet)
 
-            #count tweets that are updated
-            count_tweets+=1
+      #create a list of Tweets
+      self.tweets_list = [tweet for tweet in tweets]
 
-            #close database
-            myclient.close()
-            
-            continue
-         else:
-            print('Insert ID :', tweet_id)
+      print(len(self.tweets_list))
 
-            #insert to database
-            self.insert_database(self.tweet_object, mycol)
-
-            #close database
-            myclient.close()
-
-         #count Tweet that is inserted
-         count_tweets+=1
+      self.twitter_scarpping(self.tweets_list)
 
       #finish text for unittest
-      finish_text = 'TOTAL TWITTER : %d'%count_tweets
+      finish_text = 'TOTAL TWITTER : %d'%self.count_tweets
 
       print(finish_text)
    
       return finish_text
+
+
+if __name__ == '__main__':
+
+   auth = tweepy.OAuth1UserHandler(
+      config.consumer_key, config.consumer_secret, config.access_token, config.access_token_secret
+      )
+   api = tweepy.API(auth)
+   PullTwitterData().search_twitter(api)
