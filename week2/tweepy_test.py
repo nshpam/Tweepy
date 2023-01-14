@@ -1,27 +1,26 @@
-import tweepy
-import config
+# coding=utf8
 
-#connect to twitter
-auth = tweepy.OAuth1UserHandler(
-   config.consumer_key, config.consumer_secret, config.access_token, config.access_token_secret
-)
-api = tweepy.API(auth)
-# print(api)
-try:
-   user = api.get_user(screen_name='pammy113357') #@...
-except Exception as e:
-   print(e)
-# print(user.screen_name)
+# from unidecode import unidecode
 
-# print(user.screen_name)
-# print(user.followers_count)
-# for friend in user.friends():
-#    print(friend.screen_name)
+# test = ' 📼 𝐍𝐞𝐭𝐟𝐥𝐢𝐱 𝐔𝐥𝐭𝐫𝐚 𝐇𝐃 𝐊 📼 🏷  day ฿ -แอคไทยแท้  % -ไม่ต้องเปิด vpn ขณะดู 🛒                : #netflixราคาถูก #หารnetflixราคาถูก #หารnetflix #หารnetflixTH #NetflixTH #รีวิวหนัง #หารเน็ตฟลิกซ์ราคาถูก #หารnetflixราคาถูก #หารเน็ตฟลิกซ์รายเดือน'
+# my_dict = {}
+# temp = ''
 
-# public_tweets = api.home_timeline()
-# for tweet in public_tweets:
-#     print(tweet.text)
+# for list_word in test.split():
 
-# public_tweets = api.user_timeline(screen_name='iconnnz')
-# for tweet in public_tweets:
-#     print(tweet.text)
+#     my_dict[list_word] = list_word.encode('ascii','namereplace').decode('utf-8').split('\\N')
+#     my_dict[list_word] = my_dict[list_word][1:]
+
+#     for word in my_dict[list_word]:
+#         if 'THAI' not in word and '{' in word and '}' in word:
+#             if unidecode(list_word) not in temp.split():
+#                 temp += ' ' + unidecode(list_word)
+#             continue
+#         temp += ' ' + list_word
+#         break
+
+# print(temp)
+
+x = ['sdfdasfg','asdfasdg','asdfasg']
+print(x[:-1])
+
