@@ -11,21 +11,13 @@ import datetime   #use for timezone converting
 
 #you can edit mongodb server, database name, collection name in file name "config.py"
 db_action = database_action.DatabaseAction()
-# #connect to mongodb server with pymongo
-# myclient = pymongo.MongoClient(config.mongo_client)
-# #choose database name
-# mydb = myclient[config.database_name]
-# #choose collection name
-# # mycol = mydb[config.collection_name]
-# mycol = mydb[config.collection_name_4]
 
 #scrap twitter data from Twitter API
 class PullTwitterData(object):
 
    #initialize variable
-   def __init__(self, tweets_list=[], tweet_object={}, count_tweets=0):
+   def __init__(self, tweets_list=[], count_tweets=0):
       self.tweets_list = tweets_list
-      self.tweet_object = tweet_object
       self.count_tweets = count_tweets
 
    #convert timezone from UTC to GMT
@@ -50,42 +42,6 @@ class PullTwitterData(object):
       #convert timezone and change format into day-month-year | hour-minute
       convert_date = convert_date.replace(tzinfo=from_zone).astimezone(to_zone).strftime('%d-%m-%Y | %H:%M')
       return convert_date
-
-   # update database base on tweet id
-   # def update_database(self, collection_variable, tweet_id, update_fav, update_retweet):
-      
-   #    #value for update
-   #    new_values = {"$set":{
-   #    "favorite_count": update_fav,
-   #    "retweet_count": update_retweet}}
-
-   #    #update database base on id
-   #    cmd = collection_variable.update_one({"id":tweet_id}, new_values)
-
-   #    return cmd
-
-   #create tweet object for database insertion
-   def create_tweet_object(self,id,username,date,time,text,fav_count,retw_count):
-      self.tweet_object = {
-         'id' : id,
-         'username' : username, 
-         'date' : date,
-         'time' : time,
-         'text' : text,
-         'favorite_count' : fav_count,
-         'retweet_count' : retw_count }
-      
-      return self.tweet_object
-
-
-   #insert object into database
-   def insert_database(self, data, collection_variable):
-
-      #command for insert object to mongodb
-      #insert to the specified collection
-      cmd = collection_variable.insert_one(data)
-         
-      return cmd
    
    def database_decision(self, id, username, date, time, text, fav_count, retweet_count):
       
@@ -95,32 +51,17 @@ class PullTwitterData(object):
          config.collection_name
       )
 
-      cursor = db_action.tweetdb_find(
-         config.collection_name,
-         collection,
-         "id",
-         id
-         )
+      cursor = db_action.tweetdb_find(config.collection_name, collection, "id", id)
+
+      db_action.not_print_raw()
 
       #if found then update data
       if list(cursor) != []:
-
-         db_action.not_print_raw()
-
          data_field = ['favorite_count', 'retweet_count']
          data_list = [fav_count, retweet_count]
-         dict_to_update = db_action.tweetdb_create_object(
-            data_field,
-            data_list
-         )
+         dict_to_update = db_action.tweetdb_create_object(data_field,data_list)
 
-         db_action.tweetdb_update(
-            config.collection_name,
-            collection,
-            dict_to_update,
-            "id",
-            id
-         )
+         db_action.tweetdb_update(config.collection_name, collection, dict_to_update, "id", id)
 
          print('Update ID :', id)
 
@@ -128,22 +69,12 @@ class PullTwitterData(object):
          self.count_tweets+=1
             
       else:
-
-         db_action.not_print_raw()
-
          data_field = ['id', 'username', 'date', 'time', 'text', 'favorite_count', 'retweet_count']
          data_list = [id, username, date, time, text, fav_count, retweet_count]
 
-         dict_to_insert = db_action.tweetdb_create_object(
-            data_field,
-            data_list
-         )
+         dict_to_insert = db_action.tweetdb_create_object(data_field, data_list)
 
-         db_action.tweetdb_insert(
-            config.collection_name,
-            collection,
-            dict_to_insert
-         )
+         db_action.tweetdb_insert(config.collection_name, collection, dict_to_insert)
 
          print('Insert ID :', id)
 
