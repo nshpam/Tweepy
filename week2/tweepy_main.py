@@ -88,36 +88,64 @@ class PullTwitterData(object):
       return cmd
    
    def database_decision(self, id, username, date, time, text, fav_count, retweet_count):
-      mycol = db_action.tweetdb_find(
+      
+      collection = db_action.tweetdb_object(
+         config.mongo_client,
+         config.database_name,
+         config.collection_name
+      )
+
+      cursor = db_action.tweetdb_find(
          config.collection_name,
+         collection,
+         "id",
+         id
          )
-      cursor = mycol.find({"id":id})
 
       #if found then update data
       if list(cursor) != []:
-         print('Update duplicate ID :', id)
 
-         #update retweets, favorites
-         self.update_database(mycol, id, fav_count, retweet_count)
+         db_action.not_print_raw()
+
+         data_field = ['favorite_count', 'retweet_count']
+         data_list = [fav_count, retweet_count]
+         dict_to_update = db_action.tweetdb_create_object(
+            data_field,
+            data_list
+         )
+
+         db_action.tweetdb_update(
+            config.collection_name,
+            collection,
+            dict_to_update,
+            "id",
+            id
+         )
+
+         print('Update ID :', id)
 
          #count tweets that are updated
          self.count_tweets+=1
-
-         #close database
-         myclient.close()
             
       else:
 
-         #create tweet object
-         self.create_tweet_object(id,username,date,time,text,fav_count,retweet_count)
+         db_action.not_print_raw()
+
+         data_field = ['id', 'username', 'date', 'time', 'text', 'favorite_count', 'retweet_count']
+         data_list = [id, username, date, time, text, fav_count, retweet_count]
+
+         dict_to_insert = db_action.tweetdb_create_object(
+            data_field,
+            data_list
+         )
+
+         db_action.tweetdb_insert(
+            config.collection_name,
+            collection,
+            dict_to_insert
+         )
 
          print('Insert ID :', id)
-
-         #insert to database
-         self.insert_database(self.tweet_object, mycol)
-
-         #close database
-         myclient.close()
 
          #count Tweet that is inserted
          self.count_tweets+=1

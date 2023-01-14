@@ -3,7 +3,7 @@ import pymongo
 
 class DatabaseAction():
     
-    def __init__(self, db_name='', col_name='', myclient=None, mydb=None, mycol=None, cursor=None, count=0, arp=True, cmd=None):
+    def __init__(self, db_name='', col_name='', myclient=None, mydb=None, mycol=None, cursor=None, count=0, arp=True, cmd=None, history=True):
         self.db_name = db_name
         self.col_name = col_name
         self.myclient = myclient
@@ -13,14 +13,23 @@ class DatabaseAction():
         self.count = count
         self.arp = arp
         self.cmd = cmd
+        self.history = history
+
+    def print_raw(self):
+        self.arp = True
+        return self.arp
     
     def not_print_raw(self):
         self.arp = False
         return self.arp
     
-    def print_raw(self):
-        self.arp = True
-        return self.arp
+    def collect_history(self):
+        self.history = True
+        return self.history
+    
+    def not_collect_history(self):
+        self.history = False
+        return self.history
     
     #connect to database
     def tweetdb_object(self, mongoclient_to_connect, db_to_connect, col_to_connect):
@@ -85,8 +94,9 @@ class DatabaseAction():
 
         self.cursor = col_to_find.find({field_to_find : query})
 
-        print('SEARCH FROM : %s'%col_name)
-        print('FOUND :', list(self.cursor))
+        if self.arp:
+            print('SEARCH FROM : %s'%col_name)
+            print('FOUND :', list(self.cursor))
         return self.cursor
     
     #update database
@@ -112,7 +122,7 @@ class DatabaseAction():
 
         if self.arp:
             print('INSERT', data_to_insert, 'to %s'%col_name)
-            
+
         return self.cmd
     
     #delete all database
@@ -134,19 +144,22 @@ class DatabaseAction():
         return self.cmd
     
     #history log
-    def tweetdb_history(self, db, col, action):
-    
-        self.cmd = col.insert_one(action)
+    def tweetdb_history(self, action, last_id):
+        
+        history_db = db_action.tweetdb_object(config.mongo_client, config.database_name, config.history_db)
+        collect_history = history_db.insert_one({
+            'action':action,
+            'last_id': last_id
+            })
 
         if self.arp:
             print('COLLECT HISTORY : %s'%action)
             
-        return self.cmd
+        return collect_history
         
-# if __name__ == '__main__':
-    # db_action = DatabaseAction()
-
-    # collection = db_action.tweetdb_object(config.mongo_client, config.database_name, config.collection_name_5)
+if __name__ == '__main__':
+    db_action = DatabaseAction()
+    collection = db_action.tweetdb_object(config.mongo_client, config.database_name, config.collection_name)
 
     # db_action.tweetdb_delete_collection(config.collection_name_5, collection)
 
