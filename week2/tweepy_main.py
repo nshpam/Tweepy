@@ -1,6 +1,7 @@
 #import file
 import config #contain configuration of the application
 import tweepy_task
+import database_action
 
 #import library
 import tweepy     #use for twitter scrapping
@@ -9,14 +10,14 @@ from dateutil import tz #use for timezone converting
 import datetime   #use for timezone converting
 
 #you can edit mongodb server, database name, collection name in file name "config.py"
-
-#connect to mongodb server with pymongo
-myclient = pymongo.MongoClient(config.mongo_client)
-#choose database name
-mydb = myclient[config.database_name]
-#choose collection name
-# mycol = mydb[config.collection_name]
-mycol = mydb[config.collection_name_4]
+db_action = database_action.DatabaseAction()
+# #connect to mongodb server with pymongo
+# myclient = pymongo.MongoClient(config.mongo_client)
+# #choose database name
+# mydb = myclient[config.database_name]
+# #choose collection name
+# # mycol = mydb[config.collection_name]
+# mycol = mydb[config.collection_name_4]
 
 #scrap twitter data from Twitter API
 class PullTwitterData(object):
@@ -51,17 +52,17 @@ class PullTwitterData(object):
       return convert_date
 
    # update database base on tweet id
-   def update_database(self, collection_variable, tweet_id, update_fav, update_retweet):
+   # def update_database(self, collection_variable, tweet_id, update_fav, update_retweet):
       
-      #value for update
-      new_values = {"$set":{
-      "favorite_count": update_fav,
-      "retweet_count": update_retweet}}
+   #    #value for update
+   #    new_values = {"$set":{
+   #    "favorite_count": update_fav,
+   #    "retweet_count": update_retweet}}
 
-      #update database base on id
-      cmd = collection_variable.update_one({"id":tweet_id}, new_values)
+   #    #update database base on id
+   #    cmd = collection_variable.update_one({"id":tweet_id}, new_values)
 
-      return cmd
+   #    return cmd
 
    #create tweet object for database insertion
    def create_tweet_object(self,id,username,date,time,text,fav_count,retw_count):
@@ -86,7 +87,10 @@ class PullTwitterData(object):
          
       return cmd
    
-   def database_action(self, id, username, date, time, text, fav_count, retweet_count):
+   def database_decision(self, id, username, date, time, text, fav_count, retweet_count):
+      mycol = db_action.tweetdb_find(
+         config.collection_name,
+         )
       cursor = mycol.find({"id":id})
 
       #if found then update data
@@ -132,20 +136,11 @@ class PullTwitterData(object):
       #iterate the Tweet in tweets_list
       for tweet in self.tweets_list:
 
-         #tweet id
-         tweet_id = str(tweet.id)
-
-         #tweet author
-         tweet_username = tweet.user.screen_name
-
-         #tweet date
-         tweet_date = tweet.created_at
-
-         #favorite count
-         fav_count = tweet.favorite_count
-
-         #retweet count
-         retweet_count = tweet.retweet_count
+         tweet_id = str(tweet.id) #tweet id
+         tweet_username = tweet.user.screen_name #tweet author
+         tweet_date = tweet.created_at #tweet date
+         fav_count = tweet.favorite_count #favorite count
+         retweet_count = tweet.retweet_count #retweet count
 
          #get tweet text
          try:
@@ -160,7 +155,12 @@ class PullTwitterData(object):
          tweet_time = tweet_date[1]
          tweet_date = tweet_date[0]
 
-         self.database_action(tweet_id,tweet_username,tweet_date,tweet_time,tweet_text,fav_count,retweet_count)
+         #connect to database
+         db_action.tweetdb_object(
+            config.mongo_client, 
+            config.database_name,
+            config.collection_name)
+         self.database_decision(tweet_id,tweet_username,tweet_date,tweet_time,tweet_text,fav_count,retweet_count)
 
 
    #scarp twitter
