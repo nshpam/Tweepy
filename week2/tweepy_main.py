@@ -5,7 +5,7 @@ import database_action
 
 #import library
 import tweepy     #use for twitter scrapping
-import pymongo    #use for connecting to mongodb
+# import pymongo    #use for connecting to mongodb
 from dateutil import tz #use for timezone converting
 import datetime   #use for timezone converting
 
@@ -50,8 +50,10 @@ class PullTwitterData(object):
          config.database_name,
          config.collection_name
       )
+      
+      query_object = db_action.tweetdb_create_object(["id"],[id])
 
-      cursor = db_action.tweetdb_find(config.collection_name, collection, "id", id)
+      cursor = db_action.tweetdb_find(config.collection_name, collection, query_object)
 
       db_action.not_print_raw()
 
@@ -63,7 +65,7 @@ class PullTwitterData(object):
 
          db_action.tweetdb_update(config.collection_name, collection, dict_to_update, "id", id)
 
-         print('Update ID :', id)
+         # print('Update ID :', id)
 
          #count tweets that are updated
          self.count_tweets+=1
@@ -76,7 +78,7 @@ class PullTwitterData(object):
 
          db_action.tweetdb_insert(config.collection_name, collection, dict_to_insert)
 
-         print('Insert ID :', id)
+         # print('Insert ID :', id)
 
          #count Tweet that is inserted
          self.count_tweets+=1
@@ -116,11 +118,10 @@ class PullTwitterData(object):
 
          #connect to database
          db_action.tweetdb_object(
-            config.mongo_client, 
+            config.mongo_client,
             config.database_name,
             config.collection_name)
          self.database_decision(tweet_id,tweet_username,tweet_date,tweet_time,tweet_text,fav_count,retweet_count)
-
 
    #scarp twitter
    def search_twitter(self, api):

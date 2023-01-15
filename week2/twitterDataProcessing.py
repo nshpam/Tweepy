@@ -2,6 +2,7 @@
 #import file
 import config   #contain configuration of the application
 import tweepy_main  #contain method for scraping twitter
+import database_action
 
 #import library
 # nltk.download('stopwords')    #use one time for download nltk stopwords 
@@ -15,32 +16,24 @@ from nltk import WordNetLemmatizer  #use for English normalization
 from nltk.stem.porter import *  #use for stemming
 from unidecode import unidecode
 
-#connect to mongodb with pymongo
-myclient = pymongo.MongoClient(config.mongo_client)
+db_action = database_action.DatabaseAction()
 
-#database name
-mydb = myclient[config.database_name]
+class ConnectLextoPlus():
 
-#collection name
-mycol_1 = mydb[config.collection_name]
-mycol_2 = mydb[config.collection_name_2]
-mycol_3 = mydb[config.collection_name_3]
-mycol_4 = mydb[config.collection_name_4]
+    def ConnectApi(self, api_key, url_to_send, data_dict):
+        headers = {'Apikey' : api_key}
+        res = requests.get(url_to_send,params=data_dict,headers=headers)
+        return res
 
-#select only text
-# cursor = mycol_1.find({},{ "_id": 0, "text": 1})
-cursor = mycol_4.find({},{ "_id": 0, "id": 1 ,"text": 1})
 
 #Filter class
 class FilterData():
 
-    #initialize variables
-    def __init__(self, filtered=[], temp_filtered=[]):
-        self.filtered = filtered
-        self.temp_filtered = temp_filtered
-
     #Filter out unnecessary data (no meanning word, conjunction and etc...)
     def FilteredFromLexto(self, raw_json):
+
+        filtered = []
+        temp_filtered = []
 
         #iterate types from tokenization dict
         for i in range(len(raw_json['types'])):
@@ -50,19 +43,11 @@ class FilterData():
                 if raw_json['tokens'][i].strip() != '':
 
                     #append filtered data in temp list
-                    self.temp_filtered.append(raw_json['tokens'][i].strip().lower())
+                    temp_filtered.append(raw_json['tokens'][i].strip().lower())
         
         #append all data
-        self.filtered.append(self.temp_filtered)
-        self.temp_filtered = []
-        return self.filtered
-    
-    def ThaiCleansing(self, text_to_clean):
-        #connect to ThaiCleansing API
-        headers = {'Apikey': config.LextoPlus_API_key}
-        res = requests.get(config.Thai_Cleasing,params=text_to_clean,headers=headers)
-        res = res.json()
-        return res    
+        filtered = temp_filtered
+        return filtered
 
     #Filter URL and numeric data funciton
     def FilterUrlAndFilterNum(self, raw_list):
@@ -83,8 +68,6 @@ class FilterData():
             except ValueError:
                 if raw_list[i] != '':
                     word = self.FilterNum(word)
-                    # word = self.ThaiCleansing({'text':word})
-                    # clean_json += ' '+ word['cleansing_text']
                     clean_json += ' ' + word
         return clean_json
 
@@ -95,35 +78,51 @@ class FilterData():
 
     #Filter number function
     def FilterNum(self, raw_text):
-        
         raw_text = ''.join(filter(lambda x: not x.isdigit(), raw_text.strip()))
         return raw_text
     
     def FilterSpecialChar(self, raw_text):
         temp_dict = {}
         temp_text = ''
+        regex = re.compile('[@_!#$%^&*()<>?/\|~:]')
 
         for list_word in raw_text.split():
 
             temp_dict[list_word] = list_word.encode('ascii','namereplace').decode('utf-8').split('\\N')
-            temp_dict[list_word] = temp_dict[list_word][1:]
 
             for word in temp_dict[list_word]:
-                if 'THAI' not in word and '{' in word and '}' in word:
-                    if unidecode(list_word) not in temp_text.split():
-                        temp_text += ' ' + unidecode(list_word)
+                if word == '':
                     continue
-                temp_text += ' ' + list_word
-                break
+
+                if regex.search(list_word) != None:
+                        remove_char = regex.search(list_word).group()
+                        list_word = list_word.replace(remove_char,"")
+                    
+                if 'THAI' not in word and '{' in word and '}' in word:
+                    
+                    if unidecode(list_word) not in temp_text.split() and unidecode(list_word).isalnum():
+                        temp_text += ' ' + unidecode(list_word)
+                    break
+
+                elif list_word not in temp_text.split():
+                        temp_text += ' ' + list_word
         
         return temp_text
 
 #Tokenization function
 class Tokenization():
 
-    def __init__(self, count_untoken=0, count_token=0):
+    def __init__(self, count_untoken=0, count_token=0, cursor=None):
         self.count_untoken = count_untoken
         self.count_token = count_token
+        self.cursor = cursor
+    
+    def ScanRawData(self, raw_object):
+        if raw_object.text != '' and raw_object.status_code == 200:
+            raw_json = raw_object.json()
+            return raw_json
+        else:
+            return None
     
 # Read file from database
     def LextoPlusTokenization(self, api_key, url):
@@ -133,11 +132,18 @@ class Tokenization():
         tic = time.perf_counter()
 
         tokened_dict = {}
-        count = 0
         #database iteration
-        for doc in cursor:
 
-            count += 1
+        collection = db_action.tweetdb_object(config.mongo_client, config.database_name, config.collection_name)
+
+        db_action.not_print_raw()
+
+        data_field = ["_id", "id", "text"]
+        data_list = [0, 1, 1]
+        query_object = db_action.tweetdb_create_object(data_field, data_list)
+        cursor = db_action.tweetdb_show_collection(config.collection_name, collection, query_object)
+
+        for doc in cursor:
 
             #send data to filter url and numeric
             doc['text'] = FilterData().FilterUrlAndFilterNum(doc['text']).strip()
@@ -150,21 +156,22 @@ class Tokenization():
             doc_dict['norm'] = config.LextoPlus_Norm
 
             #connect with Lexto+ API
-            headers = {'Apikey': api_key}
-            res = requests.get(url,params=doc,headers=headers)     
+            res = ConnectLextoPlus().ConnectApi(api_key, url, doc_dict)     
 
-            #scan response
-            if res.text != '' and res.status_code == 200:
-                raw = res.json()
-                tokened_dict[doc['id']] = FilterData().FilteredFromLexto(raw)
+            try:
+                tokened_dict[doc['id']] = FilterData().FilteredFromLexto(res.json())
+                
+                if tokened_dict[doc['id']] == []:
+                    print(doc_dict)
+                    print(res.text)
+
                 self.count_token += 1
-            else:
-                # print('unable to tokenization',doc)
-                tokened_dict[doc['id']] = 'unable to tokenization'
-                self.count_untoken += 1
+            except:
 
-            if count == 2:
-                print(tokened_dict)
+                self.count_untoken += 1
+                tokened_dict[doc['id']] = doc['text'].split()
+            
+            time.sleep(1)
                 
         #stop the timer
         toc = time.perf_counter()
@@ -248,47 +255,23 @@ if __name__ == '__main__':
         config.LextoPlus_URL
     )
 
-    # print(list(tweet_dict.values())[:3])
-
-    # FilterData().FilterUrlAndFilterNum()
     tweet_dict_keys = list(tweet_dict.keys())
     tweet_dict_values = list(tweet_dict.values())
 
-    print('DATABASE INSERTION')
+    count_db = 0
 
-    # print(tweet_dict_keys[0],tweet_dict_values[0])
+    for i in range(len(tweet_dict_values)):
 
-    # for i in range(len(tweet_dict_values)):
-    #     print(tweet_dict_keys[i],tweet_dict_values[i])
-    #     # print(CreateDatabaseObject().create_db_object(tweet_dict_keys[i], tweet_dict_values[i]))
-    #     break
-        # tweepy_main.PullTwitterData().insert_database(
-        #         CreateDatabaseObject().create_db_object(tweet_dict_keys[i], tweet_dict_values[i]),
-        #         mycol_3)
+        count_db+=1
+        word = tweet_dict_values[i]
 
-    print('TOTAL TWITTER INSERT TO DATABASE :',len(tweet_dict))
-    
-    # # Close the connection to MongoDB when you're done.
-    
+        word = CleanThaiAndEng().cleanThaiStopword(word)
+        word = CleanThaiAndEng().cleanEnglishStopword(word)
+        word = Normailize().NormalizingEnglishword(word)
 
-    # print('Start Word Cleaning and Word Normalization')
-    
-    # tic = time.perf_counter()
-    # for word in tweet_list:
-    #     word = CleanThaiAndEng().cleanThaiStopword(word)
-    #     word = CleanThaiAndEng().cleanEnglishStopword(word)
-    #     word = Normailize().NormalizingEnglishword(word)
+        if word != []:
+            collection = db_action.tweetdb_object(config.mongo_client, config.database_name, config.collection_name_2)
+            clean_object = db_action.tweetdb_create_object([tweet_dict_keys[i]], [word])
+            db_action.tweetdb_insert(config.collection_name_2, collection, clean_object)
 
-    #     tweepy_main.PullTwitterData().insert_database(
-    #         CreateDatabaseObject().create_db_object(word), 
-    #         mycol_2)
-    
-    # #stop the timer
-    # toc = time.perf_counter()
-
-    # #display total work time of this thread
-    # print(f"RUN TIME : {toc - tic:0.4f} seconds")
-
-    # print('TOTAL TWITTER :',len(tweet_list))
-
-    # myclient.close()
+    print('TOTAL TWITTER INSERT TO DATABASE :',count_db)
