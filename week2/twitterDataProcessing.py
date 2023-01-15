@@ -2,6 +2,7 @@
 #import file
 import config   #contain configuration of the application
 import tweepy_main  #contain method for scraping twitter
+import database_action
 
 #import library
 # nltk.download('stopwords')    #use one time for download nltk stopwords 
@@ -14,6 +15,8 @@ from nltk.corpus import stopwords   #use for English stop word cleaning
 from nltk import WordNetLemmatizer  #use for English normalization
 from nltk.stem.porter import *  #use for stemming
 from unidecode import unidecode
+
+db_action = database_action.DatabaseAction()
 
 #connect to mongodb with pymongo
 myclient = pymongo.MongoClient(config.mongo_client)
@@ -29,18 +32,29 @@ mycol_4 = mydb[config.collection_name_4]
 
 #select only text
 # cursor = mycol_1.find({},{ "_id": 0, "text": 1})
-cursor = mycol_4.find({},{ "_id": 0, "id": 1 ,"text": 1})
+
+class ConnectLextoPlus():
+
+    def ConnectApi(self, api_key, url_to_send, data_dict):
+        headers = {'Apikey' : api_key}
+        res = requests.get(url_to_send,params=data_dict,headers=headers)
+
+        return res
+
 
 #Filter class
 class FilterData():
 
     #initialize variables
-    def __init__(self, filtered=[], temp_filtered=[]):
-        self.filtered = filtered
-        self.temp_filtered = temp_filtered
+    # def __init__(self, filtered=[], temp_filtered=[]):
+        # self.filtered = filtered
+        # self.temp_filtered = temp_filtered
 
     #Filter out unnecessary data (no meanning word, conjunction and etc...)
     def FilteredFromLexto(self, raw_json):
+
+        filtered = []
+        temp_filtered = []
 
         #iterate types from tokenization dict
         for i in range(len(raw_json['types'])):
@@ -50,12 +64,13 @@ class FilterData():
                 if raw_json['tokens'][i].strip() != '':
 
                     #append filtered data in temp list
-                    self.temp_filtered.append(raw_json['tokens'][i].strip().lower())
+                    temp_filtered.append(raw_json['tokens'][i].strip().lower())
         
         #append all data
-        self.filtered.append(self.temp_filtered)
-        self.temp_filtered = []
-        return self.filtered
+        filtered = temp_filtered
+        # filtered.append(temp_filtered)
+        # temp_filtered = []
+        return filtered
     
     def ThaiCleansing(self, text_to_clean):
         #connect to ThaiCleansing API
@@ -83,6 +98,7 @@ class FilterData():
             except ValueError:
                 if raw_list[i] != '':
                     word = self.FilterNum(word)
+                    
                     # word = self.ThaiCleansing({'text':word})
                     # clean_json += ' '+ word['cleansing_text']
                     clean_json += ' ' + word
@@ -96,12 +112,15 @@ class FilterData():
     #Filter number function
     def FilterNum(self, raw_text):
         
+        # raw_text = ''.join(filter(lambda x: not x.isdigit(), raw_text.strip()))
         raw_text = ''.join(filter(lambda x: not x.isdigit(), raw_text.strip()))
+        # print(raw_text)
         return raw_text
     
     def FilterSpecialChar(self, raw_text):
         temp_dict = {}
         temp_text = ''
+        regex = re.compile('[@_!#$%^&*()<>?/\|~:]')
 
         for list_word in raw_text.split():
 
@@ -109,21 +128,37 @@ class FilterData():
             temp_dict[list_word] = temp_dict[list_word][1:]
 
             for word in temp_dict[list_word]:
+                
+                if regex.search(word) != None:
+                    remove_char = regex.search(word).group()
+                    list_word = list_word.replace(remove_char,"")
+                    
                 if 'THAI' not in word and '{' in word and '}' in word:
                     if unidecode(list_word) not in temp_text.split():
                         temp_text += ' ' + unidecode(list_word)
                     continue
-                temp_text += ' ' + list_word
-                break
+                
+                elif list_word not in temp_text.split() and regex.search(list_word) == None:
+                    temp_text += ' ' + list_word
+                    
+                    
         
         return temp_text
 
 #Tokenization function
 class Tokenization():
 
-    def __init__(self, count_untoken=0, count_token=0):
+    def __init__(self, count_untoken=0, count_token=0, cursor=None):
         self.count_untoken = count_untoken
         self.count_token = count_token
+        self.cursor = cursor
+    
+    def ScanRawData(self, raw_object):
+        if raw_object.text != '' and raw_object.status_code == 200:
+            raw_json = raw_object.json()
+            return raw_json
+        else:
+            return None
     
 # Read file from database
     def LextoPlusTokenization(self, api_key, url):
@@ -135,7 +170,12 @@ class Tokenization():
         tokened_dict = {}
         count = 0
         #database iteration
+
+        cursor = mycol_1.find({},{ "_id": 0, "id": 1 ,"text": 1})
+
         for doc in cursor:
+
+            print(doc)
 
             count += 1
 
@@ -148,23 +188,46 @@ class Tokenization():
 
             #activate normalization
             doc_dict['norm'] = config.LextoPlus_Norm
+            
+            # break
 
             #connect with Lexto+ API
-            headers = {'Apikey': api_key}
-            res = requests.get(url,params=doc,headers=headers)     
+            # res = ConnectLextoPlus().ConnectApi(api_key, url, doc_dict)     
+
+            # try:
+            #     tokened_dict[doc['id']] = FilterData().FilteredFromLexto(res.json())
+            #     # tokened_dict[doc['id']] = res.json()
+            #     self.count_token += 1
+            # except:
+            #     print(res.status_code)
+            #     print(res.text)
+            #     print(doc_dict['text'])
+            #     print()
+            
+            # time.sleep(1)
 
             #scan response
-            if res.text != '' and res.status_code == 200:
-                raw = res.json()
-                tokened_dict[doc['id']] = FilterData().FilteredFromLexto(raw)
-                self.count_token += 1
-            else:
-                # print('unable to tokenization',doc)
-                tokened_dict[doc['id']] = 'unable to tokenization'
-                self.count_untoken += 1
+            # if res.text != '' and res.status_code == 200:
+            #     raw = res.json()
 
-            if count == 2:
-                print(tokened_dict)
+            #     # print('token',self.count_token, doc['id'])
+            #     # print(raw, self.count_token)
+            #     tokened_dict[doc['id']] = FilterData().FilteredFromLexto(raw)
+            #     # print(tokened_dict[doc['id']])
+            #     # break
+            # else:
+            #     raw = res.json()
+            #     tokened_dict[doc['id']] = FilterData().FilteredFromLexto(raw)
+
+            #     print(tokened_dict[doc['id']])
+            #     # print('untoken', self.count_token, doc['id'])
+            #     # print('unable to tokenization',doc)
+            #     # tokened_dict[doc['id']] = 'unable to tokenization'
+            #     self.count_untoken += 1
+
+            
+            # if count == 2:
+            #     print(tokened_dict)
                 
         #stop the timer
         toc = time.perf_counter()
@@ -248,11 +311,13 @@ if __name__ == '__main__':
         config.LextoPlus_URL
     )
 
-    # print(list(tweet_dict.values())[:3])
+    # print(tweet_dict)
+
+    # print(list(tweet_dict.values()))
 
     # FilterData().FilterUrlAndFilterNum()
-    tweet_dict_keys = list(tweet_dict.keys())
-    tweet_dict_values = list(tweet_dict.values())
+    # tweet_dict_keys = list(tweet_dict.keys())
+    # tweet_dict_values = list(tweet_dict.values())
 
     print('DATABASE INSERTION')
 

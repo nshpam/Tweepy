@@ -157,9 +157,9 @@ class DatabaseAction():
             
         return collect_history
         
-if __name__ == '__main__':
-    db_action = DatabaseAction()
-    collection = db_action.tweetdb_object(config.mongo_client, config.database_name, config.collection_name)
+# if __name__ == '__main__':
+#     db_action = DatabaseAction()
+#     collection = db_action.tweetdb_object(config.mongo_client, config.database_name, config.collection_name)
 
     # db_action.tweetdb_delete_collection(config.collection_name_5, collection)
 
