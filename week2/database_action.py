@@ -77,22 +77,26 @@ class DatabaseAction():
             print('TOTAL of %s :' %self.mydb.list_collection_names()[i], amount_list[i])
 
     #show all data in specified collection
-    def tweetdb_show_collection(self, col_name, col_to_show):
+    def tweetdb_show_collection(self, col_name, col_to_show, query_object):
+        
+        # print(query_object)
 
-        self.cursor = col_to_show.find()
+        self.cursor = col_to_show.find({},query_object)
 
-        for doc in self.cursor:
-            if self.arp:
-                print(doc)
-            self.count +=1
+        # for doc in self.cursor:
+        #     if self.arp:
+        #         print(doc)
+        #     self.count +=1
 
-        print('TOTAL of %s :' %col_name, self.count)
-        self.count = 0
+        # print('TOTAL of %s :' %col_name, self.count)
+        # self.count = 0
+
+        return self.cursor
     
     #query database
-    def tweetdb_find(self, col_name, col_to_find, field_to_find, query):
+    def tweetdb_find(self, col_name, col_to_find, query_object):
 
-        self.cursor = col_to_find.find({field_to_find : query})
+        self.cursor = col_to_find.find(query_object)
 
         if self.arp:
             print('SEARCH FROM : %s'%col_name)
@@ -146,7 +150,7 @@ class DatabaseAction():
     #history log
     def tweetdb_history(self, action, last_id):
         
-        history_db = db_action.tweetdb_object(config.mongo_client, config.database_name, config.history_db)
+        history_db = self.tweetdb_object(config.mongo_client, config.database_name, config.history_db)
         collect_history = history_db.insert_one({
             'action':action,
             'last_id': last_id
@@ -157,9 +161,11 @@ class DatabaseAction():
             
         return collect_history
         
-# if __name__ == '__main__':
-#     db_action = DatabaseAction()
-#     collection = db_action.tweetdb_object(config.mongo_client, config.database_name, config.collection_name)
+if __name__ == '__main__':
+    db_action = DatabaseAction()
+    collection = db_action.tweetdb_object(config.mongo_client, config.database_name, config.collection_name)
+    query_object = db_action.tweetdb_create_object(['id'], ['1612808365272608769'])
+    db_action.tweetdb_find(config.collection_name, collection ,query_object)
 
     # db_action.tweetdb_delete_collection(config.collection_name_5, collection)
 

@@ -50,8 +50,10 @@ class PullTwitterData(object):
          config.database_name,
          config.collection_name
       )
+      
+      query_object = db_action.tweetdb_create_object(["id"],[id])
 
-      cursor = db_action.tweetdb_find(config.collection_name, collection, "id", id)
+      cursor = db_action.tweetdb_find(config.collection_name, collection, query_object)
 
       db_action.not_print_raw()
 
