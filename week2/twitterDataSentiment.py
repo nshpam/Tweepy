@@ -37,9 +37,9 @@ class SentimentAnalysis():
         if polar == 'positive':
             converted_polar = 1
         elif polar == 'negative':
-            converted_polar = 0
+            converted_polar = -1
         elif polar == '':
-            converted_polar = 2
+            converted_polar = 0
     
         return converted_polar
 
