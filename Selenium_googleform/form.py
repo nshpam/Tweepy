@@ -102,18 +102,6 @@ time.sleep(0.5)
 returntrip1_multitablebutton = browser.find_element(By.XPATH,'//*[@id="mG61Hd"]/div[2]/div/div[2]/div[4]/div/div/div[2]/div/div[1]/div/div[4]/label[2]/div/div/div[2]').click()
 returntrip2_multitablebutton = browser.find_element(By.XPATH,'//*[@id="mG61Hd"]/div[2]/div/div[2]/div[4]/div/div/div[2]/div/div[1]/div/div[4]/label[7]/div/div/div[2]').click()
 time.sleep(0.5)
-# add_imagefile_button = browser.find_element(By.XPATH,'//*[@id="mG61Hd"]/div[2]/div/div[2]/div[7]/div/div/div[2]/div/div[2]/span').click()
-# time.sleep(0.5)
-
-# upload_imagefile_button = browser.find_element(By.XPATH,'//*[@id="yDmH0d"]/div[2]/div[3]/div[2]/div[2]/div/div/div/div[1]/div/div[2]/div/div/div[2]').click()
-# time.sleep(0.5)
-# # browse_imagebutton = browser.find_element(By.XPATH,'//*[@id="yDmH0d"]/div[2]/div[3]/div[2]/div[2]/div/div/div/div[1]/div/div[2]/div/div/div[2]').click()
-# # time.sleep(2)
-# import_imagefile = browser.find_element(By.XPATH,'//*[@id="yDmH0d"]/div[2]/div[3]/div[2]/div[2]/div/div/div/div[1]/div/div[2]/div/input')
-# submit_file = import_imagefile.send_keys(config.image)
-# submit_file 
-# time.sleep(1)
-
 
 playvideo = browser.find_element(By.XPATH,'//*[@id="mG61Hd"]/div[2]/div/div[2]/div[5]/div/div[2]/iframe').click()
 time.sleep(3)
