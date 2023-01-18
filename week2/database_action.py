@@ -78,18 +78,12 @@ class DatabaseAction():
 
     #show all data in specified collection
     def tweetdb_show_collection(self, col_name, col_to_show, query_object):
-        
-        # print(query_object)
 
         self.cursor = col_to_show.find({},query_object)
 
-        # for doc in self.cursor:
-        #     if self.arp:
-        #         print(doc)
-        #     self.count +=1
-
-        # print('TOTAL of %s :' %col_name, self.count)
-        # self.count = 0
+        if self.arp:
+            print('DATABASE NAME : %s'%config.database_name)
+            print('COLLECTION NAME : %s'%col_name)
 
         return self.cursor
     
