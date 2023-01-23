@@ -13,6 +13,8 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 
 class Ui_Form(object):
     def setupUi(self, Form):
+            
+        #widget form size, tab widget, text label of Twitter API Scraper and Search Input
         Form.setObjectName("Form")
         Form.resize(1019, 698)
         Form.setStyleSheet("background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1, stop:0 rgba(85,98,112,255), stop:1 rgba(255,107,107,255));")
@@ -27,6 +29,8 @@ class Ui_Form(object):
         self.tabWidget.setObjectName("tabWidget")
         self.tab = QtWidgets.QWidget()
         self.tab.setObjectName("tab")
+        
+        # calendar in widget tab of Super Task
         self.calendarWidget = QtWidgets.QCalendarWidget(self.tab)
         self.calendarWidget.setGeometry(QtCore.QRect(60, 50, 491, 271))
         font = QtGui.QFont()
@@ -34,6 +38,8 @@ class Ui_Form(object):
         self.calendarWidget.setFont(font)
         self.calendarWidget.setStyleSheet("color:rbg(48,44,47)")
         self.calendarWidget.setObjectName("calendarWidget")
+        
+        # spin box of tweet count limit in widget tab of Super Task
         self.spinBox = QtWidgets.QSpinBox(self.tab)
         self.spinBox.setGeometry(QtCore.QRect(230, 350, 311, 31))
         font = QtGui.QFont()
@@ -42,6 +48,8 @@ class Ui_Form(object):
         self.spinBox.setStyleSheet("background-color:rgb(210,214,213);\n"
 "border-radius:10px;")
         self.spinBox.setObjectName("spinBox")
+        
+        # text label of tweet count limit
         self.label_3 = QtWidgets.QLabel(self.tab)
         self.label_3.setGeometry(QtCore.QRect(70, 350, 161, 21))
         font = QtGui.QFont()
@@ -49,6 +57,8 @@ class Ui_Form(object):
         font.setPointSize(12)
         self.label_3.setFont(font)
         self.label_3.setObjectName("label_3")
+        
+        # create api scrap task button
         self.pushButton_2 = QtWidgets.QPushButton(self.tab)
         self.pushButton_2.setGeometry(QtCore.QRect(400, 440, 201, 41))
         font = QtGui.QFont()
@@ -58,6 +68,8 @@ class Ui_Form(object):
         self.pushButton_2.setStyleSheet("background-color:rgb(143,142,140);\n"
 "border-radius:10px;")
         self.pushButton_2.setObjectName("pushButton_2")
+        
+        # text label of warn note
         self.label_4 = QtWidgets.QLabel(self.tab)
         self.label_4.setGeometry(QtCore.QRect(110, 20, 411, 20))
         font = QtGui.QFont()
@@ -66,9 +78,12 @@ class Ui_Form(object):
         self.label_4.setFont(font)
         self.label_4.setStyleSheet("color:rgb(239,73,59);")
         self.label_4.setObjectName("label_4")
+        
         self.tabWidget.addTab(self.tab, "")
         self.tab_2 = QtWidgets.QWidget()
         self.tab_2.setObjectName("tab_2")
+        
+        # clear analyze data button
         self.pushButton_3 = QtWidgets.QPushButton(self.tab_2)
         self.pushButton_3.setGeometry(QtCore.QRect(430, 580, 171, 41))
         font = QtGui.QFont()
@@ -78,6 +93,8 @@ class Ui_Form(object):
         self.pushButton_3.setStyleSheet("background-color:rgb(143,142,140);\n"
 "border-radius:10px;")
         self.pushButton_3.setObjectName("pushButton_3")
+        
+        # text label of analyzed data sentiment
         self.label_5 = QtWidgets.QLabel(self.tab_2)
         self.label_5.setGeometry(QtCore.QRect(20, 10, 181, 41))
         font = QtGui.QFont()
@@ -85,22 +102,31 @@ class Ui_Form(object):
         font.setPointSize(10)
         self.label_5.setFont(font)
         self.label_5.setObjectName("label_5")
+        
+        # Stacked bar chart of analyzed data sentiment
         self.graphicsView = QtWidgets.QGraphicsView(self.tab_2)
         self.graphicsView.setGeometry(QtCore.QRect(10, 60, 581, 271))
         self.graphicsView.setObjectName("graphicsView")
         self.label_6 = QtWidgets.QLabel(self.tab_2)
         self.label_6.setGeometry(QtCore.QRect(10, 340, 181, 41))
+        
+        # text label of top word Result Preview
         font = QtGui.QFont()
         font.setFamily("Impact")
         font.setPointSize(10)
         self.label_6.setFont(font)
         self.label_6.setObjectName("label_6")
+        
+        # horizontal bar chart of top word Result Preview
         self.graphicsView_3 = QtWidgets.QGraphicsView(self.tab_2)
         self.graphicsView_3.setGeometry(QtCore.QRect(10, 380, 411, 231))
         self.graphicsView_3.setObjectName("graphicsView_3")
+        
         self.tabWidget.addTab(self.tab_2, "")
         self.tab_3 = QtWidgets.QWidget()
         self.tab_3.setObjectName("tab_3")
+        
+        # text label of Conduct Overall Sentiment Analysis
         self.label_7 = QtWidgets.QLabel(self.tab_3)
         self.label_7.setGeometry(QtCore.QRect(20, 10, 291, 41))
         font = QtGui.QFont()
@@ -108,16 +134,22 @@ class Ui_Form(object):
         font.setPointSize(10)
         self.label_7.setFont(font)
         self.label_7.setObjectName("label_7")
+        
+        # Donut chart of Conduct Overall Sentiment Analysis
         self.graphicsView_2 = QtWidgets.QGraphicsView(self.tab_3)
         self.graphicsView_2.setGeometry(QtCore.QRect(10, 40, 581, 321))
         self.graphicsView_2.setObjectName("graphicsView_2")
         self.label_8 = QtWidgets.QLabel(self.tab_3)
         self.label_8.setGeometry(QtCore.QRect(20, 370, 121, 41))
+        
+        # text label of System Overview
         font = QtGui.QFont()
         font.setFamily("Impact")
         font.setPointSize(10)
         self.label_8.setFont(font)
         self.label_8.setObjectName("label_8")
+        
+        # text label of Total Document/Tweet Count
         self.label_9 = QtWidgets.QLabel(self.tab_3)
         self.label_9.setGeometry(QtCore.QRect(50, 430, 211, 41))
         font = QtGui.QFont()
@@ -125,6 +157,8 @@ class Ui_Form(object):
         font.setPointSize(11)
         self.label_9.setFont(font)
         self.label_9.setObjectName("label_9")
+        
+        # display output of Total Document/Tweet Count
         self.textBrowser = QtWidgets.QTextBrowser(self.tab_3)
         self.textBrowser.setGeometry(QtCore.QRect(40, 470, 231, 41))
         font = QtGui.QFont()
@@ -132,6 +166,8 @@ class Ui_Form(object):
         self.textBrowser.setFont(font)
         self.textBrowser.setStyleSheet("background-color:rgb(210,214,213);")
         self.textBrowser.setObjectName("textBrowser")
+        
+        # text label of Newest Twitter Create At Date
         self.label_10 = QtWidgets.QLabel(self.tab_3)
         self.label_10.setGeometry(QtCore.QRect(340, 430, 211, 41))
         font = QtGui.QFont()
@@ -139,6 +175,8 @@ class Ui_Form(object):
         font.setPointSize(11)
         self.label_10.setFont(font)
         self.label_10.setObjectName("label_10")
+        
+        # display output of Newest Twitter Create At Date
         self.textBrowser_2 = QtWidgets.QTextBrowser(self.tab_3)
         self.textBrowser_2.setGeometry(QtCore.QRect(290, 470, 301, 41))
         font = QtGui.QFont()
@@ -146,6 +184,8 @@ class Ui_Form(object):
         self.textBrowser_2.setFont(font)
         self.textBrowser_2.setStyleSheet("background-color:rgb(210,214,213);")
         self.textBrowser_2.setObjectName("textBrowser_2")
+        
+        # text label of Last Time Update/Scraping
         self.label_11 = QtWidgets.QLabel(self.tab_3)
         self.label_11.setGeometry(QtCore.QRect(70, 530, 201, 41))
         font = QtGui.QFont()
@@ -153,6 +193,8 @@ class Ui_Form(object):
         font.setPointSize(11)
         self.label_11.setFont(font)
         self.label_11.setObjectName("label_11")
+        
+        # display output of Last Time Update/Scraping
         self.textBrowser_3 = QtWidgets.QTextBrowser(self.tab_3)
         self.textBrowser_3.setGeometry(QtCore.QRect(20, 570, 281, 41))
         font = QtGui.QFont()
@@ -160,6 +202,8 @@ class Ui_Form(object):
         self.textBrowser_3.setFont(font)
         self.textBrowser_3.setStyleSheet("background-color:rgb(210,214,213);")
         self.textBrowser_3.setObjectName("textBrowser_3")
+        
+        # text label of Current Time
         self.label_12 = QtWidgets.QLabel(self.tab_3)
         self.label_12.setGeometry(QtCore.QRect(410, 530, 91, 41))
         font = QtGui.QFont()
@@ -167,6 +211,8 @@ class Ui_Form(object):
         font.setPointSize(11)
         self.label_12.setFont(font)
         self.label_12.setObjectName("label_12")
+        
+        # display output of Current Time
         self.textBrowser_4 = QtWidgets.QTextBrowser(self.tab_3)
         self.textBrowser_4.setGeometry(QtCore.QRect(310, 570, 281, 41))
         font = QtGui.QFont()
@@ -174,7 +220,9 @@ class Ui_Form(object):
         self.textBrowser_4.setFont(font)
         self.textBrowser_4.setStyleSheet("background-color:rgb(210,214,213);")
         self.textBrowser_4.setObjectName("textBrowser_4")
+        
         self.tabWidget.addTab(self.tab_3, "")
+        
         self.label = QtWidgets.QLabel(Form)
         self.label.setEnabled(True)
         self.label.setGeometry(QtCore.QRect(60, 30, 271, 41))
@@ -186,6 +234,7 @@ class Ui_Form(object):
         self.label.setStyleSheet("color:rgba(255,255,255,220);")
         self.label.setTextFormat(QtCore.Qt.AutoText)
         self.label.setObjectName("label")
+        
         self.label_2 = QtWidgets.QLabel(Form)
         self.label_2.setGeometry(QtCore.QRect(120, 90, 131, 31))
         font = QtGui.QFont()
@@ -194,18 +243,24 @@ class Ui_Form(object):
         self.label_2.setFont(font)
         self.label_2.setStyleSheet("color:rgba(255,255,255,220);")
         self.label_2.setObjectName("label_2")
+        
+        # Search label
         self.textEdit = QtWidgets.QTextEdit(Form)
         self.textEdit.setGeometry(QtCore.QRect(30, 130, 321, 181))
         self.textEdit.setStyleSheet("background-color:rgba(255,255,255,255);\n"
 "border-radius:10px;\n"
 "")
         self.textEdit.setObjectName("textEdit")
+        
+        # Progressbar display  
         self.progressBar = QtWidgets.QProgressBar(Form)
         self.progressBar.setGeometry(QtCore.QRect(30, 320, 361, 31))
         self.progressBar.setProperty("value", 24)
         self.progressBar.setObjectName("progressBar")
         self.pushButton = QtWidgets.QPushButton(Form)
         self.pushButton.setGeometry(QtCore.QRect(30, 360, 321, 41))
+        
+        # Cancel Button
         font = QtGui.QFont()
         font.setFamily("Impact")
         font.setPointSize(15)
@@ -213,6 +268,8 @@ class Ui_Form(object):
         self.pushButton.setStyleSheet("background-color:rgb(210,214,213);\n"
 "border-radius:10px;")
         self.pushButton.setObjectName("pushButton")
+        
+        # Group box of type selection
         self.groupBox = QtWidgets.QGroupBox(Form)
         self.groupBox.setGeometry(QtCore.QRect(30, 410, 321, 91))
         font = QtGui.QFont()
@@ -222,6 +279,8 @@ class Ui_Form(object):
         self.groupBox.setStyleSheet("color:rgba(255,255,255,220);\n"
 "background-color:rgba(255,255,255,0);")
         self.groupBox.setObjectName("groupBox")
+        
+        # Radio button of Word
         self.radioButton_2 = QtWidgets.QRadioButton(self.groupBox)
         self.radioButton_2.setGeometry(QtCore.QRect(200, 40, 95, 31))
         font = QtGui.QFont()
@@ -230,6 +289,8 @@ class Ui_Form(object):
         self.radioButton_2.setFont(font)
         self.radioButton_2.setStyleSheet("background-color:rgba(255,255,255,0);")
         self.radioButton_2.setObjectName("radioButton_2")
+        
+        # Radio button of Hashtag
         self.radioButton = QtWidgets.QRadioButton(self.groupBox)
         self.radioButton.setGeometry(QtCore.QRect(30, 40, 131, 31))
         font = QtGui.QFont()
@@ -238,13 +299,15 @@ class Ui_Form(object):
         self.radioButton.setFont(font)
         self.radioButton.setStyleSheet("background-color:rgba(255,255,255,0);")
         self.radioButton.setObjectName("radioButton")
-
+        
+        # clear search box and progressbar
         self.retranslateUi(Form)
         self.tabWidget.setCurrentIndex(2)
         self.pushButton.clicked.connect(self.textEdit.clear) # type: ignore
         self.pushButton.clicked.connect(self.progressBar.reset) # type: ignore
         QtCore.QMetaObject.connectSlotsByName(Form)
 
+        # setting the text for various labels, buttons, and other UI elements in a form called "Form"
     def retranslateUi(self, Form):
         _translate = QtCore.QCoreApplication.translate
         Form.setWindowTitle(_translate("Form", "Form"))
