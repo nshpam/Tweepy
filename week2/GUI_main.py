@@ -1,14 +1,15 @@
 from twitterGUI import *
-import sys
+
 class UserGUI(Ui_Form):
     def __init__(self,window):
         self.setupUi(window)
         
-app = QtWidgets.QApplication(sys.argv)
-Form = QtWidgets.QWidget()
 
-# Create an instance of our app
-ui = UserGUI(Form)
-# Show the window and start the app
-Form.show()
-app.exec_() 
+
+if __name__ == '__main__':
+    import sys
+    app = QtWidgets.QApplication(sys.argv)
+    Form = QtWidgets.QWidget()
+    ui = UserGUI(Form)
+    Form.show()
+    sys.exit(app.exec_())
