@@ -59,7 +59,7 @@ class Ranking():
             print(word ,sum(polarity), len(polarity))
             # print(word, polarity)
             # print(word, input_list_polar[i], len(polarity))
-    
+            
     def rank_word(self, rank_set, rank_key, rank_f):
 
         top_dict = {}
@@ -98,8 +98,12 @@ class Ranking():
         rank_set = list(enumerate(sorted(set(ranking_frequency), reverse=True), start=1))
 
         self.sentiment_cal(self.rank_word( rank_set, ranking_key, ranking_frequency))
-
         
+        query_object = db_action.tweetdb_create_object(ranking_key,ranking_frequency )
+        collection = db_action.tweetdb_object(config.mongo_client, config.database_name, config.collection_name_6)
+        
+        # insert to db 
+        db_action.tweetdb_insert(config.collection_name_6, collection, query_object)
             
 if __name__ == '__main__':
     Ranking().rank_list()
