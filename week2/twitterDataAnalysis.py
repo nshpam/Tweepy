@@ -35,11 +35,11 @@ class Ranking():
         cursor = self.pull_sentiment()
 
         top_words = list(rank_dict.values())
+        rank_index = list(rank_dict.keys())
         
         input_list_text = []
         input_list_polar = []
         polarity = []
-        result_dict = {}
 
         for doc in cursor:
             input_list_text.append(doc['input'])
@@ -49,17 +49,31 @@ class Ranking():
         # print('หนัง ' in test)
 
         # print(top_words)
+        print('{:<5}'.format('rank'),'{:<10}'.format('word'), '{:<10}'.format('sentiment'))
 
-        for word in top_words:
+
+        for i in range(len(top_words)):
             polarity = []
-            for i in range(len(input_list_text)):
-                if word in input_list_text[i]:
-                    polarity.append(input_list_polar[i])
+            for j in range(len(input_list_text)):
+                if top_words[i] in input_list_text[j]:
+                    polarity.append(input_list_polar[j])
+
+            if sum(polarity) > 0:
+                sentiment = '+'
+            elif sum(polarity) < 0:
+                sentiment = '-'
+            elif sum(polarity) == 0:
+                sentiment = 'N'
             
+<<<<<<< Updated upstream
             print(word ,sum(polarity), len(polarity))
             # print(word, polarity)
             # print(word, input_list_polar[i], len(polarity))
             
+=======
+            print('{:<5}'.format(rank_index[i]),'{:<10}'.format(top_words[i]) , '{:<10}'.format(sentiment))
+    
+>>>>>>> Stashed changes
     def rank_word(self, rank_set, rank_key, rank_f):
 
         top_dict = {}
@@ -74,9 +88,6 @@ class Ranking():
                     temp2 += ' ' + rank_key[j]
             
             top_dict[rank_set[i][0]] = temp2
-            # print('[%d] %s'%(rank_set[i][0], temp))
-        # print(top_dict)
-
         return top_dict
         
     def rank_list(self):
@@ -107,4 +118,3 @@ class Ranking():
             
 if __name__ == '__main__':
     Ranking().rank_list()
-    # Ranking().sentiment_cal()
