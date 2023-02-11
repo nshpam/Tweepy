@@ -1,15 +1,19 @@
-from twitterGUI import *
+import os
+import sys
 
-class UserGUI(Ui_Form):
-    def __init__(self,window):
-        self.setupUi(window)
+from TweetHarvestGUI import *
+
+class MainWindow(QMainWindow):
+    def __init__(self, parent=None):
+        QMainWindow.__init__(self)
+        self.ui = Ui_MainWindow()
+        self.ui.setupUi(self)
         
-
-
+        self.show()
+        
 if __name__ == '__main__':
-    import sys
-    app = QtWidgets.QApplication(sys.argv)
-    Form = QtWidgets.QWidget()
-    ui = UserGUI(Form)
-    Form.show()
+    app = QApplication(sys.argv)
+    
+    window = MainWindow()
+    window.show()
     sys.exit(app.exec_())
