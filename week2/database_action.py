@@ -4,8 +4,8 @@ import pymongo
 class DatabaseAction():
     
     def __init__(self, db_name='', col_name='', myclient=None, mydb=None, mycol=None, cursor=None, count=0, arp=True, cmd=None, history=True):
-        self.db_name = db_name
-        self.col_name = col_name
+        # self.db_name = db_name
+        # self.col_name = col_name
         self.myclient = myclient
         self.mydb = mydb
         self.mycol = mycol
@@ -35,24 +35,44 @@ class DatabaseAction():
     def tweetdb_object(self, mongoclient_to_connect, db_to_connect, col_to_connect):
         self.db_name = db_to_connect
         self.col_name = col_to_connect
+        
+        try :
+            self.myclient = pymongo.MongoClient(mongoclient_to_connect)
+            self.mydb = self.myclient[self.db_name]
+            self.mycol = self.mydb[self.col_name]
+        except Exception as e:
+            print(e)
+            return 'Failed to Connect MongoDB'
+        else: #run when no error was raised     
+            if self.arp:
+                print('Database :', self.mydb.name)
+                print('Collection :', self.mycol.name)
 
-        self.myclient = pymongo.MongoClient(mongoclient_to_connect)
-        self.mydb = self.myclient[self.db_name]
-        self.mycol = self.mydb[self.col_name]
-
-        return self.mycol
+            return self.mycol
     
     #universal create object
     def tweetdb_create_object(self, data_field, data_list):
 
         data_dict = {}
 
-        for i in range(len(data_field)):
+        try:
+            if len(data_field) != len(data_list):
+                return 'Amount of key and value not match'
+            for i in range(len(data_field)):
 
-            if self.arp:
-                print(data_field[i],':',data_list[i])
+                if data_field[i] in data_field[:i]:
+                    print(data_field[:i])
+                    return 'Duplicate Keys'
 
-            data_dict[data_field[i]] = data_list[i]
+                if self.arp:
+                    print(data_field[i],':',data_list[i])
+                try:
+                    data_dict[data_field[i]] = data_list[i]
+                except Exception as e:
+                    # print(e)
+                    return 'Incorrect Data'
+        except:
+            return 'Failed to create object'
         
         return data_dict
 
@@ -157,9 +177,11 @@ class DatabaseAction():
         
 if __name__ == '__main__':
     db_action = DatabaseAction()
-    collection = db_action.tweetdb_object(config.mongo_client, config.database_name, config.collection_name)
-    query_object = db_action.tweetdb_create_object(['id'], ['1612808365272608769'])
-    db_action.tweetdb_find(config.collection_name, collection ,query_object)
+    
+    collection = db_action.tweetdb_object('asdasf', 'asdhjvfjh', 'ladfjgj')
+    # print(db_action.mycol.name)
+    # query_object = db_action.tweetdb_create_object(['id'], ['1612808365272608769'])
+    # db_action.tweetdb_find(config.collection_name, collection ,query_object)
 
     # db_action.tweetdb_delete_collection(config.collection_name_5, collection)
 
