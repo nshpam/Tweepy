@@ -65,15 +65,8 @@ class Ranking():
             elif sum(polarity) == 0:
                 sentiment = 'N'
             
-<<<<<<< Updated upstream
-            print(word ,sum(polarity), len(polarity))
-            # print(word, polarity)
-            # print(word, input_list_polar[i], len(polarity))
-            
-=======
             print('{:<5}'.format(rank_index[i]),'{:<10}'.format(top_words[i]) , '{:<10}'.format(sentiment))
     
->>>>>>> Stashed changes
     def rank_word(self, rank_set, rank_key, rank_f):
 
         top_dict = {}

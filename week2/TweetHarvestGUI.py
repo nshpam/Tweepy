@@ -406,6 +406,8 @@ class Ui_MainWindow(object):
         self.spinBox.setStyleSheet("background-color: rgb(13, 15, 30);\n"
 "color: rgb(255, 255, 255);\n"
 "border-radius: 20px;")
+        self.spinBox.setMaximum(999999999)
+        self.spinBox.setDisplayIntegerBase(10)
         self.spinBox.setObjectName("spinBox")
         self.horizontalLayout_8.addWidget(self.spinBox)
         self.verticalLayout_16.addWidget(self.frame_8)
@@ -556,7 +558,7 @@ class Ui_MainWindow(object):
         MainWindow.setStatusBar(self.statusbar)
 
         self.retranslateUi(MainWindow)
-        self.stackedWidget.setCurrentIndex(0)
+        self.stackedWidget.setCurrentIndex(1)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
     def retranslateUi(self, MainWindow):
@@ -580,8 +582,8 @@ class Ui_MainWindow(object):
         self.label_11.setText(_translate("MainWindow", "Tweet Created At Date Request"))
         self.label_12.setText(_translate("MainWindow", "You cannot scrape tweets that were created more than a week ago."))
         self.pushButton_Scrap.setText(_translate("MainWindow", "Create API Scrap Task"))
-        self.label_13.setText(_translate("MainWindow", "ETL and Data Processing"))
-        self.pushButton_ETL.setText(_translate("MainWindow", "Create ETL Task"))
+        self.label_13.setText(_translate("MainWindow", "Data Processing"))
+        self.pushButton_ETL.setText(_translate("MainWindow", "Analyze Tweets"))
         self.label_14.setText(_translate("MainWindow", "Available Search Term"))
         self.pushButton_selectAll.setText(_translate("MainWindow", "Select All Search Term"))
         self.pushButton_deselectAll.setText(_translate("MainWindow", "Deselect All Search Term"))
