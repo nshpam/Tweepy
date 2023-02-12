@@ -4,8 +4,8 @@ import pymongo
 class DatabaseAction():
     
     def __init__(self, db_name='', col_name='', myclient=None, mydb=None, mycol=None, cursor=None, count=0, arp=True, cmd=None, history=True):
-        self.db_name = db_name
-        self.col_name = col_name
+        # self.db_name = db_name
+        # self.col_name = col_name
         self.myclient = myclient
         self.mydb = mydb
         self.mycol = mycol
@@ -35,10 +35,13 @@ class DatabaseAction():
     def tweetdb_object(self, mongoclient_to_connect, db_to_connect, col_to_connect):
         self.db_name = db_to_connect
         self.col_name = col_to_connect
-
         self.myclient = pymongo.MongoClient(mongoclient_to_connect)
         self.mydb = self.myclient[self.db_name]
         self.mycol = self.mydb[self.col_name]
+
+        if self.arp:
+            print('Database :', self.mydb.name)
+            print('Collection :', self.mycol.name)
 
         return self.mycol
     
@@ -157,9 +160,11 @@ class DatabaseAction():
         
 if __name__ == '__main__':
     db_action = DatabaseAction()
+    
     collection = db_action.tweetdb_object(config.mongo_client, config.database_name, config.collection_name)
-    query_object = db_action.tweetdb_create_object(['id'], ['1612808365272608769'])
-    db_action.tweetdb_find(config.collection_name, collection ,query_object)
+    print(collection)
+    # query_object = db_action.tweetdb_create_object(['id'], ['1612808365272608769'])
+    # db_action.tweetdb_find(config.collection_name, collection ,query_object)
 
     # db_action.tweetdb_delete_collection(config.collection_name_5, collection)
 
