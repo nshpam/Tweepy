@@ -347,6 +347,134 @@ class Ui_MainWindow(object):
         self.verticalLayout_14.addWidget(self.frame_18)
         self.stackedWidget.addWidget(self.location)
         self.scraper_setting = QtWidgets.QWidget()
+        self.scraper_setting.setStyleSheet("QScrollBar:vertical {\n"
+"    border: none;\n"
+"    background: rgb(45, 45, 68);\n"
+"    width: 14px;\n"
+"    margin: 15px 0 15px 0;\n"
+"    border-radius: 0px;\n"
+" }\n"
+"\n"
+"/*  HANDLE BAR VERTICAL */\n"
+"QScrollBar::handle:vertical {    \n"
+"    background-color: rgb(80, 80, 122);\n"
+"    min-height: 30px;\n"
+"    border-radius: 7px;\n"
+"}\n"
+"QScrollBar::handle:vertical:hover{    \n"
+"    background-color: rgb(255, 0, 127);\n"
+"}\n"
+"QScrollBar::handle:vertical:pressed {    \n"
+"    background-color: rgb(185, 0, 92);\n"
+"}\n"
+"\n"
+"/* BTN TOP - SCROLLBAR */\n"
+"QScrollBar::sub-line:vertical {\n"
+"    border: none;\n"
+"    background-color: rgb(59, 59, 90);\n"
+"    height: 15px;\n"
+"    border-top-left-radius: 7px;\n"
+"    border-top-right-radius: 7px;\n"
+"    subcontrol-position: top;\n"
+"    subcontrol-origin: margin;\n"
+"}\n"
+"QScrollBar::sub-line:vertical:hover {    \n"
+"    background-color: rgb(255, 0, 127);\n"
+"}\n"
+"QScrollBar::sub-line:vertical:pressed {    \n"
+"    background-color: rgb(185, 0, 92);\n"
+"}\n"
+"\n"
+"/* BTN BOTTOM - SCROLLBAR */\n"
+"QScrollBar::add-line:vertical {\n"
+"    border: none;\n"
+"    background-color: rgb(59, 59, 90);\n"
+"    height: 15px;\n"
+"    border-bottom-left-radius: 7px;\n"
+"    border-bottom-right-radius: 7px;\n"
+"    subcontrol-position: bottom;\n"
+"    subcontrol-origin: margin;\n"
+"}\n"
+"QScrollBar::add-line:vertical:hover {    \n"
+"    background-color: rgb(255, 0, 127);\n"
+"}\n"
+"QScrollBar::add-line:vertical:pressed {    \n"
+"    background-color: rgb(185, 0, 92);\n"
+"}\n"
+"\n"
+"/* RESET ARROW */\n"
+"QScrollBar::up-arrow:vertical, QScrollBar::down-arrow:vertical {\n"
+"    background: none;\n"
+"}\n"
+"QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical {\n"
+"    background: none;\n"
+"}\n"
+"/* HORIZONTAL SCROLLBAR */\n"
+"/* HORIZONTAL SCROLLBAR */\n"
+"QScrollBar:horizontal {\n"
+"    border: none;\n"
+"    background: rgb(45, 45, 68);\n"
+"    height: 14px;\n"
+"    margin: 0 15px 0 15px;\n"
+"    border-radius: 0px;\n"
+"}\n"
+"\n"
+"/* HANDLE BAR HORIZONTAL */\n"
+"QScrollBar::handle:horizontal {\n"
+"    background-color: rgb(80, 80, 122);\n"
+"    min-width: 30px;\n"
+"    border-radius: 7px;\n"
+"}\n"
+"QScrollBar::handle:horizontal:hover {\n"
+"    background-color: rgb(255, 0, 127);\n"
+"}\n"
+"QScrollBar::handle:horizontal:pressed {\n"
+"    background-color: rgb(185, 0, 92);\n"
+"}\n"
+"\n"
+"/* BTN LEFT - SCROLLBAR */\n"
+"QScrollBar::sub-line:horizontal {\n"
+"    border: none;\n"
+"    background-color: rgb(59, 59, 90);\n"
+"    width: 15px;\n"
+"    border-top-left-radius: 7px;\n"
+"    border-bottom-left-radius: 7px;\n"
+"    subcontrol-position: left;\n"
+"    subcontrol-origin: margin;\n"
+"}\n"
+"QScrollBar::sub-line:horizontal:hover {\n"
+"    background-color: rgb(255, 0, 127);\n"
+"}\n"
+"QScrollBar::sub-line:horizontal:pressed {\n"
+"    background-color: rgb(185, 0, 92);\n"
+"}\n"
+"\n"
+"/* BTN RIGHT - SCROLLBAR */\n"
+"QScrollBar::add-line:horizontal {\n"
+"    border: none;\n"
+"    background-color: rgb(59, 59, 90);\n"
+"    width: 15px;\n"
+"    border-top-right-radius: 7px;\n"
+"    border-bottom-right-radius: 7px;\n"
+"    subcontrol-position: right;\n"
+"    subcontrol-origin: margin;\n"
+"}\n"
+"QScrollBar::add-line:horizontal:hover {\n"
+"    background-color: rgb(255, 0, 127);\n"
+"}\n"
+"QScrollBar::add-line:horizontal:pressed {\n"
+"    background-color: rgb(185, 0, 92);\n"
+"}\n"
+"\n"
+"/* RESET ARROW */\n"
+"QScrollBar::left-arrow:horizontal, QScrollBar::right-arrow:horizontal {\n"
+"    background: none;\n"
+"}\n"
+"QScrollBar::add-page:horizontal, QScrollBar::sub-page:horizontal {\n"
+"    background: none;\n"
+"}\n"
+"\n"
+"")
         self.scraper_setting.setObjectName("scraper_setting")
         self.verticalLayout_2 = QtWidgets.QVBoxLayout(self.scraper_setting)
         self.verticalLayout_2.setObjectName("verticalLayout_2")
@@ -364,7 +492,7 @@ class Ui_MainWindow(object):
         self.scrollArea.setWidgetResizable(True)
         self.scrollArea.setObjectName("scrollArea")
         self.scrollAreaWidgetContents = QtWidgets.QWidget()
-        self.scrollAreaWidgetContents.setGeometry(QtCore.QRect(0, 0, 819, 632))
+        self.scrollAreaWidgetContents.setGeometry(QtCore.QRect(0, 0, 826, 639))
         self.scrollAreaWidgetContents.setObjectName("scrollAreaWidgetContents")
         self.verticalLayout_15 = QtWidgets.QVBoxLayout(self.scrollAreaWidgetContents)
         self.verticalLayout_15.setObjectName("verticalLayout_15")
@@ -569,14 +697,14 @@ class Ui_MainWindow(object):
         self.pushButton_topWord.setText(_translate("MainWindow", "Top Words"))
         self.pushButton_overallSent.setText(_translate("MainWindow", "Overall Sentiment"))
         self.pushButton_location.setText(_translate("MainWindow", "Location"))
-        self.pushButton_scraperSetting.setText(_translate("MainWindow", "Scraper Setting"))
+        self.pushButton_scraperSetting.setText(_translate("MainWindow", "Scraping settings"))
         self.pushButton_searchTerms.setText(_translate("MainWindow", "Search Terms"))
         self.label_2.setText(_translate("MainWindow", "MENU"))
         self.label_3.setText(_translate("MainWindow", "DASHBORD"))
-        self.label_4.setText(_translate("MainWindow", "Analyzed Data Sentiment"))
-        self.label_5.setText(_translate("MainWindow", "Top Words Result Preview"))
+        self.label_4.setText(_translate("MainWindow", "Sentiment analysis of the data"))
+        self.label_5.setText(_translate("MainWindow", "Top 10 Words Results Preview"))
         self.label_6.setText(_translate("MainWindow", "Overall Sentiment Analysis"))
-        self.label_7.setText(_translate("MainWindow", "Tweet Location"))
+        self.label_7.setText(_translate("MainWindow", "The geographical distribution of tweets"))
         self.label_9.setText(_translate("MainWindow", "Word/Hashtag : "))
         self.label_10.setText(_translate("MainWindow", "Tweet Count Limit : "))
         self.label_11.setText(_translate("MainWindow", "Tweet Created At Date Request"))
