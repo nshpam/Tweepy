@@ -2,33 +2,30 @@ import unittest
 from unittest.mock import patch, MagicMock
 import database_action
 from  collections import namedtuple
-import pymongo
 
 class FakeMongoDB():
 
-    def __init__(self):
-        self.data = {}
-        self.client_data = ()
-    
-    # @patch('pymongo.MongoClient')
-    def connect_to_mongoclient(self, mock_client):
-        key_tuple = namedtuple('key_tuple', ['host', 'document_class', 'tz_aware', 'connect'])
+    def pymongo_MongoClient(self, collections=[]):
+        mock_client = MagicMock()
 
-        if mock_client == 'mongodb://localhost:27017/':
-            self.client_data = key_tuple(
-                host=['localhost:27017'], 
-                document_class=dict, 
-                tz_aware= False, #timezone aware
-                connect= True)
-        else:
-            self.client_data = key_tuple(
-                host=['localhost:27017'], 
-                document_class=dict, 
-                tz_aware= False, #timezone aware
-                connect= False)
+        if collections == []:
+            return mock_client
+
+        temp_list = []
+        for col in collections:
+            temp_list.append(col)
+
+        mock_client.list_collection_names.return_value = temp_list
+        return mock_client
+    
+    def Mongo_collection(self, num, mock_value):
         
-        return self.client_data
-    # collection = db_action.tweetdb_object(config.mongo_client, config.database_name, config.collection_name)
+        mock_col = MagicMock()
+        mock_col.name = 'mock_col'+str(num)
+        mock_col.find.return_value = mock_value
+
+        return mock_col
+    
 
 
 class TestDatabaseActions(unittest.TestCase):
@@ -179,34 +176,16 @@ class TestDatabaseActions(unittest.TestCase):
     #correct collection
     def test_tweetdb_showall_collection_1(self):
         
-        mock_client = MagicMock()
+        mock_client = FakeMongoDB().pymongo_MongoClient(['mock_col1', 'mock_col2', 'mock_col3', 'mock_col4'])
 
-        mock_col1 = MagicMock()
-        mock_col2 = MagicMock()
-        mock_col3 = MagicMock()
-        mock_col4 = MagicMock()
+        mock_col1 = FakeMongoDB().Mongo_collection(1, [{'a1':'ant', 'a2':'app'}])
+        mock_col2 = FakeMongoDB().Mongo_collection(2, [{'b1':'bat', 'b2':'boy'}])
+        mock_col3 = FakeMongoDB().Mongo_collection(3, [{'c1':'cat', 'c2':'cap'}])
+        mock_col4 = FakeMongoDB().Mongo_collection(4, [{'d1':'dog', 'd2':'dose'}])
 
-        mock_col1.name = 'mock_col1'
-        mock_col2.name = 'mock_col2'
-        mock_col3.name = 'mock_col3'
-        mock_col4.name = 'mock_col4'
+        self.db_action.mydb = mock_client
         
-        mock_col1.find.return_value = [{'a1':'ant', 'a2':'app'}]
-        mock_col2.find.return_value = [{'b1':'bat', 'b2':'boy'}]
-        mock_col3.find.return_value = [{'c1':'cat', 'c2':'cap'}]
-        mock_col4.find.return_value = [{'d1':'dog', 'd2':'dose'}]
-
-        mock_client.list_collection_names.return_value = ['mock_col1', 'mock_col2', 'mock_col3', 'mock_col4']
-
-        self.db_action.myclient = mock_client
-        self.db_action.mydb = self.db_action.myclient[self.mongo_db]
-        
-        collection_list = [
-            mock_col1,
-            mock_col2,
-            mock_col3,
-            mock_col4
-        ]
+        collection_list = [mock_col1, mock_col2, mock_col3, mock_col4]
         
         result = self.db_action.tweetdb_showall_collection(collection_list)
         assert result == {'mock_col1':[{'a1':'ant', 'a2':'app'}], 
@@ -217,7 +196,7 @@ class TestDatabaseActions(unittest.TestCase):
     #incorrect collection
     
     #incorrect collection in collection list
-    def test_tweetdb_showall_collection_3(self):
+    def test_tweetdb_showall_collection_2(self):
         
         mock_client = MagicMock()
 
@@ -233,7 +212,7 @@ class TestDatabaseActions(unittest.TestCase):
     
     #incorrect collection list
     #incorrect collection in collection list
-    def test_tweetdb_showall_collection_4(self):
+    def test_tweetdb_showall_collection_3(self):
         
         mock_client = MagicMock()
 
@@ -267,12 +246,24 @@ class TestDatabaseActions(unittest.TestCase):
     
     #test tweetdb_show_collection
     def test_tweetdb_show_collection_1(self):
+
+        mock_client = MagicMock()
+
         mock_col1 = MagicMock()
         mock_col1.name = 'mock_col1'
-        mock_col1.find.return_value = [{'a1':'ant', 'a2':'app'}, 
-                                       {'b1':'bat', 'b2':'boy'},
-                                       {'c1':'cat', 'c2':'cap'}]
-        mock_col1
+        mock_col1.find.return_value = [{'id':'09234', 'sentiment':'positive'}, 
+                                       {'id':'09235', 'sentiment':'positive'},
+                                       {'id':'09236', 'sentiment':'negative'}]
+        self.db_action.myclient = mock_client
+        self.db_action.mydb = self.db_action.myclient[self.mongo_db]
+
+        data_field = ['sentiment']
+        data_list = ['positive']
+
+        fake_object = self.db_action.tweetdb_create_object(data_field, data_list)
+
+        result = self.db_action.tweetdb_show_collection(mock_col1.name, mock_col1, fake_object)
+        # print('here',result)
 
 if __name__ == '__main__':
     unittest.main()

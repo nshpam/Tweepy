@@ -78,6 +78,8 @@ class DatabaseAction():
     #show all data in every collection
     def tweetdb_showall_collection(self, col_list):
 
+        # print(col_list)
+
         if type(col_list) != type([]):
             return 'Invalid Collection List'
 
@@ -87,10 +89,10 @@ class DatabaseAction():
 
         for i in range(len(col_list)):
 
-            if type(col_list[i]) != type([]):
+            try:
+                self.cursor = col_list[i].find()
+            except:
                 return 'Invalid Collection'
-
-            self.cursor = col_list[i].find()
 
             for doc in self.cursor:
                 temp_list.append(doc)
@@ -108,13 +110,13 @@ class DatabaseAction():
        
         return data_dict
 
-    #show all data in specified collection
-    def tweetdb_show_collection(self, col_name, col_to_show, query_object):
+    #show all data that match the query in specified collection
+    def tweetdb_show_collection(self, col_name, col_to_show, key_object):
 
-        self.cursor = col_to_show.find({},query_object)
+        self.cursor = col_to_show.find({},key_object)
 
         if self.arp:
-            print('DATABASE NAME : %s'%config.database_name)
+            print('DATABASE NAME : %s'%self.mydb.name)
             print('COLLECTION NAME : %s'%col_name)
 
         return self.cursor
