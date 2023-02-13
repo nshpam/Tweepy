@@ -4,16 +4,20 @@ import time
 import config
 
 class Googleform(object):
-    # link chrome driver and open google form
+    
     def __init__(self):
-        self.browser = webdriver.Chrome()
-        self.browser.get(config.google_form)
+        self.browser = webdriver.Chrome()  #link chrome driver
+        self.browser.get(config.google_form) #open google form
 
     # enter email address
     def login_user(self,id:str):
+        #find input email boxes
         inputemail_boxes = self.browser.find_element(By.XPATH,f'//*[@id="{id}Id"]')
+        #fill the input email boxes
         inputemail_boxes.send_keys(config.username)
+        #find the next button and click it
         self.browser.find_element(By.XPATH,f'//*[@id="{id}Next"]/div/button').click()
+        #wait maximum 10 seconds if finish early it will continue
         self.browser.implicitly_wait(10)
 
     # enter password

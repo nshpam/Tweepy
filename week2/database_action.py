@@ -78,8 +78,6 @@ class DatabaseAction():
     #show all data in every collection
     def tweetdb_showall_collection(self, col_list):
 
-        # print(col_list)
-
         if type(col_list) != type([]):
             return 'Invalid Collection List'
 

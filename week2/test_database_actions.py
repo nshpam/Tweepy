@@ -59,9 +59,6 @@ class FakeMongoDB():
 
         if type(condition_dict) != type({}) and type(setting_dict) != type({}):
             return 'Invalid condition_dict or setting_dict'
-
-        # print(condition_dict, type(condition_dict))
-        # print(setting_dict, type(setting_dict))
         mock_col = self.Mongo_collection(1)
         mock_col.side_effect = self.side_effect
         mock_col(condition_dict, setting_dict)
@@ -265,31 +262,31 @@ class TestDatabaseActions(unittest.TestCase):
     
     #inprogress
     #test tweetdb_show_collection
-    def test_tweetdb_show_collection_1(self):
+    # def test_tweetdb_show_collection_1(self):
         
-        print(FakeMongoDB().side_effect(1,2))
+    #     print(FakeMongoDB().side_effect(1,2))
 
-        mock_client = MagicMock()
+    #     mock_client = MagicMock()
 
-        mock_col1 = MagicMock()
-        mock_col1.name = 'mock_col1'
-        # mock_col1.find.return_value = [{'id':'09234', 'sentiment':'positive'}, 
-        #                                {'id':'09235', 'sentiment':'positive'},
-        #                                {'id':'09236', 'sentiment':'negative'}]
+    #     mock_col1 = MagicMock()
+    #     mock_col1.name = 'mock_col1'
+    #     # mock_col1.find.return_value = [{'id':'09234', 'sentiment':'positive'}, 
+    #     #                                {'id':'09235', 'sentiment':'positive'},
+    #     #                                {'id':'09236', 'sentiment':'negative'}]
         
-        self.db_action.mydb = mock_client
+    #     self.db_action.mydb = mock_client
 
-        # self.db_action.myclient = mock_client
-        # self.db_action.mydb = self.db_action.myclient[self.mongo_db]
+    #     # self.db_action.myclient = mock_client
+    #     # self.db_action.mydb = self.db_action.myclient[self.mongo_db]
 
-        data_field = ['id', 'sentiment']
-        data_list = [1, 0]
+    #     data_field = ['id', 'sentiment']
+    #     data_list = [1, 0]
 
-        fake_object = self.db_action.tweetdb_create_object(data_field, data_list)
-        # print(fake_object)
-        FakeMongoDB().Mongo_find_arg({}, fake_object)
-        # result = self.db_action.tweetdb_show_collection(mock_col1.name, mock_col1, fake_object)
-        # print('here',result)
+    #     fake_object = self.db_action.tweetdb_create_object(data_field, data_list)
+    #     # print(fake_object)
+    #     FakeMongoDB().Mongo_find_arg({}, fake_object)
+    #     # result = self.db_action.tweetdb_show_collection(mock_col1.name, mock_col1, fake_object)
+    #     # print('here',result)
 
 if __name__ == '__main__':
     unittest.main()
