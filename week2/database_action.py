@@ -61,7 +61,6 @@ class DatabaseAction():
             for i in range(len(data_field)):
 
                 if data_field[i] in data_field[:i]:
-                    print(data_field[:i])
                     return 'Duplicate Keys'
 
                 if self.arp:
@@ -69,7 +68,7 @@ class DatabaseAction():
                 try:
                     data_dict[data_field[i]] = data_list[i]
                 except Exception as e:
-                    # print(e)
+                    print(e)
                     return 'Incorrect Data'
         except:
             return 'Failed to create object'
@@ -79,22 +78,35 @@ class DatabaseAction():
     #show all data in every collection
     def tweetdb_showall_collection(self, col_list):
 
+        if type(col_list) != type([]):
+            return 'Invalid Collection List'
+
+        data_dict = {}
         amount_list = []
+        temp_list = []
 
         for i in range(len(col_list)):
+
+            if type(col_list[i]) != type([]):
+                return 'Invalid Collection'
+
             self.cursor = col_list[i].find()
 
             for doc in self.cursor:
-
+                temp_list.append(doc)
                 if self.arp:
                     print(doc)
                 self.count +=1
 
             amount_list.append(self.count)
+            data_dict[col_list[i].name] = temp_list
             self.count = 0
+            temp_list = []
 
         for i in range(len(amount_list)):
             print('TOTAL of %s :' %self.mydb.list_collection_names()[i], amount_list[i])
+       
+        return data_dict
 
     #show all data in specified collection
     def tweetdb_show_collection(self, col_name, col_to_show, query_object):

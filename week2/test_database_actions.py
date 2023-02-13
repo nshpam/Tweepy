@@ -174,5 +174,105 @@ class TestDatabaseActions(unittest.TestCase):
         test_object = self.db_action.tweetdb_create_object(data_field, data_list)
         assert test_object == 'Amount of key and value not match'
 
+    #test tweetdb_showall_collection
+
+    #correct collection
+    def test_tweetdb_showall_collection_1(self):
+        
+        mock_client = MagicMock()
+
+        mock_col1 = MagicMock()
+        mock_col2 = MagicMock()
+        mock_col3 = MagicMock()
+        mock_col4 = MagicMock()
+
+        mock_col1.name = 'mock_col1'
+        mock_col2.name = 'mock_col2'
+        mock_col3.name = 'mock_col3'
+        mock_col4.name = 'mock_col4'
+        
+        mock_col1.find.return_value = [{'a1':'ant', 'a2':'app'}]
+        mock_col2.find.return_value = [{'b1':'bat', 'b2':'boy'}]
+        mock_col3.find.return_value = [{'c1':'cat', 'c2':'cap'}]
+        mock_col4.find.return_value = [{'d1':'dog', 'd2':'dose'}]
+
+        mock_client.list_collection_names.return_value = ['mock_col1', 'mock_col2', 'mock_col3', 'mock_col4']
+
+        self.db_action.myclient = mock_client
+        self.db_action.mydb = self.db_action.myclient[self.mongo_db]
+        
+        collection_list = [
+            mock_col1,
+            mock_col2,
+            mock_col3,
+            mock_col4
+        ]
+        
+        result = self.db_action.tweetdb_showall_collection(collection_list)
+        assert result == {'mock_col1':[{'a1':'ant', 'a2':'app'}], 
+                          'mock_col2':[{'b1':'bat', 'b2':'boy'}],
+                          'mock_col3':[{'c1':'cat', 'c2':'cap'}],
+                          'mock_col4':[{'d1':'dog', 'd2':'dose'}]}
+
+    #incorrect collection
+    
+    #incorrect collection in collection list
+    def test_tweetdb_showall_collection_3(self):
+        
+        mock_client = MagicMock()
+
+        mock_client.list_collection_names.return_value = ['mock_col1', 'mock_col2', 'mock_col3', 'mock_col4']
+
+        self.db_action.myclient = mock_client
+        self.db_action.mydb = self.db_action.myclient[self.mongo_db]
+        
+        collection_list = (1,2,3,4)
+        
+        result = self.db_action.tweetdb_showall_collection(collection_list)
+        assert result == 'Invalid Collection List'
+    
+    #incorrect collection list
+    #incorrect collection in collection list
+    def test_tweetdb_showall_collection_4(self):
+        
+        mock_client = MagicMock()
+
+        mock_col1 = MagicMock()
+        mock_col2 = MagicMock()
+        mock_col3 = MagicMock()
+        mock_col4 = 0
+
+        mock_col1.name = 'mock_col1'
+        mock_col2.name = 'mock_col2'
+        mock_col3.name = 'mock_col3'
+
+        mock_col1.find.return_value = [{'a1':'ant', 'a2':'app'}]
+        mock_col2.find.return_value = [{'b1':'bat', 'b2':'boy'}]
+        mock_col3.find.return_value = [{'c1':'cat', 'c2':'cap'}]
+
+        mock_client.list_collection_names.return_value = ['mock_col1', 'mock_col2', 'mock_col3', 'mock_col4']
+
+        self.db_action.myclient = mock_client
+        self.db_action.mydb = self.db_action.myclient[self.mongo_db]
+        
+        collection_list = [
+            mock_col1,
+            mock_col2,
+            mock_col3,
+            mock_col4
+        ]
+        
+        result = self.db_action.tweetdb_showall_collection(collection_list)
+        assert result == 'Invalid Collection'
+    
+    #test tweetdb_show_collection
+    def test_tweetdb_show_collection_1(self):
+        mock_col1 = MagicMock()
+        mock_col1.name = 'mock_col1'
+        mock_col1.find.return_value = [{'a1':'ant', 'a2':'app'}, 
+                                       {'b1':'bat', 'b2':'boy'},
+                                       {'c1':'cat', 'c2':'cap'}]
+        mock_col1
+
 if __name__ == '__main__':
     unittest.main()
