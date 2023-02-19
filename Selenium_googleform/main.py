@@ -10,9 +10,7 @@ class Googleform(object):
 
     # enter email address
     def login_user(self,id:str):
-        # find input email boxes
-        inputemail_boxes = self.browser.find_element(By.XPATH,f'//*[@id="{id}Id"]')
-        # enter the email from a configuration file into the password box
+
         inputemail_boxes.send_keys(config.username)
         # find the next button and click it
         self.browser.find_element(By.XPATH,f'//*[@id="{id}Next"]/div/button').click()
@@ -21,13 +19,7 @@ class Googleform(object):
 
     # enter password
     def login_password(self,id:str):
-        # find input password boxes
-        inputpassword_boxes = self.browser.find_element(By.XPATH,f'//*[@id="{id}"]/div[1]/div/div[1]/input')
-        # enter the password from a configuration file into the password box
-        inputpassword_boxes.send_keys(config.password)
-        # find the next button and click it
-        self.browser.find_element(By.XPATH,f'//*[@id="{id}Next"]/div/button').click()
-        # wait maximum 10 seconds if finish early it will continue
+
         self.browser.implicitly_wait(10)
 
     # clear any previous answers in the form
