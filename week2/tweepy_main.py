@@ -8,6 +8,7 @@ import tweepy     #use for twitter scrapping
 # import pymongo    #use for connecting to mongodb
 from dateutil import tz #use for timezone converting
 import datetime   #use for timezone converting
+import twitterDataProcessing
 
 #you can edit mongodb server, database name, collection name in file name "config.py"
 db_action = database_action.DatabaseAction()
@@ -16,9 +17,10 @@ db_action = database_action.DatabaseAction()
 class PullTwitterData(object):
 
    #initialize variable
-   def __init__(self, tweets_list=[], count_tweets=0):
+   def __init__(self, tweets_list=[], count_tweets=0, filters=twitterDataProcessing.FilterData()):
       self.tweets_list = tweets_list
       self.count_tweets = count_tweets
+      self.filters = filters
 
    #convert timezone from UTC to GMT
    #you can edit the pair of timezone you want in file name "config.py"
@@ -40,25 +42,58 @@ class PullTwitterData(object):
          return time_err_3
 
       #convert timezone and change format into day-month-year | hour-minute
-      convert_date = convert_date.replace(tzinfo=from_zone).astimezone(to_zone).strftime('%d-%m-%Y | %H:%M')
+      # convert_date = convert_date.replace(tzinfo=from_zone).astimezone(to_zone).strftime('%d-%m-%Y | %H:%M')
+      convert_date = convert_date.replace(tzinfo=from_zone).astimezone(to_zone)
       return convert_date
+
+   def pull_all_data(self, cursor):
+
+      all_data = []
+
+      for doc in cursor:
+         raw_list = doc['text'].split()
+         clean_data = ''
+         for word in raw_list:
+            if not self.filters.FilterUrl(word):
+               clean_data += word
+         all_data.append(clean_data)
+      
+      return all_data
+
+   def check_duplicate(self, text, cursor):
+      raw_list = text.split()
+      clean_data = ''
+      
+      for word in raw_list:
+         if not self.filters.FilterUrl(word):
+            clean_data += word
+      
+      if clean_data in self.pull_all_data(cursor):
+         return True
+      return False
    
-   def database_decision(self, id, username, date, time, text, fav_count, retweet_count):
+   def database_decision(self, id, username, date, text, fav_count, retweet_count, location, keyword):
       
       collection = db_action.tweetdb_object(
          config.mongo_client,
          config.database_name,
          config.collection_name
       )
-      
-      query_object = db_action.tweetdb_create_object(["id"],[id])
 
-      cursor = db_action.tweetdb_find(config.collection_name, collection, query_object)
+      data_field = ["_id", "id", "text"]
+      data_list = [0, 1, 1]
+      
+      query_object_1 = db_action.tweetdb_create_object(["id"],[id])
+      query_object_2 = db_action.tweetdb_create_object(["text"],[1])
+
+      #find object using id
+      cursor_1 = db_action.tweetdb_find(config.collection_name, collection, query_object_1)
+      cursor_2 = db_action.tweetdb_show_collection(config.collection_name, collection, query_object_2)
 
       db_action.not_print_raw()
 
       #if found then update data
-      if list(cursor) != []:
+      if list(cursor_1) != []:
          data_field = ['favorite_count', 'retweet_count']
          data_list = [fav_count, retweet_count]
          dict_to_update = db_action.tweetdb_create_object(data_field,data_list)
@@ -69,23 +104,27 @@ class PullTwitterData(object):
 
          #count tweets that are updated
          self.count_tweets+=1
-            
+      
+      #if different unique id but same content
+      if self.check_duplicate(text, cursor_2):
+         print('data duplicate :', text)
+
+      #if not then insert
       else:
-         data_field = ['id', 'username', 'date', 'time', 'text', 'favorite_count', 'retweet_count']
-         data_list = [id, username, date, time, text, fav_count, retweet_count]
+
+         data_field = ['id', 'username', 'date', 'text', 'favorite_count', 'retweet_count', 'location']
+         data_list = [id, username, date, text, fav_count, retweet_count, location]
 
          dict_to_insert = db_action.tweetdb_create_object(data_field, data_list)
 
          db_action.tweetdb_insert(config.collection_name, collection, dict_to_insert)
-
-         # print('Insert ID :', id)
 
          #count Tweet that is inserted
          self.count_tweets+=1
       
       return self.count_tweets
    
-   def twitter_scarpping(self, tweets_data):
+   def twitter_scarpping(self, tweet_keyword):
       #count tweet
       self.count_tweets = 0
 
@@ -103,6 +142,12 @@ class PullTwitterData(object):
          fav_count = tweet.favorite_count #favorite count
          retweet_count = tweet.retweet_count #retweet count
 
+         #get tweet location
+         if tweet.place is not None:
+            tweet_location = tweet.place.full_name
+         else:
+            tweet_location = None
+
          #get tweet text
          try:
             tweet_text = tweet.retweeted_status.full_text
@@ -112,25 +157,24 @@ class PullTwitterData(object):
          #convert time zone from UTC to GMT+7
          #format the date
          tweet_date = self.convert_timezone(from_zone, to_zone, tweet_date)
-         tweet_date = tweet_date.split(' | ')
-         tweet_time = tweet_date[1]
-         tweet_date = tweet_date[0]
 
          #connect to database
          db_action.tweetdb_object(
             config.mongo_client,
             config.database_name,
             config.collection_name)
-         self.database_decision(tweet_id,tweet_username,tweet_date,tweet_time,tweet_text,fav_count,retweet_count)
+         self.database_decision(tweet_id,tweet_username,tweet_date,tweet_text,fav_count,retweet_count,tweet_location,tweet_keyword)
 
    #scarp twitter
    def search_twitter(self, api):
+
+      keyword = config.search_word  
 
       #use Cursor to serach
       #tweepy.Cursor(search API, word + filter, search mode, search type).items(search limit)
       tweets = tweepy.Cursor(
          api.search_tweets ,
-         q=config.search_word + ' -filter:retweets', 
+         q=keyword + ' -filter:retweets', 
          tweet_mode=config.search_mode,
          result_type=config.search_type
          ).items(config.num_tweet)
@@ -140,7 +184,7 @@ class PullTwitterData(object):
 
       print(len(self.tweets_list))
 
-      self.twitter_scarpping(self.tweets_list)
+      self.twitter_scarpping(self.tweets_list, keyword)
 
       #finish text for unittest
       finish_text = 'TOTAL TWITTER : %d'%self.count_tweets

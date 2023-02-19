@@ -1,13 +1,11 @@
 # coding=utf8
 #import file
 import config   #contain configuration of the application
-import tweepy_main  #contain method for scraping twitter
 import database_action
 
 #import library
 # nltk.download('stopwords')    #use one time for download nltk stopwords 
 # nltk.download(' wordnet ')      #use one time for download nltk POS
-import pymongo  #use for connecting to mongodb
 import requests #use for API requesting
 import time     #use for timer
 from pythainlp.corpus import thai_stopwords #use for Thai stop word cleaning
@@ -57,30 +55,29 @@ class FilterData():
         clean_json = ''
 
         #list of splited sentence iteration
-        for i in range(len(raw_list)):
+        for i in range(len(raw_list)):  
             word = raw_list[i]
-            
-            #Filter URL
-            try:
-                self.FilterUrl(word)
-            
-            #Filter Number
-            #If don't filter number we can't filter special characters
-            except ValueError:
-                if raw_list[i] != '':
-                    word = self.FilterNum(word)
-                    clean_json += ' ' + word
-            
-            #Filter special characters
-            word = clean_json
+
+            if self.FilterUrl(word):
+                clean_json+=' '
+                continue
+            word = self.FilterNum(word)
             word = self.FilterSpecialChar(word)
+
+            if word.strip() == '':
+                continue
+            clean_json += ' ' + word.strip()
             
+        word = clean_json
         return word
 
     #Filter url function
     def FilterUrl(self, raw_url):
-        raw_url = raw_url.index('https://')
-        return raw_url
+        try :
+            raw_url.index('https://')
+            return True
+        except:
+            return False
 
     #Filter number function
     def FilterNum(self, raw_text):
@@ -113,7 +110,7 @@ class FilterData():
                 elif list_word not in temp_text.split():
                         temp_text += ' ' + list_word
         
-        return temp_text
+        return temp_text.lower()
 
 #Tokenization function
 class Tokenization():
@@ -155,6 +152,10 @@ class Tokenization():
             # print('before: ',doc['text'])
             doc['text'] = FilterData().Filters(doc['text']).strip()
 
+            # print(doc['text'])
+            # print(doc)
+            
+
             #convert filtered data to dictionary
             doc_dict = dict(doc)
 
@@ -166,6 +167,10 @@ class Tokenization():
             # print('after', res.json())
 
             try:
+                # print(list(tokened_dict.values()))
+                # print(res.json()['tokens'])
+                # print(res.json()['tokens'])
+                # print(tokened_dict)
                 tokened_dict[doc['id']] = FilterData().FilteredFromLexto(res.json())
                 
                 #check if the data can be filter by Lexto+
@@ -276,11 +281,11 @@ if __name__ == '__main__':
         word = CleanThaiAndEng().cleaning(word)
 
         #insert to database
-        if word != []:
-            collection = db_action.tweetdb_object(config.mongo_client, config.database_name, config.collection_name_2)
-            clean_object = db_action.tweetdb_create_object([tweet_dict_keys[i]], [word])
-            db_action.tweetdb_insert(config.collection_name_2, collection, clean_object)
-        else:
-            print('failed to insert :',word)
+        # if word != []:
+        #     collection = db_action.tweetdb_object(config.mongo_client, config.database_name, config.collection_name_2)
+        #     clean_object = db_action.tweetdb_create_object([tweet_dict_keys[i]], [word])
+        #     db_action.tweetdb_insert(config.collection_name_2, collection, clean_object)
+        # else:
+        #     print('failed to insert :',word)
 
     print('TOTAL TWITTER INSERT TO DATABASE :',count_db)
