@@ -2,7 +2,6 @@ from selenium import webdriver
 from selenium.webdriver.common.by import By
 import time
 import config
-
 class Googleform(object):
     
     def __init__(self):

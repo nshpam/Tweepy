@@ -7,7 +7,6 @@ password = 'autchawa321'
 
 time_order = 17
 second_order = 55
-
 timebox = ['17','55']
 
 date = 12
