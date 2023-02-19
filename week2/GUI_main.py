@@ -6,10 +6,9 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
 from PyQt5.QtCore import *
 
-from PyQt5 import QtCore, QtWidgets, QtWebEngineWidgets
-
+# from PyQt5 import QtCore, QtWidgets, QtWebEngineWidgets
+from plotly.offline import *
 import pymongo
-import altair as alt
 import pandas as pd
 
 import plotly.express as px
@@ -19,23 +18,11 @@ class MainWindow(QMainWindow):
         QMainWindow.__init__(self)
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
-        
+        # navigate to home page
         self.ui.pushButton_home.clicked.connect(lambda: self.ui.stackedWidget.setCurrentWidget(self.ui.home))
-        
-        
-        # # get the search line edit from the nested QFrames
-        # output_frame = self.ui.mainBody.findChild(QFrame, "output_frame")
-        # stacked_widget = output_frame.findChild(QStackedWidget, "stackedWidget")
-        # home_frame = stacked_widget.findChild(QFrame, "home")
-        # search_frame = home_frame.findChild(QFrame, "frame_search")
-        # self.linesearch = search_frame.findChild(QLineEdit, "lineEdit_search")
-        # self.linesearch.setStyleSheet("QLineEdit {icon-size: 14px;}")
 
-        # # set search icon with search function at QLineEdit right
-        # search_action = self.linesearch.addAction(QIcon("icon/magnifying-glass.png"), QLineEdit.ActionPosition.TrailingPosition)
-        # search_action.triggered.connect(self.do_search)
 
-        # self.show()
+        self.show()
         
 
 
