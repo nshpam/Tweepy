@@ -84,5 +84,10 @@ from_zone = tz.gettz('UTC')
 #timezone you want to convert
 to_zone = tz.gettz(config.local_timezone)
 
-x = tweepy_main.PullTwitterData().convert_timezone(from_zone, to_zone, datetime.datetime.utcnow())
+dt = datetime.datetime.fromisoformat("2023-02-19T14:57:25.000+00:00")
+
+print(dt)
+
+# x = tweepy_main.PullTwitterData().convert_timezone(from_zone, to_zone, datetime.datetime.utcnow())
+# x = dt.date()
 print(x)

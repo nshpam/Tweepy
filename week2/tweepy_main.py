@@ -17,9 +17,10 @@ db_action = database_action.DatabaseAction()
 class PullTwitterData(object):
 
    #initialize variable
-   def __init__(self, tweets_list=[], count_tweets=0, filters=twitterDataProcessing.FilterData()):
+   def __init__(self, tweets_list=[], count_tweets=0, count_duplicate=0, filters=twitterDataProcessing.FilterData()):
       self.tweets_list = tweets_list
       self.count_tweets = count_tweets
+      self.count_duplicate = count_duplicate
       self.filters = filters
 
    #convert timezone from UTC to GMT
@@ -100,20 +101,20 @@ class PullTwitterData(object):
 
          db_action.tweetdb_update(config.collection_name, collection, dict_to_update, "id", id)
 
-         # print('Update ID :', id)
-
          #count tweets that are updated
          self.count_tweets+=1
       
       #if different unique id but same content
       if self.check_duplicate(text, cursor_2):
-         print('data duplicate :', text)
+         self.count_tweets+=1
+         self.count_duplicate += 1
+         # print('data duplicate :', text)
 
       #if not then insert
       else:
 
-         data_field = ['id', 'username', 'date', 'text', 'favorite_count', 'retweet_count', 'location']
-         data_list = [id, username, date, text, fav_count, retweet_count, location]
+         data_field = ['id', 'keyword', 'username', 'date', 'location', 'text', 'favorite_count', 'retweet_count']
+         data_list = [id, keyword, username, date, location, text, fav_count, retweet_count]
 
          dict_to_insert = db_action.tweetdb_create_object(data_field, data_list)
 
@@ -124,7 +125,7 @@ class PullTwitterData(object):
       
       return self.count_tweets
    
-   def twitter_scarpping(self, tweet_keyword):
+   def twitter_scrapping(self, tweet_data, tweet_keyword):
       #count tweet
       self.count_tweets = 0
 
@@ -134,9 +135,9 @@ class PullTwitterData(object):
       to_zone = tz.gettz(config.local_timezone)
 
       #iterate the Tweet in tweets_list
-      for tweet in self.tweets_list:
+      for tweet in tweet_data:
 
-         tweet_id = str(tweet.id) #tweet id
+         tweet_id = tweet.id #tweet id
          tweet_username = tweet.user.screen_name #tweet author
          tweet_date = tweet.created_at #tweet date
          fav_count = tweet.favorite_count #favorite count
@@ -184,15 +185,16 @@ class PullTwitterData(object):
 
       print(len(self.tweets_list))
 
-      self.twitter_scarpping(self.tweets_list, keyword)
+      self.twitter_scrapping(self.tweets_list, keyword)
 
       #finish text for unittest
       finish_text = 'TOTAL TWITTER : %d'%self.count_tweets
+      duplicate_text = 'TOTAL DUPLICATE: %d'%self.count_duplicate
 
       print(finish_text)
+      print(duplicate_text)
    
       return finish_text
-
 
 if __name__ == '__main__':
 
