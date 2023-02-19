@@ -50,7 +50,7 @@ class FilterData():
         return filtered
 
     #Filter URL and numeric data funciton
-    def FilterUrlAndFilterNum(self, raw_list):
+    def Filters(self, raw_list):
 
         #split sentence
         raw_list = raw_list.split()
@@ -65,11 +65,17 @@ class FilterData():
                 self.FilterUrl(word)
             
             #Filter Number
+            #If don't filter number we can't filter special characters
             except ValueError:
                 if raw_list[i] != '':
                     word = self.FilterNum(word)
                     clean_json += ' ' + word
-        return clean_json
+            
+            #Filter special characters
+            word = clean_json
+            word = self.FilterSpecialChar(word)
+            
+        return word
 
     #Filter url function
     def FilterUrl(self, raw_url):
@@ -146,8 +152,8 @@ class Tokenization():
         for doc in cursor:
 
             #send data to filter url and numeric
-            doc['text'] = FilterData().FilterUrlAndFilterNum(doc['text']).strip()
-            doc['text'] = FilterData().FilterSpecialChar(doc['text'])
+            # print('before: ',doc['text'])
+            doc['text'] = FilterData().Filters(doc['text']).strip()
 
             #convert filtered data to dictionary
             doc_dict = dict(doc)
@@ -156,11 +162,13 @@ class Tokenization():
             doc_dict['norm'] = config.LextoPlus_Norm
 
             #connect with Lexto+ API
-            res = ConnectLextoPlus().ConnectApi(api_key, url, doc_dict)     
+            res = ConnectLextoPlus().ConnectApi(api_key, url, doc_dict)
+            # print('after', res.json())
 
             try:
                 tokened_dict[doc['id']] = FilterData().FilteredFromLexto(res.json())
                 
+                #check if the data can be filter by Lexto+
                 if tokened_dict[doc['id']] == []:
                     print(doc_dict)
                     print(res.text)
@@ -170,6 +178,8 @@ class Tokenization():
 
                 self.count_untoken += 1
                 tokened_dict[doc['id']] = doc['text'].split()
+            
+            # print('after', tokened_dict)
             
             time.sleep(1)
                 
@@ -181,23 +191,32 @@ class Tokenization():
         print('TOTAL TOKENIZATION :', self.count_token + self.count_untoken)
 
         return tokened_dict
+        # return tokened_dict
 
 #Clean Thai stopwords and English stopwords function
 # Removing noise from the data
 class CleanThaiAndEng():
+
+    def cleaning(self, sentence):
+        #clean thai word
+        sentence = self.cleanThaiStopword(sentence)
+
+        #clean english word
+        sentence = self.cleanEnglishStopword(sentence)
+        return sentence
     
-    #Clean Thai stopwords function (use Lexto+)
+    #Clean Thai stopwords function (use pythainlp)
     def cleanThaiStopword(self, sentence):
 
         #dictionary-based stopword
-        stop_word = list(thai_stopwords())
+        stop_words = list(thai_stopwords())
         result = []
 
         #word iteration
         for word in sentence:
 
             #stopwords filter
-            if word not in stop_word:
+            if word not in stop_words:
                 result.append(word)
         return result
     
@@ -235,18 +254,6 @@ class Normailize():
                     
                 nltk_lemma_list.append(temp)
         return nltk_lemma_list
-    
-class CreateDatabaseObject():
-
-    def create_db_object(self, uniqe_id, cleaned_list):
-
-        db_object = {
-            'id' : uniqe_id,
-            'sentiment_data': cleaned_list
-        }
-
-        return db_object
-    
         
 if __name__ == '__main__':
 
@@ -264,14 +271,16 @@ if __name__ == '__main__':
 
         count_db+=1
         word = tweet_dict_values[i]
-
-        word = CleanThaiAndEng().cleanThaiStopword(word)
-        word = CleanThaiAndEng().cleanEnglishStopword(word)
+        
         word = Normailize().NormalizingEnglishword(word)
+        word = CleanThaiAndEng().cleaning(word)
 
+        #insert to database
         if word != []:
             collection = db_action.tweetdb_object(config.mongo_client, config.database_name, config.collection_name_2)
             clean_object = db_action.tweetdb_create_object([tweet_dict_keys[i]], [word])
             db_action.tweetdb_insert(config.collection_name_2, collection, clean_object)
+        else:
+            print('failed to insert :',word)
 
     print('TOTAL TWITTER INSERT TO DATABASE :',count_db)
