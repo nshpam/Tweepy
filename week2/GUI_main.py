@@ -1,8 +1,7 @@
 import os
 import sys
 
-from TweetHarvestGUI import *
-
+from ui_gui import *
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
 from PyQt5.QtCore import *
@@ -20,11 +19,29 @@ class MainWindow(QMainWindow):
         QMainWindow.__init__(self)
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
-
-        # Page
-        self.ui.pushButton_dataSentiment.clicked.connect(lambda:self.ui.stackedWidget.setCurrentWidget(self.ui.data_sentiment))
         
-        self.show()
+        self.ui.pushButton_home.clicked.connect(lambda: self.ui.stackedWidget.setCurrentWidget(self.ui.home))
+        
+        
+        # # get the search line edit from the nested QFrames
+        # output_frame = self.ui.mainBody.findChild(QFrame, "output_frame")
+        # stacked_widget = output_frame.findChild(QStackedWidget, "stackedWidget")
+        # home_frame = stacked_widget.findChild(QFrame, "home")
+        # search_frame = home_frame.findChild(QFrame, "frame_search")
+        # self.linesearch = search_frame.findChild(QLineEdit, "lineEdit_search")
+        # self.linesearch.setStyleSheet("QLineEdit {icon-size: 14px;}")
+
+        # # set search icon with search function at QLineEdit right
+        # search_action = self.linesearch.addAction(QIcon("icon/magnifying-glass.png"), QLineEdit.ActionPosition.TrailingPosition)
+        # search_action.triggered.connect(self.do_search)
+
+        # self.show()
+        
+
+
+        
+    def do_search(self):
+        QMessageBox.information(self, "Search", self.linesearch.text(), QMessageBox.StandardButton.Ok)
         
     def create_topwords_bar_chart(self):
         # Connect to MongoDB
