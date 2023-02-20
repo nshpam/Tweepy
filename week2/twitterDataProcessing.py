@@ -149,12 +149,7 @@ class Tokenization():
         for doc in cursor:
 
             #send data to filter url and numeric
-            # print('before: ',doc['text'])
             doc['text'] = FilterData().Filters(doc['text']).strip()
-
-            # print(doc['text'])
-            # print(doc)
-            
 
             #convert filtered data to dictionary
             doc_dict = dict(doc)
@@ -164,13 +159,8 @@ class Tokenization():
 
             #connect with Lexto+ API
             res = ConnectLextoPlus().ConnectApi(api_key, url, doc_dict)
-            # print('after', res.json())
 
             try:
-                # print(list(tokened_dict.values()))
-                # print(res.json()['tokens'])
-                # print(res.json()['tokens'])
-                # print(tokened_dict)
                 tokened_dict[doc['id']] = FilterData().FilteredFromLexto(res.json())
                 
                 #check if the data can be filter by Lexto+
@@ -184,8 +174,6 @@ class Tokenization():
                 self.count_untoken += 1
                 tokened_dict[doc['id']] = doc['text'].split()
             
-            # print('after', tokened_dict)
-            
             time.sleep(1)
                 
         #stop the timer
@@ -196,7 +184,6 @@ class Tokenization():
         print('TOTAL TOKENIZATION :', self.count_token + self.count_untoken)
 
         return tokened_dict
-        # return tokened_dict
 
 #Clean Thai stopwords and English stopwords function
 # Removing noise from the data
