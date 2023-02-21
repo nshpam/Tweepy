@@ -141,8 +141,8 @@ class Tokenization():
 
         db_action.not_print_raw()
 
-        data_field = ["_id", "id", "text"]
-        data_list = [0, 1, 1]
+        data_field = ["_id", "id", "keyword", "date", "text"]
+        data_list = [0, 1, 1, 1, 1]
         query_object = db_action.tweetdb_create_object(data_field, data_list)
         cursor = db_action.tweetdb_show_collection(config.collection_name, collection, query_object)
 
@@ -161,7 +161,7 @@ class Tokenization():
             res = ConnectLextoPlus().ConnectApi(api_key, url, doc_dict)
 
             try:
-                tokened_dict[doc['id']] = FilterData().FilteredFromLexto(res.json())
+                tokened_dict[doc['id']] = [doc['keyword'], doc['date'], FilterData().FilteredFromLexto(res.json())]
                 
                 #check if the data can be filter by Lexto+
                 if tokened_dict[doc['id']] == []:
@@ -172,7 +172,7 @@ class Tokenization():
             except:
 
                 self.count_untoken += 1
-                tokened_dict[doc['id']] = doc['text'].split()
+                tokened_dict[doc['id']] = [doc['keyword'], doc['date'], doc['text'].split()]
             
             time.sleep(1)
                 
@@ -246,7 +246,52 @@ class Normailize():
                     
                 nltk_lemma_list.append(temp)
         return nltk_lemma_list
+
+class Transform():
+
+    def __init__(self, collection_name='', count_db=0, collection=None):
+        self.collection_name = collection_name
+        self.count_db = count_db
+        self.collection = collection
+
+    #check duplicate id in cleaned_data collection
+    def check_cleaned_database(self, id):
+        query_object = db_action.tweetdb_create_object(["id"],[id])
+        cursor = db_action.tweetdb_find(self.collection_name, self.collection, query_object)
+        return cursor
+    
+    def insert_cleaned_database(self, id, keyword, date, word):
+        data_field = ['id','keyword','date','text']
+        data_list = [id, keyword, date, word]
+        clean_object = db_action.tweetdb_create_object(data_field, data_list)
+        db_action.tweetdb_insert(self.collection_name, self.collection, clean_object)
+
+    def perform(self, id_list, data_list):
+        self.count_db = 0
+        self.collection_name = config.collection_name_2
+        self.collection = db_action.tweetdb_object(config.mongo_client, config.database_name, self.collection_name)
+
+
+        for i in range(len(data_list)):
+            self.count_db += 1
+            word = data_list[i][2]
+            word = Normailize().NormalizingEnglishword(word)
+            word = CleanThaiAndEng().cleaning(word)
+
+            if word != []:
+                #check duplicate id in cleaned_data collection
+                cursor = self.check_cleaned_database(id_list[i])
+
+                #if not duplicate then insert
+                if list(cursor) == []:
+                    self.insert_cleaned_database(id_list[i], data_list[i][0], data_list[i][1], word)
+                else:
+                    print('duplicate data :', tweet_dict_keys[i])
+            else:
+                print('failed to insert :',word)
         
+        print('TOTAL TWITTER INSERT TO DATABASE :',self.count_db)
+
 if __name__ == '__main__':
 
     tweet_dict = Tokenization().LextoPlusTokenization(
@@ -257,22 +302,4 @@ if __name__ == '__main__':
     tweet_dict_keys = list(tweet_dict.keys())
     tweet_dict_values = list(tweet_dict.values())
 
-    count_db = 0
-
-    for i in range(len(tweet_dict_values)):
-
-        count_db+=1
-        word = tweet_dict_values[i]
-        
-        word = Normailize().NormalizingEnglishword(word)
-        word = CleanThaiAndEng().cleaning(word)
-
-        #insert to database
-        # if word != []:
-        #     collection = db_action.tweetdb_object(config.mongo_client, config.database_name, config.collection_name_2)
-        #     clean_object = db_action.tweetdb_create_object([tweet_dict_keys[i]], [word])
-        #     db_action.tweetdb_insert(config.collection_name_2, collection, clean_object)
-        # else:
-        #     print('failed to insert :',word)
-
-    print('TOTAL TWITTER INSERT TO DATABASE :',count_db)
+    Transform().perform(tweet_dict_keys, tweet_dict_values)
