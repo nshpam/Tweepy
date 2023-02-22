@@ -12,16 +12,17 @@ import pymongo
 import pandas as pd
 
 import plotly.express as px
-
+from ui_gui import Ui_MainWindow
 class MainWindow(QMainWindow):
     def __init__(self):
         QMainWindow.__init__(self)
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
         # navigate to home page
-        self.ui.pushButton_home.clicked.connect(lambda: self.ui.stackedWidget.setCurrentWidget(self.ui.home))
+        self.ui.pushButton_home.clicked.connect(lambda: self.ui.stackedWidget.setCurrentIndex(3))
+        # self.ui.pushButton_home.clicked.connect(lambda: print("dfghjk"))
 
-
+        
         self.show()
         
 
@@ -87,7 +88,5 @@ class MainWindow(QMainWindow):
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
     MainWindow = MainWindow()
-    ui = Ui_MainWindow()
-    ui.setupUi(MainWindow)
     MainWindow.show()
     sys.exit(app.exec_())
