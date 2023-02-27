@@ -1,4 +1,3 @@
-import os
 import sys
 
 from ui_gui import *
@@ -12,6 +11,8 @@ import pandas as pd
 
 import plotly.express as px
 from ui_gui import Ui_MainWindow
+
+from tweepy_main import *
 class MainWindow(QMainWindow):
     def __init__(self):
         QMainWindow.__init__(self)
@@ -42,6 +43,8 @@ class MainWindow(QMainWindow):
         # # connection between a search action and a function that will be executed when the action is triggered by the user.
         # search_action.triggered.connect(self.do_search)
         
+        # call the show_trends method to show in Listview
+        self.show_trends()
         # display a drop-down list containing the three items: "Popular", "Recent", and "Mixed"
         self.ui.comboBox_searchtype.addItems(["Popular","Recent","Mixed"])
         # show window
@@ -52,7 +55,27 @@ class MainWindow(QMainWindow):
         self.ui.lineEdit_keyword.setText(text)
         
     # def do_search(self):
+    def show_trends(self):
+        # authenticate the Twitter API requests with the Twitter API keys and access tokens
+        auth = tweepy.OAuth1UserHandler(
+            config.consumer_key, config.consumer_secret, config.access_token, config.access_token_secret
+        )
+        # make requests to the Twitter API
+        api = tweepy.API(auth)
+        # calls the pull_trends method from the PullTwitterData class
+        trends_keyword = PullTwitterData().pull_trends(api, config.WOEid, config.ranking_top)
+        # Qt model used to display data in a QListView widget
+        model = QStandardItemModel()
         
+        for trend in trends_keyword:
+            # iterate through each key-value pair in the current trend dictionary
+            for name, volume in trend.items():
+                # representation of the form "trend_name (trend_volume)" for each trend in the trends_keyword list
+                item = QStandardItem(f"{name} ({volume})")
+                # adds a new row of items to the model
+                model.appendRow(item)
+        # display the list of trends in the widget.
+        self.ui.listView_2.setModel(model)
     
     def create_topwords_bar_chart(self):
         # Connect to MongoDB
