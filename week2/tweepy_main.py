@@ -167,9 +167,9 @@ class PullTwitterData(object):
          self.database_decision(tweet_id,tweet_username,tweet_date,tweet_text,fav_count,retweet_count,tweet_location,tweet_keyword)
 
    #scarp twitter
-   def search_twitter(self, api):
+   def search_twitter(self, api, keyword):
 
-      keyword = config.search_word  
+      # keyword = config.search_word  
 
       #use Cursor to serach
       #tweepy.Cursor(search API, word + filter, search mode, search type).items(search limit)
@@ -195,6 +195,22 @@ class PullTwitterData(object):
       print(duplicate_text)
    
       return finish_text
+   
+   def pull_trends(self, api, woeid, ranking_top):
+      trends = api.get_place_trends(woeid)
+      trends_list = trends[0]['trends'][:ranking_top]
+      trends_keyword = []
+
+      for trend in trends_list:
+         temp_dict = {}
+         print(trend['name'], trend['tweet_volume'])
+
+         if trend['name'][0] != '#':
+            trend['name'] = '#' + trend['name']
+
+         temp_dict[trend['name']] = trend['tweet_volume']
+         trends_keyword.append(temp_dict)
+      return trends_keyword
 
 if __name__ == '__main__':
 
@@ -202,4 +218,11 @@ if __name__ == '__main__':
       config.consumer_key, config.consumer_secret, config.access_token, config.access_token_secret
       )
    api = tweepy.API(auth)
-   PullTwitterData().search_twitter(api)
+   #search by keyword
+   # PullTwitterData().search_twitter(api, config.search_word)
+
+   #search by trends
+   trends_keyword = PullTwitterData().pull_trends(api, config.WOEid, config.ranking_top)
+   # for trend in range
+
+   print(trends_keyword)

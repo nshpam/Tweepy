@@ -57,10 +57,6 @@ class Ranking():
 
         top_words = list(rank_dict.values())
 
-        print(top_words)
-
-        return
-
         rank_index = list(rank_dict.keys())
         
         input_list_text = []

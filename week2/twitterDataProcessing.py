@@ -125,7 +125,7 @@ class Tokenization():
             raw_json = raw_object.json()
             return raw_json
         else:
-            return None
+            return None    
     
 # Read file from database
     def LextoPlusTokenization(self, api_key, url):
