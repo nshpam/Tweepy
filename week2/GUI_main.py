@@ -6,7 +6,6 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
 from PyQt5.QtCore import *
 
-# from PyQt5 import QtCore, QtWidgets, QtWebEngineWidgets
 from plotly.offline import *
 import pymongo
 import pandas as pd
@@ -18,19 +17,43 @@ class MainWindow(QMainWindow):
         QMainWindow.__init__(self)
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
-        # navigate to home page
+        # hides the menu icon bar by default
+        self.ui.frame_minmenu.hide()
+        # navigate to Home page
         self.ui.pushButton_home.clicked.connect(lambda: self.ui.stackedWidget.setCurrentIndex(3))
-        # self.ui.pushButton_home.clicked.connect(lambda: print("dfghjk"))
-
+        # navigate to Extract page
+        self.ui.pushButton_extract.clicked.connect(lambda: self.ui.stackedWidget.setCurrentIndex(4))
+        # navigate to Sentiment page
+        self.ui.pushButton_sentimeny.clicked.connect(lambda: self.ui.stackedWidget.setCurrentIndex(0))
+        # navigate to Rankings page
+        self.ui.pushButton_rankings.clicked.connect(lambda: self.ui.stackedWidget.setCurrentIndex(2))
+        # Click the navigation icon to go to the Home page.
+        self.ui.pushButton_iconhome.clicked.connect(lambda: self.ui.stackedWidget.setCurrentIndex(3))
+        # Click the navigation icon to go to the Extract page.
+        self.ui.pushButton_iconextract.clicked.connect(lambda: self.ui.stackedWidget.setCurrentIndex(4))
+        # Click the navigation icon to go to the Sentiment page.
+        self.ui.pushButton_iconsentiment.clicked.connect(lambda: self.ui.stackedWidget.setCurrentIndex(0))
+        # Click the navigation icon to go to the Home page.
+        self.ui.pushButton_iconrankings.clicked.connect(lambda: self.ui.stackedWidget.setCurrentIndex(2))
+        # link the textChanged signal of the search lineEdit object to a function
+        self.ui.lineEdit_search.textChanged.connect(self.auto_fill)
+        # set the icon in the search bar located on the right side
+        search_action = self.ui.lineEdit_search.addAction(QIcon("icon/magnifying-glass.png"),QLineEdit.ActionPosition.TrailingPosition)
+        # # connection between a search action and a function that will be executed when the action is triggered by the user.
+        # search_action.triggered.connect(self.do_search)
         
+        # display a drop-down list containing the three items: "Popular", "Recent", and "Mixed"
+        self.ui.comboBox_searchtype.addItems(["Popular","Recent","Mixed"])
+        # show window
         self.show()
         
-
-
+    def auto_fill(self, text):
+        # Use the setText method to autofill keyword lineEdit with the text from search lineEdit
+        self.ui.lineEdit_keyword.setText(text)
         
-    def do_search(self):
-        QMessageBox.information(self, "Search", self.linesearch.text(), QMessageBox.StandardButton.Ok)
+    # def do_search(self):
         
+    
     def create_topwords_bar_chart(self):
         # Connect to MongoDB
         client = pymongo.MongoClient("mongodb://localhost:27017/")

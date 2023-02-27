@@ -21,7 +21,99 @@ class Ui_MainWindow(object):
         self.centralwidget.setObjectName("centralwidget")
         self.horizontalLayout = QtWidgets.QHBoxLayout(self.centralwidget)
         self.horizontalLayout.setObjectName("horizontalLayout")
+        self.frame_minmenu = QtWidgets.QFrame(self.centralwidget)
+        self.frame_minmenu.setFrameShape(QtWidgets.QFrame.StyledPanel)
+        self.frame_minmenu.setFrameShadow(QtWidgets.QFrame.Raised)
+        self.frame_minmenu.setObjectName("frame_minmenu")
+        self.verticalLayout_21 = QtWidgets.QVBoxLayout(self.frame_minmenu)
+        self.verticalLayout_21.setContentsMargins(0, 0, 0, 0)
+        self.verticalLayout_21.setSpacing(0)
+        self.verticalLayout_21.setObjectName("verticalLayout_21")
+        self.frame_minlogo = QtWidgets.QFrame(self.frame_minmenu)
+        self.frame_minlogo.setFrameShape(QtWidgets.QFrame.StyledPanel)
+        self.frame_minlogo.setFrameShadow(QtWidgets.QFrame.Raised)
+        self.frame_minlogo.setObjectName("frame_minlogo")
+        self.verticalLayout_22 = QtWidgets.QVBoxLayout(self.frame_minlogo)
+        self.verticalLayout_22.setObjectName("verticalLayout_22")
+        self.pushButton_icon = QtWidgets.QPushButton(self.frame_minlogo)
+        self.pushButton_icon.setStyleSheet("color: rgb(46, 117, 158);\n"
+"padding: 10px;\n"
+"border-radius: 5px;")
+        self.pushButton_icon.setText("")
+        icon = QtGui.QIcon()
+        icon.addPixmap(QtGui.QPixmap(":/icons/icon/twitter.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.pushButton_icon.setIcon(icon)
+        self.pushButton_icon.setIconSize(QtCore.QSize(40, 40))
+        self.pushButton_icon.setObjectName("pushButton_icon")
+        self.verticalLayout_22.addWidget(self.pushButton_icon)
+        self.frame_minbutton = QtWidgets.QFrame(self.frame_minlogo)
+        self.frame_minbutton.setStyleSheet("QPushButton:hover {\n"
+"    background-color: #0e101d;\n"
+"    color: #a4e5e3;\n"
+"}\n"
+"QPushButton:pressed {\n"
+"    background-color: #0e101d;\n"
+"    color: #a4e5e3;\n"
+"}\n"
+"")
+        self.frame_minbutton.setFrameShape(QtWidgets.QFrame.StyledPanel)
+        self.frame_minbutton.setFrameShadow(QtWidgets.QFrame.Raised)
+        self.frame_minbutton.setObjectName("frame_minbutton")
+        self.verticalLayout_59 = QtWidgets.QVBoxLayout(self.frame_minbutton)
+        self.verticalLayout_59.setObjectName("verticalLayout_59")
+        self.pushButton_iconhome = QtWidgets.QPushButton(self.frame_minbutton)
+        self.pushButton_iconhome.setStyleSheet("color: rgb(46, 117, 158);\n"
+"padding: 10px;\n"
+"border-radius: 5px;")
+        self.pushButton_iconhome.setText("")
+        icon1 = QtGui.QIcon()
+        icon1.addPixmap(QtGui.QPixmap(":/icons/icon/dashboard2.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.pushButton_iconhome.setIcon(icon1)
+        self.pushButton_iconhome.setIconSize(QtCore.QSize(30, 30))
+        self.pushButton_iconhome.setObjectName("pushButton_iconhome")
+        self.verticalLayout_59.addWidget(self.pushButton_iconhome)
+        self.pushButton_iconextract = QtWidgets.QPushButton(self.frame_minbutton)
+        self.pushButton_iconextract.setStyleSheet("color: rgb(46, 117, 158);\n"
+"padding: 10px;\n"
+"border-radius: 5px;")
+        self.pushButton_iconextract.setText("")
+        icon2 = QtGui.QIcon()
+        icon2.addPixmap(QtGui.QPixmap(":/icons/icon/ax.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.pushButton_iconextract.setIcon(icon2)
+        self.pushButton_iconextract.setIconSize(QtCore.QSize(30, 30))
+        self.pushButton_iconextract.setObjectName("pushButton_iconextract")
+        self.verticalLayout_59.addWidget(self.pushButton_iconextract)
+        self.pushButton_iconsentiment = QtWidgets.QPushButton(self.frame_minbutton)
+        self.pushButton_iconsentiment.setStyleSheet("color: rgb(46, 117, 158);\n"
+"padding: 10px;\n"
+"border-radius: 5px;")
+        self.pushButton_iconsentiment.setText("")
+        icon3 = QtGui.QIcon()
+        icon3.addPixmap(QtGui.QPixmap(":/icons/icon/feedback.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.pushButton_iconsentiment.setIcon(icon3)
+        self.pushButton_iconsentiment.setIconSize(QtCore.QSize(30, 30))
+        self.pushButton_iconsentiment.setObjectName("pushButton_iconsentiment")
+        self.verticalLayout_59.addWidget(self.pushButton_iconsentiment)
+        self.pushButton_iconrankings = QtWidgets.QPushButton(self.frame_minbutton)
+        self.pushButton_iconrankings.setStyleSheet("color: rgb(46, 117, 158);\n"
+"padding: 10px;\n"
+"border-radius: 5px;")
+        self.pushButton_iconrankings.setText("")
+        icon4 = QtGui.QIcon()
+        icon4.addPixmap(QtGui.QPixmap(":/icons/icon/bar-chart.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.pushButton_iconrankings.setIcon(icon4)
+        self.pushButton_iconrankings.setIconSize(QtCore.QSize(30, 30))
+        self.pushButton_iconrankings.setObjectName("pushButton_iconrankings")
+        self.verticalLayout_59.addWidget(self.pushButton_iconrankings)
+        spacerItem = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
+        self.verticalLayout_59.addItem(spacerItem)
+        self.verticalLayout_22.addWidget(self.frame_minbutton)
+        self.verticalLayout_21.addWidget(self.frame_minlogo)
+        self.horizontalLayout.addWidget(self.frame_minmenu)
         self.choiceMenu_frame = QtWidgets.QFrame(self.centralwidget)
+        self.choiceMenu_frame.setSizeIncrement(QtCore.QSize(0, 0))
+        self.choiceMenu_frame.setBaseSize(QtCore.QSize(0, 0))
+        self.choiceMenu_frame.setStyleSheet("")
         self.choiceMenu_frame.setFrameShape(QtWidgets.QFrame.StyledPanel)
         self.choiceMenu_frame.setFrameShadow(QtWidgets.QFrame.Raised)
         self.choiceMenu_frame.setObjectName("choiceMenu_frame")
@@ -29,26 +121,27 @@ class Ui_MainWindow(object):
         self.verticalLayout.setContentsMargins(0, 0, 0, 0)
         self.verticalLayout.setSpacing(0)
         self.verticalLayout.setObjectName("verticalLayout")
-        self.frame_logo = QtWidgets.QFrame(self.choiceMenu_frame)
-        self.frame_logo.setFrameShape(QtWidgets.QFrame.StyledPanel)
-        self.frame_logo.setFrameShadow(QtWidgets.QFrame.Raised)
-        self.frame_logo.setObjectName("frame_logo")
-        self.horizontalLayout_5 = QtWidgets.QHBoxLayout(self.frame_logo)
+        self.frame_menu = QtWidgets.QFrame(self.choiceMenu_frame)
+        self.frame_menu.setStyleSheet("QPushButton {\n"
+"    text-align: left;\n"
+"}")
+        self.frame_menu.setFrameShape(QtWidgets.QFrame.StyledPanel)
+        self.frame_menu.setFrameShadow(QtWidgets.QFrame.Raised)
+        self.frame_menu.setObjectName("frame_menu")
+        self.horizontalLayout_5 = QtWidgets.QHBoxLayout(self.frame_menu)
         self.horizontalLayout_5.setObjectName("horizontalLayout_5")
-        self.label_21 = QtWidgets.QLabel(self.frame_logo)
-        self.label_21.setMinimumSize(QtCore.QSize(40, 40))
-        self.label_21.setMaximumSize(QtCore.QSize(40, 40))
-        self.label_21.setText("")
-        self.label_21.setPixmap(QtGui.QPixmap(":/icons/icon/twitter.png"))
-        self.label_21.setScaledContents(True)
-        self.label_21.setObjectName("label_21")
-        self.horizontalLayout_5.addWidget(self.label_21)
-        self.label_25 = QtWidgets.QLabel(self.frame_logo)
-        self.label_25.setStyleSheet("font: 18pt \"Impact\";\n"
+        self.pushButton_menu_2 = QtWidgets.QPushButton(self.frame_menu)
+        self.pushButton_menu_2.setMinimumSize(QtCore.QSize(0, 0))
+        self.pushButton_menu_2.setMaximumSize(QtCore.QSize(16777215, 16777215))
+        self.pushButton_menu_2.setStyleSheet("padding: 10px;\n"
+"border-radius: 5px;\n"
+"font: 20pt \"Impact\";\n"
 "color: rgb(3, 169, 244);")
-        self.label_25.setObjectName("label_25")
-        self.horizontalLayout_5.addWidget(self.label_25)
-        self.verticalLayout.addWidget(self.frame_logo, 0, QtCore.Qt.AlignHCenter|QtCore.Qt.AlignTop)
+        self.pushButton_menu_2.setIcon(icon)
+        self.pushButton_menu_2.setIconSize(QtCore.QSize(40, 40))
+        self.pushButton_menu_2.setObjectName("pushButton_menu_2")
+        self.horizontalLayout_5.addWidget(self.pushButton_menu_2)
+        self.verticalLayout.addWidget(self.frame_menu)
         self.Buttonframe = QtWidgets.QFrame(self.choiceMenu_frame)
         self.Buttonframe.setStyleSheet("QPushButton:hover {\n"
 "    background-color: #0e101d;\n"
@@ -58,15 +151,22 @@ class Ui_MainWindow(object):
 "    background-color: #0e101d;\n"
 "    color: #a4e5e3;\n"
 "}\n"
-"")
+"QPushButton {\n"
+"    text-align: left;\n"
+"}")
         self.Buttonframe.setFrameShape(QtWidgets.QFrame.StyledPanel)
         self.Buttonframe.setFrameShadow(QtWidgets.QFrame.Raised)
         self.Buttonframe.setObjectName("Buttonframe")
         self.verticalLayout_3 = QtWidgets.QVBoxLayout(self.Buttonframe)
-        self.verticalLayout_3.setContentsMargins(0, 0, 0, 0)
+        self.verticalLayout_3.setContentsMargins(11, 0, 0, 0)
         self.verticalLayout_3.setSpacing(0)
         self.verticalLayout_3.setObjectName("verticalLayout_3")
         self.pushButton_home = QtWidgets.QPushButton(self.Buttonframe)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.pushButton_home.sizePolicy().hasHeightForWidth())
+        self.pushButton_home.setSizePolicy(sizePolicy)
         font = QtGui.QFont()
         font.setFamily("Source Code Pro Semibold")
         font.setPointSize(16)
@@ -79,9 +179,8 @@ class Ui_MainWindow(object):
 "border-radius: 5px;\n"
 "font: 63 16pt \"Source Code Pro Semibold\";\n"
 "")
-        icon = QtGui.QIcon()
-        icon.addPixmap(QtGui.QPixmap(":/icons/icon/dashboard2.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-        self.pushButton_home.setIcon(icon)
+        self.pushButton_home.setIcon(icon1)
+        self.pushButton_home.setIconSize(QtCore.QSize(30, 30))
         self.pushButton_home.setObjectName("pushButton_home")
         self.verticalLayout_3.addWidget(self.pushButton_home)
         self.pushButton_extract = QtWidgets.QPushButton(self.Buttonframe)
@@ -89,10 +188,8 @@ class Ui_MainWindow(object):
 "padding: 10px;\n"
 "border-radius: 5px;\n"
 "font: 63 16pt \"Source Code Pro Semibold\";")
-        icon1 = QtGui.QIcon()
-        icon1.addPixmap(QtGui.QPixmap(":/icons/icon/ax.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-        self.pushButton_extract.setIcon(icon1)
-        self.pushButton_extract.setIconSize(QtCore.QSize(20, 20))
+        self.pushButton_extract.setIcon(icon2)
+        self.pushButton_extract.setIconSize(QtCore.QSize(30, 30))
         self.pushButton_extract.setObjectName("pushButton_extract")
         self.verticalLayout_3.addWidget(self.pushButton_extract)
         self.pushButton_sentimeny = QtWidgets.QPushButton(self.Buttonframe)
@@ -100,9 +197,8 @@ class Ui_MainWindow(object):
 "padding: 10px;\n"
 "border-radius: 5px;\n"
 "font: 63 16pt \"Source Code Pro Semibold\";")
-        icon2 = QtGui.QIcon()
-        icon2.addPixmap(QtGui.QPixmap(":/icons/icon/feedback.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-        self.pushButton_sentimeny.setIcon(icon2)
+        self.pushButton_sentimeny.setIcon(icon3)
+        self.pushButton_sentimeny.setIconSize(QtCore.QSize(30, 30))
         self.pushButton_sentimeny.setObjectName("pushButton_sentimeny")
         self.verticalLayout_3.addWidget(self.pushButton_sentimeny)
         self.pushButton_rankings = QtWidgets.QPushButton(self.Buttonframe)
@@ -111,38 +207,14 @@ class Ui_MainWindow(object):
 "padding: 10px;\n"
 "border-radius: 5px;\n"
 "font: 63 16pt \"Source Code Pro Semibold\";")
-        icon3 = QtGui.QIcon()
-        icon3.addPixmap(QtGui.QPixmap(":/icons/icon/bar-chart.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-        self.pushButton_rankings.setIcon(icon3)
+        self.pushButton_rankings.setIcon(icon4)
+        self.pushButton_rankings.setIconSize(QtCore.QSize(30, 30))
         self.pushButton_rankings.setAutoExclusive(False)
         self.pushButton_rankings.setObjectName("pushButton_rankings")
         self.verticalLayout_3.addWidget(self.pushButton_rankings)
         self.verticalLayout.addWidget(self.Buttonframe, 0, QtCore.Qt.AlignHCenter|QtCore.Qt.AlignTop)
-        self.frame_68 = QtWidgets.QFrame(self.choiceMenu_frame)
-        self.frame_68.setFrameShape(QtWidgets.QFrame.StyledPanel)
-        self.frame_68.setFrameShadow(QtWidgets.QFrame.Raised)
-        self.frame_68.setObjectName("frame_68")
-        self.verticalLayout.addWidget(self.frame_68)
-        self.frame_2 = QtWidgets.QFrame(self.choiceMenu_frame)
-        self.frame_2.setFrameShape(QtWidgets.QFrame.StyledPanel)
-        self.frame_2.setFrameShadow(QtWidgets.QFrame.Raised)
-        self.frame_2.setObjectName("frame_2")
-        self.verticalLayout.addWidget(self.frame_2)
-        self.frame_70 = QtWidgets.QFrame(self.choiceMenu_frame)
-        self.frame_70.setFrameShape(QtWidgets.QFrame.StyledPanel)
-        self.frame_70.setFrameShadow(QtWidgets.QFrame.Raised)
-        self.frame_70.setObjectName("frame_70")
-        self.verticalLayout.addWidget(self.frame_70)
-        self.frame_69 = QtWidgets.QFrame(self.choiceMenu_frame)
-        self.frame_69.setFrameShape(QtWidgets.QFrame.StyledPanel)
-        self.frame_69.setFrameShadow(QtWidgets.QFrame.Raised)
-        self.frame_69.setObjectName("frame_69")
-        self.verticalLayout.addWidget(self.frame_69)
-        self.frame_67 = QtWidgets.QFrame(self.choiceMenu_frame)
-        self.frame_67.setFrameShape(QtWidgets.QFrame.StyledPanel)
-        self.frame_67.setFrameShadow(QtWidgets.QFrame.Raised)
-        self.frame_67.setObjectName("frame_67")
-        self.verticalLayout.addWidget(self.frame_67)
+        spacerItem1 = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
+        self.verticalLayout.addItem(spacerItem1)
         self.frame_version = QtWidgets.QFrame(self.choiceMenu_frame)
         self.frame_version.setFrameShape(QtWidgets.QFrame.StyledPanel)
         self.frame_version.setFrameShadow(QtWidgets.QFrame.Raised)
@@ -170,7 +242,8 @@ class Ui_MainWindow(object):
         self.Bar_frame.setMaximumSize(QtCore.QSize(16777215, 50))
         self.Bar_frame.setStyleSheet("background-color: rgb(23, 31, 53);\n"
 "font: 63 16pt \"Source Code Pro Semibold\";\n"
-"border-radius: 5px;")
+"border-radius: 5px;\n"
+"")
         self.Bar_frame.setFrameShape(QtWidgets.QFrame.StyledPanel)
         self.Bar_frame.setFrameShadow(QtWidgets.QFrame.Raised)
         self.Bar_frame.setObjectName("Bar_frame")
@@ -185,39 +258,31 @@ class Ui_MainWindow(object):
         self.horizontalLayout_3 = QtWidgets.QHBoxLayout(self.menu_frame)
         self.horizontalLayout_3.setObjectName("horizontalLayout_3")
         self.pushButton_menu = QtWidgets.QPushButton(self.menu_frame)
+        self.pushButton_menu.setMinimumSize(QtCore.QSize(34, 34))
+        self.pushButton_menu.setMaximumSize(QtCore.QSize(16777215, 16777215))
+        self.pushButton_menu.setSizeIncrement(QtCore.QSize(0, 0))
+        self.pushButton_menu.setBaseSize(QtCore.QSize(0, 0))
+        self.pushButton_menu.setAutoFillBackground(False)
         self.pushButton_menu.setStyleSheet("color: rgb(46, 117, 158);\n"
 "padding: 10px;\n"
 "border-radius: 5px;\n"
 "")
         self.pushButton_menu.setText("")
-        icon4 = QtGui.QIcon()
-        icon4.addPixmap(QtGui.QPixmap(":/icons/icon/menu.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-        self.pushButton_menu.setIcon(icon4)
-        self.pushButton_menu.setIconSize(QtCore.QSize(30, 30))
+        icon5 = QtGui.QIcon()
+        icon5.addPixmap(QtGui.QPixmap(":/icons/icon/menu.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.pushButton_menu.setIcon(icon5)
+        self.pushButton_menu.setIconSize(QtCore.QSize(34, 34))
+        self.pushButton_menu.setCheckable(True)
+        self.pushButton_menu.setAutoExclusive(False)
+        self.pushButton_menu.setAutoDefault(False)
         self.pushButton_menu.setObjectName("pushButton_menu")
         self.horizontalLayout_3.addWidget(self.pushButton_menu)
         self.label_2 = QtWidgets.QLabel(self.menu_frame)
+        self.label_2.setStyleSheet("font: 20pt \"Impact\";\n"
+"color: rgb(255, 255, 255);")
         self.label_2.setObjectName("label_2")
         self.horizontalLayout_3.addWidget(self.label_2)
         self.horizontalLayout_2.addWidget(self.menu_frame, 0, QtCore.Qt.AlignLeft)
-        self.Dashbord_frame = QtWidgets.QFrame(self.Bar_frame)
-        self.Dashbord_frame.setStyleSheet("")
-        self.Dashbord_frame.setFrameShape(QtWidgets.QFrame.StyledPanel)
-        self.Dashbord_frame.setFrameShadow(QtWidgets.QFrame.Raised)
-        self.Dashbord_frame.setObjectName("Dashbord_frame")
-        self.horizontalLayout_6 = QtWidgets.QHBoxLayout(self.Dashbord_frame)
-        self.horizontalLayout_6.setObjectName("horizontalLayout_6")
-        self.label_3 = QtWidgets.QLabel(self.Dashbord_frame)
-        font = QtGui.QFont()
-        font.setFamily("Source Code Pro Semibold")
-        font.setPointSize(16)
-        font.setBold(False)
-        font.setItalic(False)
-        font.setWeight(7)
-        self.label_3.setFont(font)
-        self.label_3.setObjectName("label_3")
-        self.horizontalLayout_6.addWidget(self.label_3)
-        self.horizontalLayout_2.addWidget(self.Dashbord_frame, 0, QtCore.Qt.AlignHCenter|QtCore.Qt.AlignVCenter)
         self.Icon_frame = QtWidgets.QFrame(self.Bar_frame)
         self.Icon_frame.setFrameShape(QtWidgets.QFrame.StyledPanel)
         self.Icon_frame.setFrameShadow(QtWidgets.QFrame.Raised)
@@ -376,7 +441,7 @@ class Ui_MainWindow(object):
         self.scrollArea_3.setWidgetResizable(True)
         self.scrollArea_3.setObjectName("scrollArea_3")
         self.scrollAreaWidgetContents_4 = QtWidgets.QWidget()
-        self.scrollAreaWidgetContents_4.setGeometry(QtCore.QRect(0, 0, 855, 5061))
+        self.scrollAreaWidgetContents_4.setGeometry(QtCore.QRect(0, 0, 723, 5061))
         self.scrollAreaWidgetContents_4.setAutoFillBackground(False)
         self.scrollAreaWidgetContents_4.setStyleSheet("")
         self.scrollAreaWidgetContents_4.setObjectName("scrollAreaWidgetContents_4")
@@ -895,7 +960,7 @@ class Ui_MainWindow(object):
         self.scrollArea_2.setWidgetResizable(True)
         self.scrollArea_2.setObjectName("scrollArea_2")
         self.scrollAreaWidgetContents_2 = QtWidgets.QWidget()
-        self.scrollAreaWidgetContents_2.setGeometry(QtCore.QRect(0, 0, 94, 94))
+        self.scrollAreaWidgetContents_2.setGeometry(QtCore.QRect(0, 0, 737, 325))
         self.scrollAreaWidgetContents_2.setObjectName("scrollAreaWidgetContents_2")
         self.verticalLayout_53 = QtWidgets.QVBoxLayout(self.scrollAreaWidgetContents_2)
         self.verticalLayout_53.setObjectName("verticalLayout_53")
@@ -1400,15 +1465,6 @@ class Ui_MainWindow(object):
         self.lineEdit_search.setStyleSheet("")
         self.lineEdit_search.setObjectName("lineEdit_search")
         self.horizontalLayout_18.addWidget(self.lineEdit_search)
-        self.pushButton = QtWidgets.QPushButton(self.frame_search)
-        self.pushButton.setText("")
-        icon5 = QtGui.QIcon()
-        icon5.addPixmap(QtGui.QPixmap(":/icons/icon/magnifying-glass.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-        self.pushButton.setIcon(icon5)
-        self.pushButton.setIconSize(QtCore.QSize(30, 30))
-        self.pushButton.setAutoDefault(False)
-        self.pushButton.setObjectName("pushButton")
-        self.horizontalLayout_18.addWidget(self.pushButton)
         self.verticalLayout_14.addWidget(self.frame_search, 0, QtCore.Qt.AlignTop)
         self.frame_trends = QtWidgets.QFrame(self.home)
         self.frame_trends.setStyleSheet("QScrollBar:vertical {\n"
@@ -1560,20 +1616,147 @@ class Ui_MainWindow(object):
         self.verticalLayout_51.addWidget(self.label_14)
         self.verticalLayout_20.addWidget(self.frame_5, 0, QtCore.Qt.AlignTop)
         self.scrollArea_5 = QtWidgets.QScrollArea(self.frame_trends)
+        self.scrollArea_5.setStyleSheet("QScrollBar:vertical {\n"
+"    border: none;\n"
+"    background: rgb(45, 45, 68);\n"
+"    width: 14px;\n"
+"    margin: 15px 0 15px 0;\n"
+"    border-radius: 0px;\n"
+"}\n"
+"\n"
+"QScrollBar::handle:vertical {\n"
+"    background-color: rgb(80, 80, 122);\n"
+"    min-height: 30px;\n"
+"    border-radius: 7px;\n"
+"}\n"
+"\n"
+"QScrollBar::handle:vertical:hover {\n"
+"    background-color: rgb(255, 0, 127);\n"
+"}\n"
+"\n"
+"QScrollBar::handle:vertical:pressed {\n"
+"    background-color: rgb(185, 0, 92);\n"
+"}\n"
+"\n"
+"QScrollBar::sub-line:vertical {\n"
+"    border: none;\n"
+"    background-color: rgb(59, 59, 90);\n"
+"    height: 15px;\n"
+"    border-top-left-radius: 7px;\n"
+"    border-top-right-radius: 7px;\n"
+"    subcontrol-position: top;\n"
+"    subcontrol-origin: margin;\n"
+"}\n"
+"\n"
+"QScrollBar::sub-line:vertical:hover {\n"
+"    background-color: rgb(255, 0, 127);\n"
+"}\n"
+"\n"
+"QScrollBar::sub-line:vertical:pressed {\n"
+"    background-color: rgb(185, 0, 92);\n"
+"}\n"
+"\n"
+"QScrollBar::add-line:vertical {\n"
+"    border: none;\n"
+"    background-color: rgb(59, 59, 90);\n"
+"    height: 15px;\n"
+"    border-bottom-left-radius: 7px;\n"
+"    border-bottom-right-radius: 7px;\n"
+"    subcontrol-position: bottom;\n"
+"    subcontrol-origin: margin;\n"
+"}\n"
+"\n"
+"QScrollBar::add-line:vertical:hover {\n"
+"    background-color: rgb(255, 0, 127);\n"
+"}\n"
+"\n"
+"QScrollBar::add-line:vertical:pressed {\n"
+"    background-color: rgb(185, 0, 92);\n"
+"}\n"
+"\n"
+"QScrollBar::up-arrow:vertical, QScrollBar::down-arrow:vertical {\n"
+"    background: none;\n"
+"}\n"
+"\n"
+"QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical {\n"
+"    background: none;\n"
+"}\n"
+"\n"
+"QScrollBar:horizontal {\n"
+"    border: none;\n"
+"    background: rgb(45, 45, 68);\n"
+"    height: 14px;\n"
+"    margin: 0 15px 0 15px;\n"
+"    border-radius: 0px;\n"
+"}\n"
+"\n"
+"QScrollBar::handle:horizontal {\n"
+"    background-color: rgb(80, 80, 122);\n"
+"    min-width: 30px;\n"
+"    border-radius: 7px;\n"
+"}\n"
+"\n"
+"QScrollBar::handle:horizontal:hover {\n"
+"    background-color: rgb(255, 0, 127);\n"
+"}\n"
+"\n"
+"QScrollBar::handle:horizontal:pressed {\n"
+"    background-color: rgb(185, 0, 92);\n"
+"}\n"
+"\n"
+"QScrollBar::sub-line:horizontal {\n"
+"    border: none;\n"
+"    background-color: rgb(59, 59, 90);\n"
+"    width: 15px;\n"
+"    border-top-left-radius: 7px;\n"
+"    border-bottom-left-radius: 7px;\n"
+"    subcontrol-position: left;\n"
+"    subcontrol-origin: margin;\n"
+"}\n"
+"\n"
+"QScrollBar::sub-line:horizontal:hover {\n"
+"    background-color: rgb(255, 0, 127);\n"
+"}\n"
+"\n"
+"QScrollBar::sub-line:horizontal:pressed {\n"
+"    background-color: rgb(185, 0, 92);\n"
+"}\n"
+"\n"
+"QScrollBar::add-line:horizontal {\n"
+"    border: none;\n"
+"    background-color: rgb(59, 59, 90);\n"
+"    width: 15px;\n"
+"    border-top-right-radius: 7px;\n"
+"    border-bottom-right-radius: 7px;\n"
+"    subcontrol-position: right;\n"
+"    subcontrol-origin: margin;\n"
+"}\n"
+"\n"
+"QScrollBar::add-line:horizontal:hover {\n"
+"    background-color: rgb(255, 0, 127);\n"
+"}\n"
+"QScrollBar::add-line:horizontal:pressed {\n"
+"    background-color: rgb(185, 0, 92);\n"
+"}\n"
+"QScrollBar::left-arrow:horizontal, QScrollBar::right-arrow:horizontal {\n"
+"    background: none;\n"
+"}\n"
+"QScrollBar::add-page:horizontal, QScrollBar::sub-page:horizontal {\n"
+"    background: none;\n"
+"}\n"
+"")
         self.scrollArea_5.setWidgetResizable(True)
         self.scrollArea_5.setObjectName("scrollArea_5")
         self.scrollAreaWidgetContents_3 = QtWidgets.QWidget()
-        self.scrollAreaWidgetContents_3.setGeometry(QtCore.QRect(0, 0, 869, 548))
+        self.scrollAreaWidgetContents_3.setGeometry(QtCore.QRect(0, 0, 737, 548))
         self.scrollAreaWidgetContents_3.setObjectName("scrollAreaWidgetContents_3")
         self.verticalLayout_50 = QtWidgets.QVBoxLayout(self.scrollAreaWidgetContents_3)
         self.verticalLayout_50.setObjectName("verticalLayout_50")
-        self.tableWidget = QtWidgets.QTableWidget(self.scrollAreaWidgetContents_3)
-        self.tableWidget.setStyleSheet("background-color: rgb(19, 27, 47);\n"
+        self.listView_2 = QtWidgets.QListView(self.scrollAreaWidgetContents_3)
+        self.listView_2.setStyleSheet("background-color: rgb(19, 27, 47);\n"
 "color: rgb(255, 255, 255);")
-        self.tableWidget.setObjectName("tableWidget")
-        self.tableWidget.setColumnCount(0)
-        self.tableWidget.setRowCount(0)
-        self.verticalLayout_50.addWidget(self.tableWidget)
+        self.listView_2.setObjectName("listView_2")
+        self.verticalLayout_50.addWidget(self.listView_2)
         self.scrollArea_5.setWidget(self.scrollAreaWidgetContents_3)
         self.verticalLayout_20.addWidget(self.scrollArea_5)
         self.verticalLayout_14.addWidget(self.frame_trends)
@@ -1714,7 +1897,7 @@ class Ui_MainWindow(object):
         self.scrollArea.setWidgetResizable(True)
         self.scrollArea.setObjectName("scrollArea")
         self.scrollAreaWidgetContents = QtWidgets.QWidget()
-        self.scrollAreaWidgetContents.setGeometry(QtCore.QRect(0, 0, 539, 775))
+        self.scrollAreaWidgetContents.setGeometry(QtCore.QRect(0, 0, 723, 775))
         self.scrollAreaWidgetContents.setObjectName("scrollAreaWidgetContents")
         self.verticalLayout_5 = QtWidgets.QVBoxLayout(self.scrollAreaWidgetContents)
         self.verticalLayout_5.setObjectName("verticalLayout_5")
@@ -2383,20 +2566,21 @@ class Ui_MainWindow(object):
         MainWindow.setStatusBar(self.statusbar)
 
         self.retranslateUi(MainWindow)
-        self.stackedWidget.setCurrentIndex(0)
+        self.stackedWidget.setCurrentIndex(3)
+        self.pushButton_menu.toggled['bool'].connect(self.frame_minmenu.setVisible) # type: ignore
+        self.pushButton_menu.toggled['bool'].connect(self.choiceMenu_frame.setHidden) # type: ignore
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
-        self.label_25.setText(_translate("MainWindow", "Twitisen"))
+        self.pushButton_menu_2.setText(_translate("MainWindow", "Twitisen"))
         self.pushButton_home.setText(_translate("MainWindow", "Home"))
         self.pushButton_extract.setText(_translate("MainWindow", "Extract"))
         self.pushButton_sentimeny.setText(_translate("MainWindow", "Sentiment"))
         self.pushButton_rankings.setText(_translate("MainWindow", "Rankings"))
         self.label.setText(_translate("MainWindow", "version 1.0"))
         self.label_2.setText(_translate("MainWindow", "MENU"))
-        self.label_3.setText(_translate("MainWindow", "DASHBORD"))
         self.label_4.setText(_translate("MainWindow", "Overview of hashtags"))
         self.label_8.setText(_translate("MainWindow", "Sentiment Word Clound (Overall)"))
         self.label_16.setText(_translate("MainWindow", "Sentiment Word Clound (Negative)"))
