@@ -47,14 +47,38 @@ class MainWindow(QMainWindow):
         self.show_trends()
         # display a drop-down list containing the three items: "Popular", "Recent", and "Mixed"
         self.ui.comboBox_searchtype.addItems(["Popular","Recent","Mixed"])
+        # connect the search button with the search_twitter function
+        self.ui.comboBox_searchtype.currentIndexChanged.connect(self.search_twitter)
         # show window
         self.show()
         
     def auto_fill(self, text):
         # Use the setText method to autofill keyword lineEdit with the text from search lineEdit
         self.ui.lineEdit_keyword.setText(text)
+    
+    def search_twitter(self):
+       
+        # get the search keyword from the input textbox
+        search_word = self.ui.lineEdit_keyword.text()
+
+        # get the selected search type from the combo box
+        search_type = self.ui.comboBox_searchtype.currentText()
+        # get the selected search limit from the spin box
+        num_tweet = self.ui.spinBox_searchlimit.value()
+        # create an instance of the Twitter API
+        auth = tweepy.OAuthHandler(config.consumer_key, config.consumer_secret)
+        auth.set_access_token(config.access_token, config.access_token_secret)
+        api = tweepy.API(auth)
+        # create an instance of PullTwitterData
+        self.twitter_data = PullTwitterData()
+        # call the search_twitter function from the PullTwitterData object
+        result_text = self.twitter_data.search_twitter(api, search_word, search_type, num_tweet)
+
+        # print the result in the terminal
+        print(result_text)
         
     # def do_search(self):
+    
     def show_trends(self):
         # authenticate the Twitter API requests with the Twitter API keys and access tokens
         auth = tweepy.OAuth1UserHandler(
