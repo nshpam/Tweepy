@@ -103,6 +103,7 @@ class Ranking():
                 if rank_set[i][1] == rank_f[j]:
                     temp += rank_key[j] 
                     temp2 += str(rank_f[j])
+                    break
             
             top_dict[rank_set[i][0]] = [temp, temp2]
 
@@ -122,8 +123,13 @@ class Ranking():
 
         #append all the word from every tweet into total_list
         for doc in cursor:
-            total_list += list(doc.values())[0]
+            # print(list(doc.values())[3])
+            
+            total_list+= list(doc.values())[3]
 
+        # print(total_list)
+        # return
+        
         #counting the frequency of elements
         rank_dict = dict(collections.Counter(total_list))
         #sort from high to low
@@ -136,11 +142,13 @@ class Ranking():
         rank_set = list(enumerate(sorted(set(ranking_frequency), reverse=True), start=1))
 
         # print(rank_set)
+        #ranking by word
+        print(self.rank_word(rank_set, ranking_key, ranking_frequency))
 
-        # print(self.rank_word(rank_set, ranking_key, ranking_frequency))
+        #ranking by key
 
         #ranking by frequency but showing its sentiments
-        self.sentiment_cal(self.rank_word( rank_set, ranking_key, ranking_frequency))
+        # self.sentiment_cal(self.rank_word( rank_set, ranking_key, ranking_frequency))
             
 if __name__ == '__main__':
 
