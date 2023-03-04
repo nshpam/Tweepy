@@ -4,8 +4,12 @@ from ui_gui import *
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
 from PyQt5.QtCore import *
-
+from PyQt5.QtChart import *
+from PyQt5.QtWebEngineWidgets import *
 from plotly.offline import *
+import plotly.graph_objs as go
+import plotly.offline as po
+
 import pymongo
 import pandas as pd
 
@@ -13,6 +17,7 @@ import plotly.express as px
 from ui_gui import Ui_MainWindow
 
 from tweepy_main import *
+
 class MainWindow(QMainWindow):
     def __init__(self):
         QMainWindow.__init__(self)
@@ -49,8 +54,40 @@ class MainWindow(QMainWindow):
         self.ui.comboBox_searchtype.addItems(["Popular","Recent","Mixed"])
         # connect the search button with the search_twitter function
         self.ui.comboBox_searchtype.currentIndexChanged.connect(self.search_twitter)
+        
+        self.create_pie_chart()
+        # Add chart view to QFrame
+        self.ui.frame_33.layout().addWidget(self.chart_view)
         # show window
         self.show()
+        
+    def create_pie_chart(self):
+        labels = ['Apple', 'Banana', 'Pear', 'Melon', 'Water Melon']
+        values = [80, 70, 50, 80, 30]
+        
+        # Define data and layout
+        data = go.Pie(labels=labels, values=values)
+        layout = go.Layout(title='Fruits Pie Chart')
+        
+        # Create figure and plot in QWebEngineView
+        fig = go.Figure(data=[data], layout=layout)
+        po.init_notebook_mode(connected=True)
+        plot_html = po.plot(fig, include_plotlyjs=False, output_type='div')
+         # Add Plotly library to HTML file
+        html = f"""
+        <html>
+        <head>
+            <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+        </head>
+        <body>
+            {plot_html}
+        </body>
+        </html>
+        """
+        
+        self.chart_view = QWebEngineView()
+        self.chart_view.setHtml(html)
+        self.chart_view.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         
     def auto_fill(self, text):
         # Use the setText method to autofill keyword lineEdit with the text from search lineEdit
