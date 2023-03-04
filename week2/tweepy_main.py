@@ -1,231 +1,130 @@
-#import file
-import config #contain configuration of the application
-import tweepy_task
+import tweepy_search
+import twitterDataSentiment
+import twitterDataProcessing
+import twitterDataRankings
+import config
+import datetime
+import tweepy
 import database_action
 
-#import library
-import tweepy     #use for twitter scrapping
-# import pymongo    #use for connecting to mongodb
-from dateutil import tz #use for timezone converting
-import datetime   #use for timezone converting
-import twitterDataProcessing
+class MainOperation():
 
-from GUI_main import *
-#you can edit mongodb server, database name, collection name in file name "config.py"
-db_action = database_action.DatabaseAction()
+    #collect user interaction
+    def __init__(self, keyword='', search_type='', search_limit=0, start_date=None, end_date=None, db_action=None):
 
-#scrap twitter data from Twitter API
-class PullTwitterData(object):
+        self.keyword = keyword
+        self.search_type = search_type
+        self.search_limit = search_limit
+        self.start_date = start_date
+        self.end_date = end_date
+        self.db_action = db_action
 
-   #initialize variable
-   def __init__(self, tweets_list=[], count_tweets=0, count_duplicate=0, filters=twitterDataProcessing.FilterData()):
-      self.tweets_list = tweets_list
-      self.count_tweets = count_tweets
-      self.count_duplicate = count_duplicate
-      self.filters = filters
+        self.keyword = config.search_word
+        self.search_type = config.search_type
+        self.search_limit = config.num_tweet
+        self.start_date = datetime.date(2022, 12, 30) #y m d
+        self.end_date = datetime.date(2023, 1, 16)
+        self.db_action = database_action.DatabaseAction()
 
-   #convert timezone from UTC to GMT
-   #you can edit the pair of timezone you want in file name "config.py"
-   def convert_timezone(self, from_zone, to_zone, convert_date):
+    #extract and load twitter data
+    def Extract(self, keyword):
+        print('Extract begin...')
+        
+        #connect to tweepy
+        auth = tweepy.OAuth1UserHandler(
+            config.consumer_key, config.consumer_secret, config.access_token, config.access_token_secret
+            )
+        api = tweepy.API(auth)
+        
+        #search by keyword
+        tweepy_search.PullTwitterData().search_twitter(api, keyword, self.search_type, self.search_limit)
 
-      #in case that convert_date not datatime
-      if type(convert_date) != type(datetime.datetime.utcnow()):
-         time_err_1 = 'Timezone type is not datetime'
-         return time_err_1
-      
-      #in case that from_zone not timezone
-      if type(from_zone) != type(tz.gettz('UTC')):
-         time_err_2 = 'Timezone type is not timezone'
-         return time_err_2
-      
-      #in case that to_zone not timezone
-      if type(to_zone) != type(tz.gettz('Thailand/Bangkok')):
-         time_err_3 = 'Timezone type is not timezone'
-         return time_err_3
+        print('Extract end...')
+    
+    def check_previous(self, previous, time_list):
+        if previous not in time_list:
+            return False #True = perform transformation
+        return True
 
-      #convert timezone and change format into day-month-year | hour-minute
-      # convert_date = convert_date.replace(tzinfo=from_zone).astimezone(to_zone).strftime('%d-%m-%Y | %H:%M')
-      convert_date = convert_date.replace(tzinfo=from_zone).astimezone(to_zone)
-      return convert_date
+    def check_next(self, next, time_list):
+        if next not in time_list:
+            return False #True = perform transformation
+        return True
+    
+    def set_scope(self, checkpoint, end_d):
+        if checkpoint > end_d:
+            return end_d
+        return checkpoint
 
-   def pull_all_data(self, cursor):
 
-      all_data = []
+    def check_tf_timeline(self, checkpoint, end_d, time_list):
+        
+        interval = datetime.timedelta(days=1)
+        tf_date_list = []
+        while checkpoint <= end_d:
 
-      for doc in cursor:
-         raw_list = doc['text'].split()
-         clean_data = ''
-         for word in raw_list:
-            if not self.filters.FilterUrl(word):
-               clean_data += word
-         all_data.append(clean_data)
-      
-      return all_data
+            previous = self.set_scope(checkpoint, end_d)
+            next = self.set_scope(checkpoint, end_d)
+            
+            #check checkpoint
+            if checkpoint not in time_list:
+                print('transform')
+                tf_date_list.append(checkpoint)
+            
+            #check previous and next
+            for i in range(1,8):
+                #previous
+                previous -= interval
+                if not self.check_previous(previous, time_list):
+                    tf_date_list.append(previous)
+                    # print('perform transformation')
 
-   def check_duplicate(self, text, cursor):
-      raw_list = text.split()
-      clean_data = ''
-      
-      for word in raw_list:
-         if not self.filters.FilterUrl(word):
-            clean_data += word
-      
-      if clean_data in self.pull_all_data(cursor):
-         return True
-      return False
-   
-   def database_decision(self, id, username, date, text, fav_count, retweet_count, location, keyword):
-      
-      collection = db_action.tweetdb_object(
-         config.mongo_client,
-         config.database_name,
-         config.collection_name
-      )
+                #next
+                next -= interval
+                if not self.check_next(next, time_list):
+                    tf_date_list.append(next)
+                    # print('perform transformation')
+            
+            #pin new checkpoint
+            checkpoint += datetime.timedelta(days=14)
 
-      data_field = ["_id", "id", "text"]
-      data_list = [0, 1, 1]
-      
-      query_object_1 = db_action.tweetdb_create_object(["id"],[id])
-      query_object_2 = db_action.tweetdb_create_object(["text"],[1])
+        return tf_date_list
+            
 
-      #find object using id
-      cursor_1 = db_action.tweetdb_find(config.collection_name, collection, query_object_1)
-      cursor_2 = db_action.tweetdb_show_collection(config.collection_name, collection, query_object_2)
-
-      db_action.not_print_raw()
-
-      #if found then update data
-      if list(cursor_1) != []:
-         data_field = ['favorite_count', 'retweet_count']
-         data_list = [fav_count, retweet_count]
-         dict_to_update = db_action.tweetdb_create_object(data_field,data_list)
-
-         db_action.tweetdb_update(config.collection_name, collection, dict_to_update, "id", id)
-
-         #count tweets that are updated
-         self.count_tweets+=1
-      
-      #if different unique id but same content
-      if self.check_duplicate(text, cursor_2):
-         self.count_tweets+=1
-         self.count_duplicate += 1
-         # print('data duplicate :', text)
-
-      #if not then insert
-      else:
-
-         data_field = ['id', 'keyword', 'username', 'date', 'location', 'text', 'favorite_count', 'retweet_count']
-         data_list = [id, keyword, username, date, location, text, fav_count, retweet_count]
-
-         dict_to_insert = db_action.tweetdb_create_object(data_field, data_list)
-
-         db_action.tweetdb_insert(config.collection_name, collection, dict_to_insert)
-
-         #count Tweet that is inserted
-         self.count_tweets+=1
-      
-      return self.count_tweets
-   
-   def twitter_scrapping(self, tweet_data, tweet_keyword):
-      #count tweet
-      self.count_tweets = 0
-
-      #timezone of your variable
-      from_zone = tz.gettz('UTC')
-      #timezone you want to convert
-      to_zone = tz.gettz(config.local_timezone)
-
-      #iterate the Tweet in tweets_list
-      for tweet in tweet_data:
-
-         tweet_id = tweet.id #tweet id
-         tweet_username = tweet.user.screen_name #tweet author
-         tweet_date = tweet.created_at #tweet date
-         fav_count = tweet.favorite_count #favorite count
-         retweet_count = tweet.retweet_count #retweet count
-
-         #get tweet location
-         if tweet.place is not None:
-            tweet_location = tweet.place.full_name
-         else:
-            tweet_location = None
-
-         #get tweet text
-         try:
-            tweet_text = tweet.retweeted_status.full_text
-         except AttributeError:
-            tweet_text = tweet.full_text
-
-         #convert time zone from UTC to GMT+7
-         #format the date
-         tweet_date = self.convert_timezone(from_zone, to_zone, tweet_date)
-
-         #connect to database
-         db_action.tweetdb_object(
+    def check_tf(self, start_d, end_d):
+        db_action = self.db_action
+        time_list = []
+        collection_2 = db_action.tweetdb_object(
             config.mongo_client,
             config.database_name,
-            config.collection_name)
-         self.database_decision(tweet_id,tweet_username,tweet_date,tweet_text,fav_count,retweet_count,tweet_location,tweet_keyword)
+            config.collection_name_2
+        ) 
 
-   #scarp twitter
-   def search_twitter(self, api, keyword, search_type, num_tweet):
+        query_object_2 = db_action.tweetdb_create_object(["_id","date"],[0,1])
+        cursor_2 = db_action.tweetdb_show_collection(config.collection_name_2, collection_2, query_object_2)
+        
+        #pull date and time from cleaned database
+        for doc in cursor_2:
+            time_list.append(doc['date'].date())
+        time_list = sorted(list(set(time_list)))
 
-      # keyword = config.search_word  
+        result = sorted(list(set(self.check_tf_timeline(start_d, end_d, time_list))))
 
-      #use Cursor to serach
-      #tweepy.Cursor(search API, word + filter, search mode, search type).items(search limit)
-      tweets = tweepy.Cursor(
-         api.search_tweets ,
-         q=keyword + ' -filter:retweets', 
-         tweet_mode=config.search_mode,
-         result_type=search_type
-         ).items(num_tweet)
-         # result_type=config.search_type
-         # ).items(config.num_tweet)
+        print('tf_date_list :',result)
 
-      #create a list of Tweets
-      self.tweets_list = [tweet for tweet in tweets]
+        return result
 
-      print(len(self.tweets_list))
-
-      self.twitter_scrapping(self.tweets_list, keyword)
-
-      #finish text for unittest
-      finish_text = 'TOTAL TWITTER : %d'%self.count_tweets
-      duplicate_text = 'TOTAL DUPLICATE: %d'%self.count_duplicate
-
-      print(finish_text)
-      print(duplicate_text)
-   
-      return finish_text
-   
-   def pull_trends(self, api, woeid, ranking_top):
-      trends = api.get_place_trends(woeid)
-      trends_list = trends[0]['trends'][:ranking_top]
-      trends_keyword = []
-
-      for trend in trends_list:
-         temp_dict = {}
-         print(trend['name'], trend['tweet_volume'])
-            
-         if trend['name'][0] != '#':
-            trend['name'] = '#' + trend['name']
-
-         temp_dict[trend['name']] = trend['tweet_volume']
-         trends_keyword.append(temp_dict)
-      return trends_keyword
+    #Transform and load tweets data
+    def Transform(self):
+        #check if the data should be transformed
+        tf_date_list = self.check_tf(self.start_date, self.end_date)
+        #if it transform already so we skip them
+        if tf_date_list == []:
+            print('sentiment')
+        #if not perform the transformation or extract
+        else:
+            pass
 
 if __name__ == '__main__':
-
-   auth = tweepy.OAuth1UserHandler(
-      config.consumer_key, config.consumer_secret, config.access_token, config.access_token_secret
-      )
-   api = tweepy.API(auth)
-   #search by keyword
-   PullTwitterData().search_twitter(api, config.search_word)
-
-   #search by trends
-   # trends_keyword = PullTwitterData().pull_trends(api, config.WOEid, config.ranking_top)
-   # for trend in range
-
-   # print(trends_keyword)
+    # MainOperation().ExtractAndLoad(config.search_word)
+    MainOperation().Transform()
