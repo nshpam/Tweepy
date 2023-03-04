@@ -1,17 +1,23 @@
-import os
 import sys
 
 from ui_gui import *
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
 from PyQt5.QtCore import *
-
+from PyQt5.QtChart import *
+from PyQt5.QtWebEngineWidgets import *
 from plotly.offline import *
+import plotly.graph_objs as go
+import plotly.offline as po
+
 import pymongo
 import pandas as pd
 
 import plotly.express as px
 from ui_gui import Ui_MainWindow
+
+from tweepy_main import *
+
 class MainWindow(QMainWindow):
     def __init__(self):
         QMainWindow.__init__(self)
@@ -42,17 +48,100 @@ class MainWindow(QMainWindow):
         # # connection between a search action and a function that will be executed when the action is triggered by the user.
         # search_action.triggered.connect(self.do_search)
         
+        # call the show_trends method to show in Listview
+        self.show_trends()
         # display a drop-down list containing the three items: "Popular", "Recent", and "Mixed"
         self.ui.comboBox_searchtype.addItems(["Popular","Recent","Mixed"])
+        # connect the search button with the search_twitter function
+        self.ui.comboBox_searchtype.currentIndexChanged.connect(self.search_twitter)
+        
+        self.create_pie_chart()
+        # Add chart view to QFrame
+        self.ui.frame_33.layout().addWidget(self.chart_view)
         # show window
         self.show()
+        
+    def create_pie_chart(self):
+        labels = ['Apple', 'Banana', 'Pear', 'Melon', 'Water Melon']
+        values = [80, 70, 50, 80, 30]
+        
+        # Define data and layout
+        data = go.Pie(labels=labels, values=values)
+        layout = go.Layout(title='Fruits Pie Chart')
+        
+        # Create figure and plot in QWebEngineView
+        fig = go.Figure(data=[data], layout=layout)
+        po.init_notebook_mode(connected=True)
+        plot_html = po.plot(fig, include_plotlyjs=False, output_type='div')
+         # Add Plotly library to HTML file
+        html = f"""
+        <html>
+        <head>
+            <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+        </head>
+        <body>
+            {plot_html}
+        </body>
+        </html>
+        """
+        
+        self.chart_view = QWebEngineView()
+        self.chart_view.setHtml(html)
+        self.chart_view.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         
     def auto_fill(self, text):
         # Use the setText method to autofill keyword lineEdit with the text from search lineEdit
         self.ui.lineEdit_keyword.setText(text)
+    
+    def search_twitter(self):
+       
+        # get the search keyword from the input textbox
+        search_word = self.ui.lineEdit_keyword.text()
+
+        # get the selected search type from the combo box
+        search_type = self.ui.comboBox_searchtype.currentText()
+        # get the selected search limit from the spin box
+        num_tweet = self.ui.spinBox_searchlimit.value()
+        # create an instance of the Twitter API
+        auth = tweepy.OAuthHandler(config.consumer_key, config.consumer_secret)
+        auth.set_access_token(config.access_token, config.access_token_secret)
+        api = tweepy.API(auth)
+        # create an instance of PullTwitterData
+        self.twitter_data = PullTwitterData()
+        # call the search_twitter function from the PullTwitterData object
+        result_text = self.twitter_data.search_twitter(api, search_word, search_type, num_tweet)
+
+        # print the result in the terminal
+        print(result_text)
         
     # def do_search(self):
+    
+    def show_trends(self):
+        # authenticate the Twitter API requests with the Twitter API keys and access tokens
+        auth = tweepy.OAuth1UserHandler(
+            config.consumer_key, config.consumer_secret, config.access_token, config.access_token_secret
+        )
+        # make requests to the Twitter API
+        api = tweepy.API(auth)
+        # calls the pull_trends method from the PullTwitterData class
+        trends_keyword = PullTwitterData().pull_trends(api, config.WOEid, config.ranking_top)
+        # Qt model used to display data in a QListView widget
+        model = QStandardItemModel()
         
+            # counter for number of trends
+        count = 0
+        for trend in trends_keyword:
+            # iterate through each key-value pair in the current trend dictionary
+            for name, volume in trend.items():
+                # convert volume to thousands and format as string with "K" appended
+                volume_str = "{:.1f}K".format(volume/1000) if volume is not None else "-"
+                # representation of the form "trend_name (trend_volume)" for each trend in the trends_keyword list
+                item = QStandardItem(f"{count+1}. {name} ({volume_str})")
+                # adds a new row of items to the model
+                model.appendRow(item)
+                count += 1
+        # display the list of trends in the widget.
+        self.ui.listView_2.setModel(model)
     
     def create_topwords_bar_chart(self):
         # Connect to MongoDB

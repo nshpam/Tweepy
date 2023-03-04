@@ -10,6 +10,7 @@ from dateutil import tz #use for timezone converting
 import datetime   #use for timezone converting
 import twitterDataProcessing
 
+from GUI_main import *
 #you can edit mongodb server, database name, collection name in file name "config.py"
 db_action = database_action.DatabaseAction()
 
@@ -167,7 +168,7 @@ class PullTwitterData(object):
          self.database_decision(tweet_id,tweet_username,tweet_date,tweet_text,fav_count,retweet_count,tweet_location,tweet_keyword)
 
    #scarp twitter
-   def search_twitter(self, api, keyword):
+   def search_twitter(self, api, keyword, search_type, num_tweet):
 
       # keyword = config.search_word  
 
@@ -177,8 +178,10 @@ class PullTwitterData(object):
          api.search_tweets ,
          q=keyword + ' -filter:retweets', 
          tweet_mode=config.search_mode,
-         result_type=config.search_type
-         ).items(config.num_tweet)
+         result_type=search_type
+         ).items(num_tweet)
+         # result_type=config.search_type
+         # ).items(config.num_tweet)
 
       #create a list of Tweets
       self.tweets_list = [tweet for tweet in tweets]
@@ -204,7 +207,7 @@ class PullTwitterData(object):
       for trend in trends_list:
          temp_dict = {}
          print(trend['name'], trend['tweet_volume'])
-
+            
          if trend['name'][0] != '#':
             trend['name'] = '#' + trend['name']
 
