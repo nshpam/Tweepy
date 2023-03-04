@@ -91,13 +91,18 @@ class MainWindow(QMainWindow):
         # Qt model used to display data in a QListView widget
         model = QStandardItemModel()
         
+            # counter for number of trends
+        count = 0
         for trend in trends_keyword:
             # iterate through each key-value pair in the current trend dictionary
             for name, volume in trend.items():
+                # convert volume to thousands and format as string with "K" appended
+                volume_str = "{:.1f}K".format(volume/1000) if volume is not None else "-"
                 # representation of the form "trend_name (trend_volume)" for each trend in the trends_keyword list
-                item = QStandardItem(f"{name} ({volume})")
+                item = QStandardItem(f"{count+1}. {name} ({volume_str})")
                 # adds a new row of items to the model
                 model.appendRow(item)
+                count += 1
         # display the list of trends in the widget.
         self.ui.listView_2.setModel(model)
     

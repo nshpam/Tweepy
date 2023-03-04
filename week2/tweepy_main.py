@@ -207,7 +207,7 @@ class PullTwitterData(object):
       for trend in trends_list:
          temp_dict = {}
          print(trend['name'], trend['tweet_volume'])
-
+            
          if trend['name'][0] != '#':
             trend['name'] = '#' + trend['name']
 
