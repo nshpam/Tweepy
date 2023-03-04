@@ -64,9 +64,23 @@ else:
      #first checkpoint
       checkpoint = start_date
       while checkpoint <= end_date:
+            
             print(checkpoint)
+
             previous = checkpoint
             next = checkpoint
+
+            if checkpoint > end_date:
+                  previous = end_date
+                  next = end_date
+            
+            #check checkpoint
+            if checkpoint not in time_list:
+                  if checkpoint in scrape_date:
+                        print('can scrape %s' %checkpoint)
+                  else:
+                        print('cannot scrape %s'%checkpoint)
+
             #check previous and next
             for i in range(1,8):
                   #previous
@@ -74,7 +88,6 @@ else:
                   if previous not in time_list:
                         if previous in scrape_date:
                               print('can scrape %s' %previous)
-                              break
                         else:
                               print('cannot scrape %s'%previous)
                   #next
@@ -82,7 +95,8 @@ else:
                   if next not in time_list:
                         if next in scrape_date:
                               print('can scrape %s'%next)
-                              break
                         else:
                               print('cannot scrape %s'%next)
+            
+            #pin new checkpoint
             checkpoint += datetime.timedelta(days=14)
