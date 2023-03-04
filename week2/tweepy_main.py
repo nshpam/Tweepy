@@ -222,10 +222,10 @@ if __name__ == '__main__':
       )
    api = tweepy.API(auth)
    #search by keyword
-   # PullTwitterData().search_twitter(api, config.search_word)
+   PullTwitterData().search_twitter(api, config.search_word)
 
    #search by trends
-   trends_keyword = PullTwitterData().pull_trends(api, config.WOEid, config.ranking_top)
+   # trends_keyword = PullTwitterData().pull_trends(api, config.WOEid, config.ranking_top)
    # for trend in range
 
-   print(trends_keyword)
+   # print(trends_keyword)
