@@ -7,6 +7,7 @@ db_action = database_action.DatabaseAction()
 
 class SentimentAnalysis():
 
+    #pull clean data from database
     def pull_clean(self):
         cursor = db_action.tweetdb_object(config.mongo_client, config.database_name, config.collection_name_2)
         
@@ -18,6 +19,7 @@ class SentimentAnalysis():
 
         return show_cursor
     
+    #analyze which intension the data is.
     def intention_analysis(self, intention):
 
         intention_type = list(intention.keys())
@@ -30,6 +32,7 @@ class SentimentAnalysis():
         
         return conclusion
     
+    #convert_polarity of the data
     def convert_polarity(self, polar):
 
         converted_polar = 0
@@ -42,12 +45,14 @@ class SentimentAnalysis():
             converted_polar = 0
     
         return converted_polar
-
+    
     def sentiment(self):
         cursor = self.pull_clean()
         db_action.not_print_raw()
 
         for doc in cursor:
+            # print(doc)
+            # return
             res = requests.get(config.SSense_URL, headers={'Apikey':config.LextoPlus_API_key}, params={'text':' '.join(list(doc.values())[0])})
             try:
                 raw = res.json()
@@ -58,15 +63,14 @@ class SentimentAnalysis():
                 polar = self.convert_polarity(raw['sentiment']['polarity'])
                 conclusion = self.intention_analysis(raw['intention'])
 
-                data_field = ['input','score', 'polarity', 'intention']
-                data_list = [raw['preprocess']['input'] ,raw['sentiment']['score'], polar, conclusion]
+                #use the score to calculate overall sentiment
+                data_field = ['id', 'keyword', 'date', 'text', 'score', 'polarity', 'intention']
+                data_list = [doc['id'], doc['keyword'], doc['date'], raw['preprocess']['input'], raw['sentiment']['score'], polar, conclusion]
                 query_object = db_action.tweetdb_create_object(data_field, data_list)
 
                 collection = db_action.tweetdb_object(config.mongo_client, config.database_name, config.collection_name_5)
                 #insert to db
                 db_action.tweetdb_insert(config.collection_name_5, collection, query_object)
-                # print(query_object)
-                # break
 
             except:
                 print('error')

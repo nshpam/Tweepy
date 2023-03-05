@@ -22,7 +22,6 @@ class MainOperation():
         self.keyword = config.search_word
         self.search_type = config.search_type
         self.search_limit = config.num_tweet
-        # self.start_date = datetime.date(2023, 1, 16)
         self.start_date = datetime.date(2022, 12, 30) #y m d
         self.end_date = datetime.date(2023, 1, 16)
         self.db_action = database_action.DatabaseAction()
@@ -56,6 +55,11 @@ class MainOperation():
         if checkpoint > end_d:
             return end_d
         return checkpoint
+    
+    def transform_one_day(self, day, time_list):
+        if day in time_list:
+            return []
+        return [day]
 
     def transform_period(self, checkpoint, end_d, time_list, interval):
 
@@ -91,11 +95,10 @@ class MainOperation():
 
     def check_tf_timeline(self, checkpoint, end_d, time_list):
         interval = datetime.timedelta(days=1)
-
         #check if it's a period or it's a day
         if checkpoint == end_d:
             #transform one day
-            return [checkpoint]
+            return self.transform_one_day(checkpoint, time_list)
         #transform period
         return self.transform_period(checkpoint, end_d, time_list, interval)
             
@@ -121,32 +124,41 @@ class MainOperation():
         print('tf_date_list :',result)
 
         return result
+    
+    def Sentiment(self):
+        #sentiment
+        pass
 
     #Transform and load tweets data
-    def Transform(self):
+    def TransformByTime(self):
         #check if the data should be transformed
         tf_date_list = self.check_tf(self.start_date, self.end_date)
         #if it transform already so we skip them
         if tf_date_list == []:
-            print('there is noting to transform')
+            print('there is nothing to transform')
             print('sentiment')
         #if not perform the transformation or extract
         #extract commander should be sentiment function
+        #if have data but not transform yet
         else:
+            #transform by time
             tweet_dict = twitterDataProcessing.Tokenization().LextoPlusTokenization(
                 config.LextoPlus_API_key, config.LextoPlus_URL, config.search_word, tf_date_list
             )
 
             tweet_dict_keys = list(tweet_dict.keys())
             tweet_dict_values = list(tweet_dict.values())
-            print('transform')
+            twitterDataProcessing.Transform().perform(tweet_dict_keys, tweet_dict_values)
     
-    def Sentiment(self):
-        #sentiment
-        pass
+    #extract by time
+    def PerformSentimentByTime(self):
+        #check sentiment database
+        
 
-    #press extract button
-    def Perform(self):
+        #check cleaned database
+
+        #check tweets database
+
         #check if that timeline in tweets database
         #check if the correction of timeline
         #extract
@@ -160,6 +172,11 @@ class MainOperation():
         #show ranking
         pass
 
+    #extract by keyword
+    def PerformSentimentByKeyword(self):
+        pass
+
 if __name__ == '__main__':
     # MainOperation().ExtractAndLoad(config.search_word)
-    MainOperation().Transform()
+    # MainOperation().Transform()
+    pass
