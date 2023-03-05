@@ -22,8 +22,8 @@ class MainOperation():
         self.keyword = config.search_word
         self.search_type = config.search_type
         self.search_limit = config.num_tweet
-        self.start_date = datetime.date(2023, 1, 16)
-        # self.start_date = datetime.date(2022, 12, 30) #y m d
+        # self.start_date = datetime.date(2023, 1, 16)
+        self.start_date = datetime.date(2022, 12, 30) #y m d
         self.end_date = datetime.date(2023, 1, 16)
         self.db_action = database_action.DatabaseAction()
 
@@ -57,9 +57,6 @@ class MainOperation():
             return end_d
         return checkpoint
 
-    def transform_one_day(self):
-        pass
-
     def transform_period(self, checkpoint, end_d, time_list, interval):
 
         tf_date_list = []
@@ -91,23 +88,17 @@ class MainOperation():
             checkpoint += datetime.timedelta(days=14)
         
         return tf_date_list
-    
-    def check_day(self, start_d, end_d, time_list, interval):
-        if start_d == end_d:
-            #transform one day
-            return self.transform_one_day()
-        #transform period
-        return self.transform_period(start_d, end_d, time_list, interval)
 
     def check_tf_timeline(self, checkpoint, end_d, time_list):
         interval = datetime.timedelta(days=1)
 
-        #check if only one day or period
-        tf_date_list=self.check_day(self, checkpoint, end_d, time_list, interval)
-        
-        return tf_date_list
+        #check if it's a period or it's a day
+        if checkpoint == end_d:
+            #transform one day
+            return [checkpoint]
+        #transform period
+        return self.transform_period(checkpoint, end_d, time_list, interval)
             
-
     def check_tf(self, start_d, end_d):
         db_action = self.db_action
         time_list = []
@@ -137,10 +128,17 @@ class MainOperation():
         tf_date_list = self.check_tf(self.start_date, self.end_date)
         #if it transform already so we skip them
         if tf_date_list == []:
+            print('there is noting to transform')
             print('sentiment')
         #if not perform the transformation or extract
         #extract commander should be sentiment function
         else:
+            tweet_dict = twitterDataProcessing.Tokenization().LextoPlusTokenization(
+                config.LextoPlus_API_key, config.LextoPlus_URL, config.search_word, tf_date_list
+            )
+
+            tweet_dict_keys = list(tweet_dict.keys())
+            tweet_dict_values = list(tweet_dict.values())
             print('transform')
     
     def Sentiment(self):
