@@ -51,9 +51,7 @@ class SentimentAnalysis():
         db_action.not_print_raw()
 
         for doc in cursor:
-            # print(doc)
-            # return
-            res = requests.get(config.SSense_URL, headers={'Apikey':config.LextoPlus_API_key}, params={'text':' '.join(list(doc.values())[0])})
+            res = requests.get(config.SSense_URL, headers={'Apikey':config.LextoPlus_API_key}, params={'text':' '.join(doc['text'])})
             try:
                 raw = res.json()
 
@@ -75,7 +73,7 @@ class SentimentAnalysis():
             except:
                 print('error')
 
-            time.sleep(1)
+            time.sleep(0.5)
                 
 
 if __name__ == '__main__':

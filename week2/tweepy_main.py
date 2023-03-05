@@ -120,7 +120,8 @@ class MainOperation():
         time_list = sorted(list(set(time_list)))
 
         result = sorted(list(set(self.check_tf_timeline(start_d, end_d, time_list))))
-
+        
+        print('data in database :',time_list)
         print('tf_date_list :',result)
 
         return result
@@ -150,10 +151,86 @@ class MainOperation():
             tweet_dict_values = list(tweet_dict.values())
             twitterDataProcessing.Transform().perform(tweet_dict_keys, tweet_dict_values)
     
+    def SetCheckPoint(self, start_d, end_d):
+        #check time
+        time_delta = (end_d - start_d)+ datetime.timedelta(days=1)
+        interval_1 = datetime.timedelta(days=int(time_delta.days/2))
+        interval_2 = datetime.timedelta(days=int(time_delta.days/2-1))
+        print(time_delta.days)
+        print(start_d, end_d)
+        #even day
+        if time_delta.days %2 == 0:
+            checkpoint = [end_d-interval_1, end_d-interval_2]
+        #odd day
+        else:
+            checkpoint = [end_d-interval_1]
+        return checkpoint
+    
+    def CheckSentimentTimeline(self, start_d, end_d, checkpoint, time_list, even):
+
+        interval = datetime.timedelta(days=1)
+        time_delta = (end_d - start_d)+ interval
+        date_sentiment = []
+        
+        if even == True:
+            checkpoint_s = checkpoint[0]
+            checkpoint_e = checkpoint[1]
+            for i in range(int(time_delta.days/2)):
+                print(checkpoint_s, checkpoint_s not in time_list)
+                print(checkpoint_e, checkpoint_e not in time_list)
+                #check checkpoint 1 (start)
+                if checkpoint_s not in time_list:
+                    date_sentiment.append(checkpoint_s)
+                checkpoint_s -= interval
+                if checkpoint_e not in time_list:
+                    date_sentiment.append(checkpoint_e)
+                checkpoint_e += interval
+        else:
+            checkpoint = checkpoint[0]
+            for i in range(int(time_delta.days/2)):
+               pass
+
+        print('date to sentiment',date_sentiment)
+
+                #check checkpoint 2 (end)
+
+
+
+    def CheckSentimentDB(self, start_d, end_d):
+        db_action = self.db_action
+        time_list = []
+        sentiment_date = []
+        collection = db_action.tweetdb_object(config.mongo_client, config.database_name, config.collection_name_5)
+
+        db_action.not_print_raw()
+        
+        query_object = db_action.tweetdb_create_object(["_id", "date"], [0,1])
+        cursor = db_action.tweetdb_show_collection(config.collection_name_5, collection, query_object)
+
+        #pull time from sentiment database
+        for doc in cursor:
+            time_list.append(doc['date'].date())
+        
+        checkpoint = self.SetCheckPoint(start_d, end_d)
+        print(checkpoint)
+
+        #even day
+        if len(checkpoint) == 2:
+            self.CheckSentimentTimeline(start_d, end_d, checkpoint, time_list, True)
+        #odd day
+        else:
+            pass
+        
+
+    def CheckCleanedDB(self, date_list):
+        pass
+
+    def CheckTweetsDB(self, date_list):
+        pass
+
     #extract by time
     def PerformSentimentByTime(self):
         #check sentiment database
-        
 
         #check cleaned database
 
@@ -179,4 +256,10 @@ class MainOperation():
 if __name__ == '__main__':
     # MainOperation().ExtractAndLoad(config.search_word)
     # MainOperation().Transform()
-    pass
+
+    mainoperation = MainOperation()
+
+    start_date = datetime.date(2022, 12, 30) #y m d
+    end_date = datetime.date(2023, 1, 16)
+
+    mainoperation.CheckSentimentDB(start_date, end_date)
