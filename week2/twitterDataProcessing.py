@@ -13,6 +13,7 @@ from nltk.corpus import stopwords   #use for English stop word cleaning
 from nltk import WordNetLemmatizer  #use for English normalization
 from nltk.stem.porter import *  #use for stemming
 from unidecode import unidecode
+import datetime
 
 db_action = database_action.DatabaseAction()
 
@@ -128,7 +129,7 @@ class Tokenization():
             return None    
     
 # Read file from database
-    def LextoPlusTokenization(self, api_key, url):
+    def LextoPlusTokenization(self, api_key, url, keyword, date_list):
 
         print('Start Tokenization')
         #start the timer
@@ -147,33 +148,36 @@ class Tokenization():
         cursor = db_action.tweetdb_show_collection(config.collection_name, collection, query_object)
 
         for doc in cursor:
+            for date in date_list:
+                if doc['keyword'] == keyword and doc['date'].date() == date:
 
-            #send data to filter url and numeric
-            doc['text'] = FilterData().Filters(doc['text']).strip()
+                    #send data to filter url and numeric
+                    doc['text'] = FilterData().Filters(doc['text']).strip()
 
-            #convert filtered data to dictionary
-            doc_dict = dict(doc)
+                    #convert filtered data to dictionary
+                    doc_dict = dict(doc)
 
-            #activate normalization
-            doc_dict['norm'] = config.LextoPlus_Norm
+                    #activate normalization
+                    doc_dict['norm'] = config.LextoPlus_Norm
 
-            #connect with Lexto+ API
-            res = ConnectLextoPlus().ConnectApi(api_key, url, doc_dict)
+                    #connect with Lexto+ API
+                    res = ConnectLextoPlus().ConnectApi(api_key, url, doc_dict)
 
-            try:
-                tokened_dict[doc['id']] = [doc['keyword'], doc['date'], FilterData().FilteredFromLexto(res.json())]
-                
-                #check if the data can be filter by Lexto+
-                if tokened_dict[doc['id']] == []:
-                    print(doc_dict)
-                    print(res.text)
+                    try:
+                        tokened_dict[doc['id']] = [doc['keyword'], doc['date'], FilterData().FilteredFromLexto(res.json())]
+                        
+                        #check if the data can be filter by Lexto+
+                        if tokened_dict[doc['id']] == []:
+                            print(doc_dict)
+                            print(res.text)
 
-                self.count_token += 1
-            except:
+                        self.count_token += 1
+                    except:
 
-                self.count_untoken += 1
-                tokened_dict[doc['id']] = [doc['keyword'], doc['date'], doc['text'].split()]
-            
+                        self.count_untoken += 1
+                        tokened_dict[doc['id']] = [doc['keyword'], doc['date'], doc['text'].split()]
+                else:
+                    continue
             time.sleep(1)
                 
         #stop the timer
@@ -296,7 +300,8 @@ if __name__ == '__main__':
 
     tweet_dict = Tokenization().LextoPlusTokenization(
         config.LextoPlus_API_key,
-        config.LextoPlus_URL
+        config.LextoPlus_URL,
+        config.search_word
     )
 
     tweet_dict_keys = list(tweet_dict.keys())
