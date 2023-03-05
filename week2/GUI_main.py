@@ -1,5 +1,5 @@
 import sys
-
+import os
 from ui_gui import *
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
@@ -10,7 +10,6 @@ from plotly.offline import *
 import plotly.graph_objs as go
 import plotly.offline as po
 
-import pymongo
 import pandas as pd
 
 import plotly.express as px
@@ -18,6 +17,8 @@ from ui_gui import Ui_MainWindow
 
 from tweepy_search import *
 
+from pytagcloud import *
+import tempfile
 class MainWindow(QMainWindow):
     def __init__(self):
         QMainWindow.__init__(self)
@@ -59,7 +60,10 @@ class MainWindow(QMainWindow):
         self.create_pie_chart()
         self.ui.frame_21.layout().addWidget(self.chart_view)
         
-        # self.ui.frame_24.layout().addWidget(self.chart_view)
+        # Add world cloud to QFrame 
+        self.create_word_cloud()
+        self.ui.frame_24.layout().addWidget(self.wordcloud_label)
+        
         # show window
         self.show()
     # for Overview of hashtags
@@ -79,7 +83,8 @@ class MainWindow(QMainWindow):
         family='SF Compact Display',
         size=20,
         color='white',  # set font color to white
-    ),plot_bgcolor='rgb(13, 15, 33)',
+    ),
+    plot_bgcolor='rgb(13, 15, 33)',
     paper_bgcolor='rgb(13, 15, 33)',
 )
         
@@ -103,6 +108,35 @@ class MainWindow(QMainWindow):
         self.chart_view.setHtml(html)
         self.chart_view.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         
+    # for Sentiment Word Clound (Overall)
+    def create_word_cloud(self):
+        # Generate mock data
+        text = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."
+        words = text.split()
+        word_counts = {word: words.count(word) for word in words}
+        sorted_word_counts = sorted(word_counts.items(), key=lambda x: x[1], reverse=True)
+        top_words = dict(sorted_word_counts[:20])
+        
+        # Create tags for word cloud
+        tags = make_tags(list(top_words.items()), maxsize=80)
+        
+        # Set font for word cloud
+        create_tag_image(tags, 'wordcloud.png', fontname='Droid Sans')
+        
+        # Set temporary file path to save the word cloud image
+        tmp_file_path = os.path.join(tempfile.gettempdir(), "wordcloud.png")
+        
+        # Generate word cloud image and save to file
+        create_tag_image(tags, tmp_file_path, size=(800, 600))
+        
+        # Load word cloud image into QLabel widget in GUI
+        pixmap = QtGui.QPixmap(tmp_file_path)
+        self.wordcloud_label = QtWidgets.QLabel()
+        self.wordcloud_label.setPixmap(pixmap)
+        self.wordcloud_label.setScaledContents(True)
+        self.wordcloud_label.setMinimumSize(1, 1)
+        self.wordcloud_label.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
+    
     def auto_fill(self, text):
         # Use the setText method to autofill keyword lineEdit with the text from search lineEdit
         self.ui.lineEdit_keyword.setText(text)
@@ -175,8 +209,7 @@ class MainWindow(QMainWindow):
         
         # display the list of trends in the widget.
         self.ui.listView_2.setModel(model)
-        
-    
+
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
     MainWindow = MainWindow()
