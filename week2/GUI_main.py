@@ -16,7 +16,7 @@ import pandas as pd
 import plotly.express as px
 from ui_gui import Ui_MainWindow
 
-from tweepy_main import *
+from tweepy_search import *
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -55,19 +55,33 @@ class MainWindow(QMainWindow):
         # connect the search button with the search_twitter function
         self.ui.comboBox_searchtype.currentIndexChanged.connect(self.search_twitter)
         
+        # Add chart view to QFrame (Overview of hashtags)
         self.create_pie_chart()
-        # Add chart view to QFrame
-        self.ui.frame_33.layout().addWidget(self.chart_view)
+        self.ui.frame_21.layout().addWidget(self.chart_view)
+        
+        # self.ui.frame_24.layout().addWidget(self.chart_view)
         # show window
         self.show()
-        
+    # for Overview of hashtags
     def create_pie_chart(self):
-        labels = ['Apple', 'Banana', 'Pear', 'Melon', 'Water Melon']
-        values = [80, 70, 50, 80, 30]
+        labels = ['Apple', 'Banana', 'Pear']
+        values = [80, 70, 50]
         
         # Define data and layout
-        data = go.Pie(labels=labels, values=values)
-        layout = go.Layout(title='Fruits Pie Chart')
+        data = go.Pie(
+                        labels=labels,
+                        values=values,
+                        marker=dict(colors=['#FF3B30', '#4CD964', '#007AFF']),
+                        hole=0.3  # set the size of the center hole
+    )
+        
+        layout = go.Layout(font=dict(
+        family='SF Compact Display',
+        size=20,
+        color='white',  # set font color to white
+    ),plot_bgcolor='rgb(13, 15, 33)',
+    paper_bgcolor='rgb(13, 15, 33)',
+)
         
         # Create figure and plot in QWebEngineView
         fig = go.Figure(data=[data], layout=layout)
@@ -127,8 +141,20 @@ class MainWindow(QMainWindow):
         trends_keyword = PullTwitterData().pull_trends(api, config.WOEid, config.ranking_top)
         # Qt model used to display data in a QListView widget
         model = QStandardItemModel()
-        
-            # counter for number of trends
+        # create a custom font
+        # Load the font file
+        font_id = QFontDatabase.addApplicationFont("FontsFree-Net-SFCompactDisplay-Regular.ttf")
+        # Get the family name of the loaded font
+        font_family = QFontDatabase.applicationFontFamilies(font_id)[0]
+        # Create a QFont object using the loaded font
+        font = QFont(font_family)
+        font.setPointSize(14)
+        font.setBold(True)
+        # Create a QFont object for the trend volume
+        volume_font = QFont(font_family)
+        volume_font.setPointSize(12)
+
+        # counter for number of trends
         count = 0
         for trend in trends_keyword:
             # iterate through each key-value pair in the current trend dictionary
@@ -136,65 +162,19 @@ class MainWindow(QMainWindow):
                 # convert volume to thousands and format as string with "K" appended
                 volume_str = "{:.1f}K".format(volume/1000) if volume is not None else "-"
                 # representation of the form "trend_name (trend_volume)" for each trend in the trends_keyword list
-                item = QStandardItem(f"{count+1}. {name} ({volume_str})")
+                item = QStandardItem(f"{count+1}. {name}")
+                item.setFont(font)  # set the custom font to the QStandardItem
                 # adds a new row of items to the model
                 model.appendRow(item)
+                # create a new QStandardItem for the trend volume
+                volume_item = QStandardItem(f"{volume_str} tweets\n")
+                volume_item.setFont(volume_font) # set the custom font to the QStandardItem
+                model.appendRow(volume_item)
+
                 count += 1
+        
         # display the list of trends in the widget.
         self.ui.listView_2.setModel(model)
-    
-    def create_topwords_bar_chart(self):
-        # Connect to MongoDB
-        client = pymongo.MongoClient("mongodb://localhost:27017/")
-        db = client["twitter_data"]
-        collection = db["ranking_word"]
-
-        # retrieve data from a MongoDB collection and store it in a Pandas dataframe
-        data = list(collection.find({}))
-        source = pd.DataFrame({"word":list(data[0].keys())[1:11], "count":list(data[0].values())[1:11]})
-        source = source.sort_values(by='count', ascending=True)
-        print(source)
-
-        # Plot bar chart using Plotly
-        fig = px.bar(source, x='count', y='word', title='Ranking of words in tweets', text='count', orientation='h')
-        fig.update_traces(textposition='auto', marker=dict(color='blue'))
-        fig.update_layout(
-            title=dict(font=dict(size=24)),
-            xaxis=dict(title=dict(font=dict(size=18)), tickfont=dict(size=14)),
-            yaxis=dict(title=dict(font=dict(size=18)), tickfont=dict(size=14)),
-        )
-
-        # Save the chart to an HTML file
-        fig.write_html('topwords_bar_chart.html')
-        
-        # # check the location of the current working directory
-        # print(os.getcwd())
-        
-        # view = QtWebEngineWidgets.QWebEngineView()
-        # view.load(QtCore.QUrl().fromLocalFile(os.path.split(os.path.abspath(__file__))[0]))
-        
-        # view.show()
-        
-        # # Show the chart legend
-        # chart.legend().setVisible(True)
-        # chart.legend().setAlignment(Qt.AlignBottom)
-        
-        # # Set chart renderer and theme
-        # self.ui.chart_view = QtCharts.QChartView(chart)
-        # self.ui.chart_view.setRenderHint(QPainter.Antialiasing)
-        # self.ui.chart_view.chart().setTheme(QtCharts.QChart.ChartThemeDark)
-        
-        # # Set chart size policy
-        # sizePolicy = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-        # sizePolicy.setHorizontalStretch(0)
-        # sizePolicy.setVerticalStretch(0)
-        # sizePolicy.setHeightForWidth(self.ui.chart_view.sizePolicy().hasHeightForWidth())
-        # self.ui.chart_view.setSizePolicy(sizePolicy)
-        
-        # # Add chart to container
-        # self.ui.chart_view.setMinimumSize(QSize(0,300))
-        # self.ui.top_word.addWidget(self.ui.chart_view)
-        
         
     
 if __name__ == "__main__":
