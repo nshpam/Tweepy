@@ -22,7 +22,8 @@ class MainOperation():
         self.keyword = config.search_word
         self.search_type = config.search_type
         self.search_limit = config.num_tweet
-        self.start_date = datetime.date(2022, 12, 30) #y m d
+        self.start_date = datetime.date(2023, 1, 16)
+        # self.start_date = datetime.date(2022, 12, 30) #y m d
         self.end_date = datetime.date(2023, 1, 16)
         self.db_action = database_action.DatabaseAction()
 
@@ -56,10 +57,11 @@ class MainOperation():
             return end_d
         return checkpoint
 
+    def transform_one_day(self):
+        pass
 
-    def check_tf_timeline(self, checkpoint, end_d, time_list):
-        
-        interval = datetime.timedelta(days=1)
+    def transform_period(self, checkpoint, end_d, time_list, interval):
+
         tf_date_list = []
         while checkpoint <= end_d:
 
@@ -87,7 +89,22 @@ class MainOperation():
             
             #pin new checkpoint
             checkpoint += datetime.timedelta(days=14)
+        
+        return tf_date_list
+    
+    def check_day(self, start_d, end_d, time_list, interval):
+        if start_d == end_d:
+            #transform one day
+            return self.transform_one_day()
+        #transform period
+        return self.transform_period(start_d, end_d, time_list, interval)
 
+    def check_tf_timeline(self, checkpoint, end_d, time_list):
+        interval = datetime.timedelta(days=1)
+
+        #check if only one day or period
+        tf_date_list=self.check_day(self, checkpoint, end_d, time_list, interval)
+        
         return tf_date_list
             
 
@@ -122,8 +139,28 @@ class MainOperation():
         if tf_date_list == []:
             print('sentiment')
         #if not perform the transformation or extract
+        #extract commander should be sentiment function
         else:
-            pass
+            print('transform')
+    
+    def Sentiment(self):
+        #sentiment
+        pass
+
+    #press extract button
+    def Perform(self):
+        #check if that timeline in tweets database
+        #check if the correction of timeline
+        #extract
+
+        #check if that timeline transformed already
+        #chcek if the correction of timeline
+        #transform
+        #sentiment
+        #show report page (total extract, keyword, sentiment score, top 10 word, date range, pie chart sentiment, sentiment top 10 word)
+        #show data visualization of sentiment
+        #show ranking
+        pass
 
 if __name__ == '__main__':
     # MainOperation().ExtractAndLoad(config.search_word)
