@@ -441,7 +441,7 @@ class Ui_MainWindow(object):
         self.scrollArea_3.setWidgetResizable(True)
         self.scrollArea_3.setObjectName("scrollArea_3")
         self.scrollAreaWidgetContents_4 = QtWidgets.QWidget()
-        self.scrollAreaWidgetContents_4.setGeometry(QtCore.QRect(0, 0, 723, 5061))
+        self.scrollAreaWidgetContents_4.setGeometry(QtCore.QRect(0, 0, 374, 5061))
         self.scrollAreaWidgetContents_4.setAutoFillBackground(False)
         self.scrollAreaWidgetContents_4.setStyleSheet("")
         self.scrollAreaWidgetContents_4.setObjectName("scrollAreaWidgetContents_4")
@@ -960,7 +960,7 @@ class Ui_MainWindow(object):
         self.scrollArea_2.setWidgetResizable(True)
         self.scrollArea_2.setObjectName("scrollArea_2")
         self.scrollAreaWidgetContents_2 = QtWidgets.QWidget()
-        self.scrollAreaWidgetContents_2.setGeometry(QtCore.QRect(0, 0, 94, 94))
+        self.scrollAreaWidgetContents_2.setGeometry(QtCore.QRect(0, 0, 737, 325))
         self.scrollAreaWidgetContents_2.setObjectName("scrollAreaWidgetContents_2")
         self.verticalLayout_53 = QtWidgets.QVBoxLayout(self.scrollAreaWidgetContents_2)
         self.verticalLayout_53.setObjectName("verticalLayout_53")
@@ -1898,7 +1898,7 @@ class Ui_MainWindow(object):
         self.scrollArea.setWidgetResizable(True)
         self.scrollArea.setObjectName("scrollArea")
         self.scrollAreaWidgetContents = QtWidgets.QWidget()
-        self.scrollAreaWidgetContents.setGeometry(QtCore.QRect(0, 0, 539, 775))
+        self.scrollAreaWidgetContents.setGeometry(QtCore.QRect(0, -145, 723, 809))
         self.scrollAreaWidgetContents.setObjectName("scrollAreaWidgetContents")
         self.verticalLayout_5 = QtWidgets.QVBoxLayout(self.scrollAreaWidgetContents)
         self.verticalLayout_5.setObjectName("verticalLayout_5")
@@ -2194,6 +2194,25 @@ class Ui_MainWindow(object):
         self.calendarWidget.setObjectName("calendarWidget")
         self.gridLayout_21.addWidget(self.calendarWidget, 0, 0, 1, 1)
         self.verticalLayout_5.addWidget(self.frame_calendar, 0, QtCore.Qt.AlignHCenter)
+        self.frame_checkbox = QtWidgets.QFrame(self.scrollAreaWidgetContents)
+        self.frame_checkbox.setStyleSheet("QCheckBox::indicator {\n"
+"    background-color: rgb(23, 31, 53);\n"
+"    border: 1px solid rgb(3, 169, 244);\n"
+"}\n"
+"")
+        self.frame_checkbox.setFrameShape(QtWidgets.QFrame.StyledPanel)
+        self.frame_checkbox.setFrameShadow(QtWidgets.QFrame.Raised)
+        self.frame_checkbox.setObjectName("frame_checkbox")
+        self.horizontalLayout_6 = QtWidgets.QHBoxLayout(self.frame_checkbox)
+        self.horizontalLayout_6.setContentsMargins(11, 4, 0, 0)
+        self.horizontalLayout_6.setSpacing(0)
+        self.horizontalLayout_6.setObjectName("horizontalLayout_6")
+        self.checkBox = QtWidgets.QCheckBox(self.frame_checkbox)
+        self.checkBox.setStyleSheet("color: rgb(3, 169, 244);\n"
+"font: 12pt \"HP Simplified Hans\";")
+        self.checkBox.setObjectName("checkBox")
+        self.horizontalLayout_6.addWidget(self.checkBox, 0, QtCore.Qt.AlignHCenter)
+        self.verticalLayout_5.addWidget(self.frame_checkbox)
         self.frame_extract = QtWidgets.QFrame(self.scrollAreaWidgetContents)
         self.frame_extract.setStyleSheet("QPushButton {\n"
 "    background-color: #1aa0e9;\n"
@@ -2613,6 +2632,7 @@ class Ui_MainWindow(object):
         self.label_11.setText(_translate("MainWindow", "Search limit"))
         self.label_12.setText(_translate("MainWindow", "Date Range"))
         self.label_13.setText(_translate("MainWindow", "-"))
+        self.checkBox.setText(_translate("MainWindow", "Displaying results with database data"))
         self.pushButton_extract_2.setText(_translate("MainWindow", "Extract"))
         self.label_outputnumber.setText(_translate("MainWindow", "989"))
         self.label_40.setText(_translate("MainWindow", "TOTAL TWEETS"))

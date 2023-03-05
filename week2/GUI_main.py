@@ -64,6 +64,10 @@ class MainWindow(QMainWindow):
         self.create_word_cloud()
         self.ui.frame_24.layout().addWidget(self.wordcloud_label)
         
+        # Add world cloud to QFrame (Ranking Top 10 Words)
+        self.create_bar_chart()
+        self.ui.frame_33.layout().addWidget(self.horizontalbar_chart_view)
+        
         # show window
         self.show()
     # for Overview of hashtags
@@ -136,6 +140,84 @@ class MainWindow(QMainWindow):
         self.wordcloud_label.setScaledContents(True)
         self.wordcloud_label.setMinimumSize(1, 1)
         self.wordcloud_label.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
+    
+    def create_bar_chart(self):
+        # Generate mock data
+        text = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."
+        words = text.split()
+        word_counts = {word: words.count(word) for word in words}
+        sorted_word_counts = sorted(word_counts.items(), key=lambda x: x[1], reverse=True)
+        top_words = dict(sorted_word_counts[:10])
+
+        # Get data for horizontal bar chart
+        labels = list(top_words.keys())
+        values = list(top_words.values())
+
+        # Define data and layout
+        data = go.Bar(
+            x=values,
+            y=labels,
+            orientation='h',
+            marker=dict(color='#007AFF', )
+        )
+
+        layout = go.Layout(
+            font=dict(
+                family='SF Compact Display',
+                size=20,
+                color='white'
+            ),
+            plot_bgcolor='rgb(13, 15, 33)',
+            paper_bgcolor='rgb(13, 15, 33)',
+            xaxis=dict(
+                title=dict(
+                    text='Frequency',
+                    font=dict(
+                        family='SF Compact Display',
+                        size=20,
+                        color='white'
+                    )
+                ),
+                tickfont=dict(
+                    family='SF Compact Display',
+                    size=18,
+                    color='white'
+                ),
+                autorange=True,
+                zeroline=False,
+                range=[0, max(values) + 10],
+            ),
+            yaxis=dict(
+                tickfont=dict(
+                    family='SF Compact Display',
+                    size=18,
+                    color='white'
+                ),
+                autorange='reversed' # Reverse the y-axis
+            )
+        )
+
+        # Create figure and plot in QWebEngineView
+        fig = go.Figure(data=[data], layout=layout)
+        po.init_notebook_mode(connected=True)
+        plot_html = po.plot(fig, include_plotlyjs=False, output_type='div')
+
+        # Add Plotly library to HTML file
+        html = f"""
+        <html>
+        <head>
+            <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+        </head>
+        <body>
+            {plot_html}
+        </body>
+        </html>
+        """
+
+        
+        self.horizontalbar_chart_view = QWebEngineView()
+        self.horizontalbar_chart_view.setHtml(html)
+        self.horizontalbar_chart_view.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
     
     def auto_fill(self, text):
         # Use the setText method to autofill keyword lineEdit with the text from search lineEdit
