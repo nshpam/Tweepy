@@ -85,33 +85,71 @@ class FilterData():
         raw_text = ''.join(filter(lambda x: not x.isdigit(), raw_text.strip()))
         return raw_text
     
+    # def FilterSpecialChar(self, raw_text):
+    #     temp_dict = {}
+    #     temp_text = ''
+    #     regex = re.compile('[@_!#$%^&*()<>?/\|~:]')
+
+    #     for list_word in raw_text.split():
+
+    #         temp_dict[list_word] = list_word.encode('ascii','namereplace').decode('utf-8').split('\\N')
+
+    #         for word in temp_dict[list_word]:
+    #             if word == '':
+    #                 continue
+
+    #             if regex.search(list_word) != None:
+    #                     remove_char = regex.search(list_word).group()
+    #                     list_word = list_word.replace(remove_char,"")
+                    
+    #             if 'THAI' not in word and '{' in word and '}' in word:
+                    
+    #                 if unidecode(list_word) not in temp_text.split() and unidecode(list_word).isalnum():
+    #                     temp_text += ' ' + unidecode(list_word)
+    #                 break
+
+    #             elif list_word not in temp_text.split():
+    #                     temp_text += ' ' + list_word
+        
+    #     return temp_text.lower()
+    
     def FilterSpecialChar(self, raw_text):
         temp_dict = {}
         temp_text = ''
-        regex = re.compile('[@_!#$%^&*()<>?/\|~:]')
+        # regex = re.compile('[@_!#$%^&*()<>?/\|~:]')
+        regex = re.compile('[^a-zA-Z0-9_\-]')
 
         for list_word in raw_text.split():
 
-            temp_dict[list_word] = list_word.encode('ascii','namereplace').decode('utf-8').split('\\N')
+            # temp_dict[list_word] = list_word.encode('ascii','namereplace').decode('utf-8').split('\\N')
+            temp_dict[list_word] = [word.encode('ascii', 'namereplace').decode('utf-8').split('\\N') for word in list_word.split()]
 
             for word in temp_dict[list_word]:
                 if word == '':
                     continue
 
-                if regex.search(list_word) != None:
-                        remove_char = regex.search(list_word).group()
-                        list_word = list_word.replace(remove_char,"")
-                    
-                if 'THAI' not in word and '{' in word and '}' in word:
-                    
+                # if regex.search(list_word) != None:
+                #         remove_char = regex.search(list_word).group()
+                #         list_word = list_word.replace(remove_char,"")
+                
+                list_word = regex.sub('', list_word) 
+   
+                if '{' in word and '}' in word:
                     if unidecode(list_word) not in temp_text.split() and unidecode(list_word).isalnum():
                         temp_text += ' ' + unidecode(list_word)
                     break
-
-                elif list_word not in temp_text.split():
-                        temp_text += ' ' + list_word
+                # if 'THAI' not in list_word and unidecode(list_word).isalnum():    
+                    # if unidecode(list_word) not in temp_text.split() and unidecode(list_word).isalnum():
+                    #     temp_text += ' ' + unidecode(list_word)
+                    # break
+                    
+                elif unidecode(list_word).isalnum() and list_word not in temp_text.split():
+                    temp_text += ' ' + list_word
+                # elif list_word not in temp_text.split():
+                #         temp_text += ' ' + list_word
         
-        return temp_text.lower()
+        # return temp_text.lower()
+        return temp_text.strip()
 
 #Tokenization function
 class Tokenization():
