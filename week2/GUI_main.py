@@ -56,6 +56,7 @@ class MainWindow(QMainWindow):
         # connect the search button with the search_twitter function
         self.ui.comboBox_searchtype.currentIndexChanged.connect(self.search_twitter)
         
+        
         # Add chart view to QFrame (Overview of hashtags)
         self.create_pie_chart()
         self.ui.frame_21.layout().addWidget(self.chart_view)
@@ -70,6 +71,8 @@ class MainWindow(QMainWindow):
         
         # show window
         self.show()
+        
+        
     # for Overview of hashtags
     def create_pie_chart(self):
         labels = ['Apple', 'Banana', 'Pear']
