@@ -41,6 +41,7 @@ class MainOperation():
 
         print('Extract end...')
     
+    #transform
     def check_previous(self, previous, time_list):
         if previous not in time_list:
             return False #True = perform transformation
@@ -102,7 +103,7 @@ class MainOperation():
         #transform period
         return self.transform_period(checkpoint, end_d, time_list, interval)
             
-    def check_tf(self, start_d, end_d):
+    def CheckCleanedDB(self, start_d, end_d):
         db_action = self.db_action
         time_list = []
         collection_2 = db_action.tweetdb_object(
@@ -126,10 +127,19 @@ class MainOperation():
 
         return result
 
+    def TransformByTime(self, tf_date_list):
+        tweet_dict = twitterDataProcessing.Tokenization().LextoPlusTokenization(
+                config.LextoPlus_API_key, config.LextoPlus_URL, config.search_word, tf_date_list
+            )
+
+        tweet_dict_keys = list(tweet_dict.keys())
+        tweet_dict_values = list(tweet_dict.values())
+        twitterDataProcessing.Transform().perform(tweet_dict_keys, tweet_dict_values)
+
     #Transform and load tweets data
-    def TransformByTime(self):
+    def TransformByTime_old(self):
         #check if the data should be transformed
-        tf_date_list = self.check_tf(self.start_date, self.end_date)
+        tf_date_list = self.CheckCleanedDB(self.start_date, self.end_date)
         #if it transform already so we skip them
         if tf_date_list == []:
             print('there is nothing to transform')
@@ -147,6 +157,16 @@ class MainOperation():
             tweet_dict_values = list(tweet_dict.values())
             twitterDataProcessing.Transform().perform(tweet_dict_keys, tweet_dict_values)
     
+    def TransformByKeyword(self):
+        tweet_dict = twitterDataProcessing.Tokenization().LextoPlusTokenization(
+                config.LextoPlus_API_key, config.LextoPlus_URL, config.search_word, ['keyword']
+            )
+
+        tweet_dict_keys = list(tweet_dict.keys())
+        tweet_dict_values = list(tweet_dict.values())
+        twitterDataProcessing.Transform().perform(tweet_dict_keys, tweet_dict_values)
+
+    #Sentiment
     def SetCheckPoint(self, start_d, end_d):
         #check time
         time_delta = (end_d - start_d)+ datetime.timedelta(days=1)
@@ -215,49 +235,61 @@ class MainOperation():
         
         checkpoint = self.SetCheckPoint(start_d, end_d)
 
-        #even day
-        if checkpoint[2]:
-            sentiment_date = self.CheckTimeline(start_d, end_d, checkpoint, time_list, checkpoint[2])
-        #odd day
+        if start_d == end_d:
+            if start_date not in time_list:
+                sentiment_date = [start_date]
         else:
-            sentiment_date = self.CheckTimeline(start_d, end_d, checkpoint, time_list, checkpoint[2])
+            #even day
+            if checkpoint[2]:
+                sentiment_date = self.CheckTimeline(start_d, end_d, checkpoint, time_list, checkpoint[2])
+            #odd day
+            else:
+                sentiment_date = self.CheckTimeline(start_d, end_d, checkpoint, time_list, checkpoint[2])
         
         return sentiment_date
 
-    def Sentiment(self):
-        #sentiment
+    def SentimentByTime(self, start_d, end_d):
+        sentiment_date = self.CheckSentimentDB(start_d, end_d)
+
+        if sentiment_date == []:
+            #show sentiment data visualization
+            print('show data visualization')
+        else:
+            #case 1 :have data but not sentiment
+            #case 2 :don't have data to sentiment
+            #both case need to check cleaned database
+
+            #check if the datae exist and collect data
+            sentiment_date = sorted(sentiment_date)
+            self.CheckCleanedDB(sentiment_date[0], sentiment_date[-1])
+            pass
+    
+    def SentimentByKeyword(self):
         pass
 
-    def CheckCleanedDB(self, date_list):
-        pass
+    # def CheckCleanedDB(self, date_list):
+    #     #if have all the cleaned data then return it
+    #     #if not pull data from tweets and clean
+    #     pass
 
     def CheckTweetsDB(self, date_list):
+        #if have all the tweet data then return it
+        #if not pull data from tweet
+        #if no tweet in that period show error
         pass
 
-    #extract by time
-    def PerformSentimentByTime(self):
-        #check sentiment database
-
-        #check cleaned database
-
-        #check tweets database
-
-        #check if that timeline in tweets database
-        #check if the correction of timeline
-        #extract
-
-        #check if that timeline transformed already
-        #chcek if the correction of timeline
-        #transform
-        #sentiment
-        #show report page (total extract, keyword, sentiment score, top 10 word, date range, pie chart sentiment, sentiment top 10 word)
-        #show data visualization of sentiment
-        #show ranking
-        pass
-
-    #extract by keyword
-    def PerformSentimentByKeyword(self):
-        pass
+    def CheckSearchMode(self, mode, date_list=[]):
+        if mode == 'keyword':
+            #sentiment by keyword
+            pass
+        elif mode == 'time':
+            #sentiment by time
+            #check sentiment database
+            self.CheckTimeline(date_list)
+            pass
+        else:
+            return 'Invalid Mode'
+    
 
 if __name__ == '__main__':
     # MainOperation().ExtractAndLoad(config.search_word)
@@ -269,4 +301,4 @@ if __name__ == '__main__':
     # end_date = datetime.date(2023, 1, 15)
     end_date = datetime.date(2023, 1, 16)
 
-    mainoperation.CheckSentimentDB(start_date, end_date)
+    mainoperation.CheckTimeline(start_date, end_date)

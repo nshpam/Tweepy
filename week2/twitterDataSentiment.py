@@ -7,6 +7,9 @@ db_action = database_action.DatabaseAction()
 
 class SentimentAnalysis():
 
+    def __init__(self, count_db=0):
+        self.count_db = count_db
+
     #pull clean data from database
     def PullClean(self, keyword):
         cursor = db_action.tweetdb_object(config.mongo_client, config.database_name, config.collection_name_2)
@@ -45,14 +48,70 @@ class SentimentAnalysis():
     
         return converted_polar
     
-    def Sentiment(self, keyword):
+    def SentimentByTime(self, cursor, date_list):
+
+        sentiment_dict = {}
+
+        for doc in cursor:
+            for date in date_list:
+                if doc['date'].date() == date:
+
+                    #sentiment
+                    res = requests.get(config.SSense_URL, headers={'Apikey':config.LextoPlus_API_key}, params={'text':' '.join(doc['text'])})
+                    try:
+                        raw = res.json()
+
+                        if raw['alert'] != []:
+                            print('ALERT! :',raw['alert'])
+
+                        #converting polar for calculation
+                        polar = self.convert_polarity(raw['sentiment']['polarity'])
+                        #intension analysis
+                        conclusion = self.intention_analysis(raw['intention'])
+
+                        sentiment_dict[doc['id']] = [doc['keyword'], doc['date'], raw['preprocess']['input'], raw['sentiment']['score'], polar, conclusion]
+
+                        # data_field = ['id', 'keyword', 'date', 'text', 'score', 'polarity', 'intention']
+                        # data_list = [doc['id'], doc['keyword'], doc['date'], raw['preprocess']['input'], raw['sentiment']['score'], polar, conclusion]
+                        # query_object = db_action.tweetdb_create_object(data_field, data_list)
+
+                        # collection = db_action.tweetdb_object(config.mongo_client, config.database_name, config.collection_name_5)
+                        # #insert to db
+                        # db_action.tweetdb_insert(config.collection_name_5, collection, query_object)
+
+                    except:
+                        print('error')
+
+            time.sleep(0.5)
+        return sentiment_dict
+
+    def SentimentByKeyword(self, cursor):
+        pass
+    
+    def Perform(self, keyword, date_list):
 
         #start the timer
         tic = time.perf_counter()
 
+        self.count_db = 0
+
         cursor = self.PullClean(keyword)
 
         #check the operation
+
+        if date_list == ['keyword']:
+            #perform tokenization by keyword
+            pass
+        else:
+            #check 
+            pass
+
+        if date_list == 'time':
+            self.SentimentByTime(cursor, date_list)
+        elif date_list == 'keyword':
+            pass
+        else:
+            pass
 
         #stop the timer
         toc = time.perf_counter()
@@ -60,31 +119,6 @@ class SentimentAnalysis():
         #display total work time of this thread
         print(f"RUN TIME : {toc - tic:0.4f} seconds")
         print('TOTAL TOKENIZATION :', self.count_token + self.count_untoken)
-
-        for doc in cursor:
-            res = requests.get(config.SSense_URL, headers={'Apikey':config.LextoPlus_API_key}, params={'text':' '.join(doc['text'])})
-            try:
-                raw = res.json()
-
-                if raw['alert'] != []:
-                    print('ALERT! :',raw['alert'])
-
-                polar = self.convert_polarity(raw['sentiment']['polarity'])
-                conclusion = self.intention_analysis(raw['intention'])
-
-                #use the score to calculate overall sentiment
-                data_field = ['id', 'keyword', 'date', 'text', 'score', 'polarity', 'intention']
-                data_list = [doc['id'], doc['keyword'], doc['date'], raw['preprocess']['input'], raw['sentiment']['score'], polar, conclusion]
-                query_object = db_action.tweetdb_create_object(data_field, data_list)
-
-                collection = db_action.tweetdb_object(config.mongo_client, config.database_name, config.collection_name_5)
-                #insert to db
-                db_action.tweetdb_insert(config.collection_name_5, collection, query_object)
-
-            except:
-                print('error')
-
-            time.sleep(0.5)
                 
 
 if __name__ == '__main__':

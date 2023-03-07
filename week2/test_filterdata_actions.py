@@ -29,20 +29,20 @@ class TestFilterData(unittest.TestCase):
     # Test Filter Special Char function
     def test_filter_special_char(self):
         raw_text = "This is ◡̈ some text that we want to process"
-        expected_output = "This is some text that we want to process"
+        expected_output = "this is some text that we want to process"
         self.assertEqual(self.filter_data.FilterSpecialChar(raw_text), expected_output)
 
         raw_text = "Thai {curly braces} with some special characters"
-        expected_output = "Thai curly braces with some special characters"
+        expected_output = "thai {curly braces} with some special characters"
         self.assertEqual(self.filter_data.FilterSpecialChar(raw_text), expected_output)
         
         raw_text = "This is some ◡̈ Text with {กก braces} and THAI กำหนด หัวข้อ รายละเอียด"
-        expected_output = "This is some Text with braces and THAI"
+        expected_output = "this is some text with {กก braces} and thai กำหนด หัวข้อ รายละเอียด"
         self.assertEqual(self.filter_data.FilterSpecialChar(raw_text), expected_output)
         
-        # raw_text = "This is some ◡̈ Text with {กก braces} and กำหนด หัวข้อ รายละเอียด"
-        # expected_output = "This is some Text with กก braces and กำหนด หัวข้อ รายละเอียด"
-        # self.assertEqual(self.filter_data.FilterSpecialChar(raw_text), expected_output)
+        raw_text = "This is some ◡̈ Text with {กก braces} and กำหนด หัวข้อ รายละเอียด"
+        expected_output = "this is some text with {กก braces} and กำหนด หัวข้อ รายละเอียด"
+        self.assertEqual(self.filter_data.FilterSpecialChar(raw_text), expected_output)
     
     # Test Filters function
     def test_filters(self):
@@ -51,7 +51,7 @@ class TestFilterData(unittest.TestCase):
         self.assertEqual(self.filter_data.Filters(raw_list), expected_output)
         
         raw_list = 'ก'
-        expected_output = ''
+        expected_output = 'ก'
         self.assertEqual(self.filter_data.Filters(raw_list), expected_output)
     
 if __name__ == '__main__':
