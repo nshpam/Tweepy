@@ -100,16 +100,9 @@ class MainWindow(QMainWindow):
         po.init_notebook_mode(connected=True)
         plot_html = po.plot(fig, include_plotlyjs=False, output_type='div')
          # Add Plotly library to HTML file
-        html = f"""
-        <html>
-        <head>
-            <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
-        </head>
-        <body>
-            {plot_html}
-        </body>
-        </html>
-        """
+        # Add Plotly library to HTML file
+        html = "<html><head><script src='https://cdn.plot.ly/plotly-latest.min.js'></script></head><body>{plot_html}</body></html>".format(plot_html=plot_html)
+
         
         self.chart_view = QWebEngineView()
         self.chart_view.setHtml(html)
