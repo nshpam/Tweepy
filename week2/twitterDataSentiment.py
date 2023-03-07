@@ -8,14 +8,13 @@ db_action = database_action.DatabaseAction()
 class SentimentAnalysis():
 
     #pull clean data from database
-    def pull_clean(self):
+    def PullClean(self, keyword):
         cursor = db_action.tweetdb_object(config.mongo_client, config.database_name, config.collection_name_2)
         
-        data_field = ["_id"]
-        data_list = [0]
+        db_action.not_print_raw()
         
-        query_object = db_action.tweetdb_create_object(data_field, data_list)
-        show_cursor = db_action.tweetdb_show_collection(config.collection_name_2, cursor, query_object)
+        query_object = db_action.tweetdb_create_object(["keyword"], [keyword])
+        show_cursor = db_action.tweetdb_find(config.collection_name_2, cursor, query_object)
 
         return show_cursor
     
@@ -46,9 +45,21 @@ class SentimentAnalysis():
     
         return converted_polar
     
-    def sentiment(self):
-        cursor = self.pull_clean()
-        db_action.not_print_raw()
+    def Sentiment(self, keyword):
+
+        #start the timer
+        tic = time.perf_counter()
+
+        cursor = self.PullClean(keyword)
+
+        #check the operation
+
+        #stop the timer
+        toc = time.perf_counter()
+
+        #display total work time of this thread
+        print(f"RUN TIME : {toc - tic:0.4f} seconds")
+        print('TOTAL TOKENIZATION :', self.count_token + self.count_untoken)
 
         for doc in cursor:
             res = requests.get(config.SSense_URL, headers={'Apikey':config.LextoPlus_API_key}, params={'text':' '.join(doc['text'])})
@@ -77,6 +88,6 @@ class SentimentAnalysis():
                 
 
 if __name__ == '__main__':
-    SentimentAnalysis().sentiment()
+    SentimentAnalysis().Sentiment()
 
     print('finish insertion')

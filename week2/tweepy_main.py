@@ -125,10 +125,6 @@ class MainOperation():
         print('tf_date_list :',result)
 
         return result
-    
-    def Sentiment(self):
-        #sentiment
-        pass
 
     #Transform and load tweets data
     def TransformByTime(self):
@@ -154,47 +150,53 @@ class MainOperation():
     def SetCheckPoint(self, start_d, end_d):
         #check time
         time_delta = (end_d - start_d)+ datetime.timedelta(days=1)
-        interval_1 = datetime.timedelta(days=int(time_delta.days/2))
-        interval_2 = datetime.timedelta(days=int(time_delta.days/2-1))
-        print(time_delta.days)
-        print(start_d, end_d)
+        
         #even day
         if time_delta.days %2 == 0:
-            checkpoint = [end_d-interval_1, end_d-interval_2]
+            interval = datetime.timedelta(days=int(time_delta.days/2)-1)
+            checkpoint = [start_d+interval, end_d-interval, True]
+            
         #odd day
         else:
-            checkpoint = [end_d-interval_1]
+            interval = datetime.timedelta(days=int((time_delta.days-1)/2))
+            cp_interval = datetime.timedelta(days=1)
+            cp = end_d-interval
+            checkpoint = [cp-cp_interval, cp+cp_interval, False]
+
         return checkpoint
     
-    def CheckSentimentTimeline(self, start_d, end_d, checkpoint, time_list, even):
+    def CheckTimeline(self, start_d, end_d, checkpoint, time_list, even):
 
         interval = datetime.timedelta(days=1)
-        time_delta = (end_d - start_d)+ interval
-        date_sentiment = []
+        end_d += interval
+        time_delta = (end_d - start_d)
+        process_date = []
+        cp1 = checkpoint[0]
+        cp2 = checkpoint[1]
         
-        if even == True:
-            checkpoint_s = checkpoint[0]
-            checkpoint_e = checkpoint[1]
-            for i in range(int(time_delta.days/2)):
-                print(checkpoint_s, checkpoint_s not in time_list)
-                print(checkpoint_e, checkpoint_e not in time_list)
-                #check checkpoint 1 (start)
-                if checkpoint_s not in time_list:
-                    date_sentiment.append(checkpoint_s)
-                checkpoint_s -= interval
-                if checkpoint_e not in time_list:
-                    date_sentiment.append(checkpoint_e)
-                checkpoint_e += interval
-        else:
-            checkpoint = checkpoint[0]
-            for i in range(int(time_delta.days/2)):
-               pass
+        print(start_d, end_d)
 
-        print('date to sentiment',date_sentiment)
+        #odd number
+        if not even:
+            cp = end_d-time_delta
+            #check the first checkpoint
+            if cp not in time_list :
+                process_date.append(cp)
+            
+        while True:
+            #check checkpoint 1
+            if cp1 == start_d-interval or cp2 == end_d+interval:
+                break
+            if cp1 not in time_list:
+                process_date.append(cp1)
+            cp1 -= interval
+            #check checkpoint 2
+            if cp2 not in time_list:
+                process_date.append(cp2)
+            cp2+=interval
 
-                #check checkpoint 2 (end)
-
-
+        print('date to sentiment',process_date)
+        return process_date
 
     def CheckSentimentDB(self, start_d, end_d):
         db_action = self.db_action
@@ -212,15 +214,19 @@ class MainOperation():
             time_list.append(doc['date'].date())
         
         checkpoint = self.SetCheckPoint(start_d, end_d)
-        print(checkpoint)
 
         #even day
-        if len(checkpoint) == 2:
-            self.CheckSentimentTimeline(start_d, end_d, checkpoint, time_list, True)
+        if checkpoint[2]:
+            sentiment_date = self.CheckTimeline(start_d, end_d, checkpoint, time_list, checkpoint[2])
         #odd day
         else:
-            pass
+            sentiment_date = self.CheckTimeline(start_d, end_d, checkpoint, time_list, checkpoint[2])
         
+        return sentiment_date
+
+    def Sentiment(self):
+        #sentiment
+        pass
 
     def CheckCleanedDB(self, date_list):
         pass
@@ -260,6 +266,7 @@ if __name__ == '__main__':
     mainoperation = MainOperation()
 
     start_date = datetime.date(2022, 12, 30) #y m d
+    # end_date = datetime.date(2023, 1, 15)
     end_date = datetime.date(2023, 1, 16)
 
     mainoperation.CheckSentimentDB(start_date, end_date)
