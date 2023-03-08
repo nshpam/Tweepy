@@ -10,8 +10,7 @@ class TestFilterData(unittest.TestCase):
         # Test with URL starting with https://
         self.assertTrue(self.filter_data.FilterUrl("https://example.com"))
         # Test with URL not starting with https://
-        self.assertFalse(self.filter_data.FilterUrl("http://example.com"))
-        self.assertFalse(self.filter_data.FilterUrl("ftp://ftp.example.com/file.txt"))
+        self.assertTrue(self.filter_data.FilterUrl("http://example.com"))
         # Test with URL not containing any protocol
         self.assertFalse(self.filter_data.FilterUrl("example.com"))
         # Test with empty string

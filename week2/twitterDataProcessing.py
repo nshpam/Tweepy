@@ -81,7 +81,12 @@ class FilterData():
             raw_url.index('https://')
             return True
         except:
-            return False
+            try:
+                raw_url.index('http://')
+                return True
+            except:
+                return False
+            # return False
 
     #Filter number function
     def FilterNum(self, raw_text):
