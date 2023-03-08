@@ -57,7 +57,7 @@ class TestFilterData(unittest.TestCase):
         expected_output = ''
         self.assertEqual(self.filter_data.Filters(raw_list), expected_output)
         
-        raw_list = 'ก'
+        raw_list = 'ก@'
         expected_output = 'ก'
         self.assertEqual(self.filter_data.Filters(raw_list), expected_output)
 
