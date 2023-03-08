@@ -51,6 +51,9 @@ class FilterData():
     #Filter URL and numeric data funciton
     def Filters(self, raw_list):
 
+        if type(raw_list) != type(''):
+            return 'Invalid data type'
+
         #split sentence
         raw_list = raw_list.split()
         clean_json = ''
@@ -70,7 +73,7 @@ class FilterData():
             clean_json += ' ' + word.strip()
             
         word = clean_json
-        return word.lstrip()
+        return word.lstrip().rstrip()
 
     #Filter url function
     def FilterUrl(self, raw_url):
@@ -82,10 +85,18 @@ class FilterData():
 
     #Filter number function
     def FilterNum(self, raw_text):
+
+        if type(raw_text) != type(''):
+            return 'Invalid data type'
+
         raw_text = ''.join(filter(lambda x: not x.isdigit(), raw_text.strip()))
         return raw_text
     
     def FilterSpecialChar(self, raw_text):
+
+        if type(raw_text) != type(''):
+            return 'Invalid data type'
+
         temp_dict = {}
         temp_text = ''
         regex = re.compile('[@_!#$%^&*()<>?/\|~:]')
@@ -111,7 +122,7 @@ class FilterData():
                 elif list_word not in temp_text.split():
                         temp_text += ' ' + list_word
         
-        return temp_text.lower().lstrip()
+        return temp_text.lower().lstrip().rstrip()
 
 #Tokenization function
 class Tokenization():
