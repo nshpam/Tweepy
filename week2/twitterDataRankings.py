@@ -109,7 +109,7 @@ class Ranking():
 
             top_word.append(temp)
             top_f.append(temp2)
-
+        print(top_dict)
         return top_dict
         
     def rank_list(self):

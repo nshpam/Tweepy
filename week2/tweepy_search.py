@@ -170,8 +170,6 @@ class PullTwitterData(object):
    #scarp twitter
    def search_twitter(self, api, keyword, search_type, num_tweet):
 
-      # keyword = config.search_word  
-
       #use Cursor to serach
       #tweepy.Cursor(search API, word + filter, search mode, search type).items(search limit)
       tweets = tweepy.Cursor(
@@ -180,8 +178,6 @@ class PullTwitterData(object):
          tweet_mode=config.search_mode,
          result_type=search_type
          ).items(num_tweet)
-         # result_type=config.search_type
-         # ).items(config.num_tweet)
 
       #create a list of Tweets
       self.tweets_list = [tweet for tweet in tweets]
@@ -215,12 +211,18 @@ class PullTwitterData(object):
          trends_keyword.append(temp_dict)
       return trends_keyword
 
+   def pull_trends_word(self):
+      pass
+
+   def pull_trends_hashtags(self):
+      pass
+
 # if __name__ == '__main__':
 
-#    auth = tweepy.OAuth1UserHandler(
-#       config.consumer_key, config.consumer_secret, config.access_token, config.access_token_secret
-#       )
-#    api = tweepy.API(auth)
+   # auth = tweepy.OAuth1UserHandler(
+   #    config.consumer_key, config.consumer_secret, config.access_token, config.access_token_secret
+   #    )
+   # api = tweepy.API(auth)
 #    #search by keyword
 #    PullTwitterData().search_twitter(api, config.search_word)
 

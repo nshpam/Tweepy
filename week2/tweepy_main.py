@@ -62,37 +62,37 @@ class MainOperation():
             return []
         return [day]
 
-    def transform_period(self, checkpoint, end_d, time_list, interval):
+    # def transform_period(self, checkpoint, end_d, time_list, interval):
 
-        tf_date_list = []
-        while checkpoint <= end_d:
+    #     tf_date_list = []
+    #     while checkpoint <= end_d:
 
-            previous = self.set_scope(checkpoint, end_d)
-            next = self.set_scope(checkpoint, end_d)
+    #         previous = self.set_scope(checkpoint, end_d)
+    #         next = self.set_scope(checkpoint, end_d)
             
-            #check checkpoint
-            if checkpoint not in time_list:
-                print('transform')
-                tf_date_list.append(checkpoint)
+    #         #check checkpoint
+    #         if checkpoint not in time_list:
+    #             print('transform')
+    #             tf_date_list.append(checkpoint)
             
-            #check previous and next
-            for i in range(1,8):
-                #previous
-                previous -= interval
-                if not self.check_previous(previous, time_list):
-                    tf_date_list.append(previous)
-                    # print('perform transformation')
+    #         #check previous and next
+    #         for i in range(1,8):
+    #             #previous
+    #             previous -= interval
+    #             if not self.check_previous(previous, time_list):
+    #                 tf_date_list.append(previous)
+    #                 # print('perform transformation')
 
-                #next
-                next -= interval
-                if not self.check_next(next, time_list):
-                    tf_date_list.append(next)
-                    # print('perform transformation')
+    #             #next
+    #             next -= interval
+    #             if not self.check_next(next, time_list):
+    #                 tf_date_list.append(next)
+    #                 # print('perform transformation')
             
-            #pin new checkpoint
-            checkpoint += datetime.timedelta(days=14)
+    #         #pin new checkpoint
+    #         checkpoint += datetime.timedelta(days=14)
         
-        return tf_date_list
+    #     return tf_date_list
 
     def check_tf_timeline(self, checkpoint, end_d, time_list):
         interval = datetime.timedelta(days=1)
@@ -102,30 +102,62 @@ class MainOperation():
             return self.transform_one_day(checkpoint, time_list)
         #transform period
         return self.transform_period(checkpoint, end_d, time_list, interval)
-            
-    def CheckCleanedDB(self, start_d, end_d):
+    
+    def CheckDB(self, start_d, end_d, collection_name):
         db_action = self.db_action
         time_list = []
-        collection_2 = db_action.tweetdb_object(
-            config.mongo_client,
-            config.database_name,
-            config.collection_name_2
-        ) 
+        collection = db_action.tweetdb_object(config.mongo_client, config.database_name, collection_name)
 
-        query_object_2 = db_action.tweetdb_create_object(["_id","date"],[0,1])
-        cursor_2 = db_action.tweetdb_show_collection(config.collection_name_2, collection_2, query_object_2)
-        
-        #pull date and time from cleaned database
-        for doc in cursor_2:
+        db_action.not_print_raw()
+
+        query_object = db_action.tweetdb_create_object(["_id", "date"], [0,1])
+        cursor = db_action.tweetdb_show_collection(collection_name, collection, query_object)
+
+        for doc in cursor:
             time_list.append(doc['date'].date())
-        time_list = sorted(list(set(time_list)))
-
-        result = sorted(list(set(self.check_tf_timeline(start_d, end_d, time_list))))
         
-        print('data in database :',time_list)
-        print('tf_date_list :',result)
+        time_list = sorted(list(set(time_list)))
+        checkpoint = self.SetCheckPoint(start_d, end_d)
 
-        return result
+        if start_d == end_d:
+            if start_date not in time_list:
+                process_date = [start_date]
+        else:
+            #even day
+            if checkpoint[2]:
+                process_date = self.CheckTimeline(start_d, end_d, checkpoint, time_list, checkpoint[2])
+            #odd day
+            else:
+                process_date = self.CheckTimeline(start_d, end_d, checkpoint, time_list, checkpoint[2])
+        
+        return process_date
+
+    # def CheckCleanedDB(self, start_d, end_d):
+    #     db_action = self.db_action
+    #     time_list = []
+    #     collection_2 = db_action.tweetdb_object(
+    #         config.mongo_client,
+    #         config.database_name,
+    #         config.collection_name_2
+    #     ) 
+
+    #     db_action.not_print_raw()
+
+    #     query_object_2 = db_action.tweetdb_create_object(["_id","date"],[0,1])
+    #     cursor_2 = db_action.tweetdb_show_collection(config.collection_name_2, collection_2, query_object_2)
+        
+    #     #pull date and time from cleaned database
+    #     for doc in cursor_2:
+    #         time_list.append(doc['date'].date())
+    #     time_list = sorted(list(set(time_list)))
+    #     checkpoint = self.SetCheckPoint(start_d, end_d)
+
+    #     result = sorted(list(set(self.check_tf_timeline(start_d, end_d, time_list))))
+        
+    #     print('data in database :',time_list)
+    #     print('tf_date_list :',result)
+
+    #     return result
 
     def TransformByTime(self, tf_date_list):
         tweet_dict = twitterDataProcessing.Tokenization().LextoPlusTokenization(
@@ -218,64 +250,32 @@ class MainOperation():
         print('date to sentiment',process_date)
         return process_date
 
-    def CheckSentimentDB(self, start_d, end_d):
-        db_action = self.db_action
-        time_list = []
-        sentiment_date = []
-        collection = db_action.tweetdb_object(config.mongo_client, config.database_name, config.collection_name_5)
-
-        db_action.not_print_raw()
-        
-        query_object = db_action.tweetdb_create_object(["_id", "date"], [0,1])
-        cursor = db_action.tweetdb_show_collection(config.collection_name_5, collection, query_object)
-
-        #pull time from sentiment database
-        for doc in cursor:
-            time_list.append(doc['date'].date())
-        
-        checkpoint = self.SetCheckPoint(start_d, end_d)
-
-        if start_d == end_d:
-            if start_date not in time_list:
-                sentiment_date = [start_date]
-        else:
-            #even day
-            if checkpoint[2]:
-                sentiment_date = self.CheckTimeline(start_d, end_d, checkpoint, time_list, checkpoint[2])
-            #odd day
-            else:
-                sentiment_date = self.CheckTimeline(start_d, end_d, checkpoint, time_list, checkpoint[2])
-        
-        return sentiment_date
-
     def SentimentByTime(self, start_d, end_d):
-        sentiment_date = self.CheckSentimentDB(start_d, end_d)
 
-        if sentiment_date == []:
-            #show sentiment data visualization
-            print('show data visualization')
-        else:
-            #case 1 :have data but not sentiment
-            #case 2 :don't have data to sentiment
-            #both case need to check cleaned database
+        while True:
+            #check if all data avaliable
+            sentiment_date = self.CheckDB(start_d, end_d, config.collection_name_5)
 
-            #check if the datae exist and collect data
-            sentiment_date = sorted(sentiment_date)
-            self.CheckCleanedDB(sentiment_date[0], sentiment_date[-1])
-            pass
+            if sentiment_date == []:
+                print('show data visualization')
+                break
+            else:
+                #check if sentiment_date is discrete timeline or continuous timeline
+                sentiment_date = sorted(sentiment_date)
+                cleaned_date = self.CheckDB(sentiment_date[0], sentiment_date[-1], config.collection_name_2)
+                temp_date = []
+                
+                #check if every date from sentiment in clean_date
+                for date in sentiment_date:
+                    if date not in cleaned_date:
+                        temp_date.append(date)
+                
+                if temp_date == []:
+                    print('sentiment')
+                else:
+                    print('extract temp_date')
     
     def SentimentByKeyword(self):
-        pass
-
-    # def CheckCleanedDB(self, date_list):
-    #     #if have all the cleaned data then return it
-    #     #if not pull data from tweets and clean
-    #     pass
-
-    def CheckTweetsDB(self, date_list):
-        #if have all the tweet data then return it
-        #if not pull data from tweet
-        #if no tweet in that period show error
         pass
 
     def CheckSearchMode(self, mode, date_list=[]):
@@ -301,4 +301,5 @@ if __name__ == '__main__':
     # end_date = datetime.date(2023, 1, 15)
     end_date = datetime.date(2023, 1, 16)
 
-    mainoperation.CheckTimeline(start_date, end_date)
+    # mainoperation.CheckTimeline(start_date, end_date)
+    print( mainoperation.CheckDB(start_date, end_date, config.collection_name_5))
