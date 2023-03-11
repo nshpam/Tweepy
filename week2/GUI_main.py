@@ -9,7 +9,6 @@ from PyQt5.QtWebEngineWidgets import *
 from plotly.offline import *
 import plotly.graph_objs as go
 import plotly.offline as po
-
 import pandas as pd
 
 import plotly.express as px
@@ -19,6 +18,9 @@ from tweepy_search import *
 
 from pytagcloud import *
 import tempfile
+
+from urllib.request import urlopen
+import json
 class MainWindow(QMainWindow):
     def __init__(self):
         QMainWindow.__init__(self)
@@ -73,6 +75,10 @@ class MainWindow(QMainWindow):
         # Add world cloud to QFrame (Ranking Top 10 Words)
         self.create_bar_chart()
         self.ui.frame_33.layout().addWidget(self.horizontalbar_chart_view)
+        
+        # Call spatial_chart method and add it to the layout
+        self.spatial_chart()
+        self.ui.frame_23.layout().addWidget(self.spatial_chart_view)
         
         # show window
         self.show()
@@ -218,6 +224,53 @@ class MainWindow(QMainWindow):
         self.horizontalbar_chart_view = QWebEngineView()
         self.horizontalbar_chart_view.setHtml(html)
         self.horizontalbar_chart_view.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+    
+    
+    def spatial_chart(self):
+        # Geojson
+        ccaa = {
+            "type": "FeatureCollection",
+            "features": [
+                {
+                    "type": "Feature",
+                    "properties": {"ccaa_id": "01", "name": "Andalucía"},
+                    "geometry": {
+                        "type": "Polygon",
+                        "coordinates": [[[-5.158, 36.417], [-4.877, 36.773], [-3.001, 36.975], [-2.53, 36.728], [-2.469, 36.558], [-4.116, 36.128], [-4.799, 36.16], [-5.158, 36.417]]],
+                    },
+                },]}
+        # Data
+        unemp_rates = [    {"ccaa_id": "01", "name": "Andalucía", "unemp_rate": 18.68},    {"ccaa_id": "02", "name": "Aragón", "unemp_rate": 8.96},    {"ccaa_id": "03", "name": "Principado de Asturias", "unemp_rate": 11.36},    {"ccaa_id": "04", "name": "Islas Baleares", "unemp_rate": 9.29},    {"ccaa_id": "05", "name": "Islas Canarias", "unemp_rate": 17.76},    {"ccaa_id": "06", "name": "Cantabria", "unemp_rate": 8.17},    {"ccaa_id": "07", "name": "Castilla y León", "unemp_rate": 10.19},    {"ccaa_id": "08", "name": "Castilla-La Mancha", "unemp_rate": 14.11},    {"ccaa_id": "09", "name": "Cataluña", "unemp_rate": 9.29},    {"ccaa_id": "10", "name": "Comunidad Valenciana", "unemp_rate": 12.81},    {"ccaa_id": "11", "name": "Extremadura", "unemp_rate": 16.73},    {"ccaa_id": "12", "name": "Galicia", "unemp_rate": 11.2},    {"ccaa_id": "13", "name": "Comunidad de Madrid", "unemp_rate": 10.18},    {"ccaa_id": "14", "name": "Región de Murcia", "unemp_rate": 12.18},    {"ccaa_id": "15", "name": "Comunidad Foral de Navarra", "unemp_rate": 8.76},    {"ccaa_id": "16", "name": "País Vasco", "unemp_rate": 8.75},    {"ccaa_id": "17", "name": "La Rioja", "unemp_rate": 10.19},    {"ccaa_id": "18", "name": "Ceuta y Melilla", "unemp_rate": 23.71},]
+
+        fig = px.choropleth_mapbox(
+            data_frame = unemp_rates,
+            geojson = ccaa,
+            featureidkey = 'properties.ccaa_id',
+            locations = 'ccaa_id',
+            color = 'unemp_rate',
+            hover_name = 'name',
+            mapbox_style = 'open-street-map',
+            center = dict(lat = 40.0, lon = -3.72),
+            zoom = 4)
+        # convert Plotly figure to HTML
+        plot_html = po.plot(fig, include_plotlyjs=False, output_type='div')
+
+        # create an HTML file with the Plotly chart
+        html = f"""
+        <html>
+        <head>
+            <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+        </head>
+        <body>
+            {plot_html}
+        </body>
+        </html>
+        """
+
+        # create a QWebEngineView widget to display the HTML chart
+        self.spatial_chart_view = QWebEngineView()
+        self.spatial_chart_view.setHtml(html)
+        self.spatial_chart_view.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
     
     def auto_fill(self, text):
         # Use the setText method to autofill keyword lineEdit with the text from search lineEdit
