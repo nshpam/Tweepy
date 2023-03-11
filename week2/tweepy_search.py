@@ -204,18 +204,46 @@ class PullTwitterData(object):
          temp_dict = {}
          print(trend['name'], trend['tweet_volume'])
             
-         if trend['name'][0] != '#':
-            trend['name'] = '#' + trend['name']
+         # if trend['name'][0] != '#':
+         #    trend['name'] = '#' + trend['name']
 
          temp_dict[trend['name']] = trend['tweet_volume']
          trends_keyword.append(temp_dict)
       return trends_keyword
 
-   def pull_trends_word(self):
-      pass
+   def pull_trends_hashtags(self, api, woeid):
+      trends = api.get_place_trends(woeid)
+      trends_list = trends[0]['trends']
+      trends_hashtags = []
+      trends_dict = []
 
-   def pull_trends_hashtags(self):
-      pass
+      for trend in trends_list:
+         if trend['name'][0] == '#' and len(trends_hashtags) < 10:
+               trends_hashtags.append(trend['name'])
+               temp_dict = {trend['name']: trend['tweet_volume']}
+               trends_dict.append(temp_dict)
+         if len(trends_hashtags) == 10:
+            break
+
+      return trends_dict
+
+   def pull_trends_word(self, api, woeid):
+      trends = api.get_place_trends(woeid)
+      trends_list = trends[0]['trends']
+      trends_word = []
+      trends_dict = []
+
+      for trend in trends_list:
+         if trend['name'][0] != '#' and len(trends_word) < 10:
+               trends_word.append(trend['name'])
+               temp_dict = {trend['name']: trend['tweet_volume']}
+               trends_dict.append(temp_dict)
+
+         if len(trends_word) == 10:
+               break
+      return trends_dict
+
+      
 
 # if __name__ == '__main__':
 

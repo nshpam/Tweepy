@@ -42,6 +42,10 @@ class MainWindow(QMainWindow):
         self.ui.pushButton_iconsentiment.clicked.connect(lambda: self.ui.stackedWidget.setCurrentIndex(0))
         # Click the navigation icon to go to the Home page.
         self.ui.pushButton_iconrankings.clicked.connect(lambda: self.ui.stackedWidget.setCurrentIndex(2))
+        
+        self.ui.pushButton_4.clicked.connect(lambda: self.ui.stackedWidget_2.setCurrentIndex(0))
+        self.ui.pushButton_5.clicked.connect(lambda: self.ui.stackedWidget_2.setCurrentIndex(1))
+        
         # link the textChanged signal of the search lineEdit object to a function
         self.ui.lineEdit_search.textChanged.connect(self.auto_fill)
         # set the icon in the search bar located on the right side
@@ -50,7 +54,8 @@ class MainWindow(QMainWindow):
         # search_action.triggered.connect(self.do_search)
         
         # call the show_trends method to show in Listview
-        self.show_trends()
+        self.show_trends_word()
+        self.show_trends_hashtags()
         # display a drop-down list containing the three items: "Popular", "Recent", and "Mixed"
         self.ui.comboBox_searchtype.addItems(["Popular","Recent","Mixed"])
         # connect the search button with the search_twitter function
@@ -241,15 +246,62 @@ class MainWindow(QMainWindow):
         
     # def do_search(self):
     
-    def show_trends(self):
+    def show_trends_word(self):
         # authenticate the Twitter API requests with the Twitter API keys and access tokens
         auth = tweepy.OAuth1UserHandler(
             config.consumer_key, config.consumer_secret, config.access_token, config.access_token_secret
         )
         # make requests to the Twitter API
         api = tweepy.API(auth)
-        # calls the pull_trends method from the PullTwitterData class
-        trends_keyword = PullTwitterData().pull_trends(api, config.WOEid, config.ranking_top)
+        # calls the pull_trends_hashtags method from the PullTwitterData class
+        trends_keyword = PullTwitterData().pull_trends_word(api, config.WOEid)
+        # Qt model used to display data in a QListView widget
+        model = QStandardItemModel()
+        # create a custom font
+        # Load the font file
+        font_id = QFontDatabase.addApplicationFont("FontsFree-Net-SFCompactDisplay-Regular.ttf")
+        # Get the family name of the loaded font
+        font_family = QFontDatabase.applicationFontFamilies(font_id)[0]
+        # Create a QFont object using the loaded font
+        font = QFont(font_family)
+        font.setPointSize(14)
+        font.setBold(True)
+        # Create a QFont object for the trend volume
+        volume_font = QFont(font_family)
+        volume_font.setPointSize(12)
+
+        # counter for number of trends
+        count = 0
+        for trend in trends_keyword:
+            # iterate through each key-value pair in the current trend dictionary
+            for name, volume in trend.items():
+                # convert volume to thousands and format as string with "K" appended
+                volume_str = "{:.1f}K".format(volume/1000) if volume is not None else "-"
+                # representation of the form "trend_name (trend_volume)" for each trend in the trends_keyword list
+                item = QStandardItem(f"{count+1}. {name}")
+                item.setFont(font)  # set the custom font to the QStandardItem
+                # adds a new row of items to the model
+                model.appendRow(item)
+                # create a new QStandardItem for the trend volume
+                volume_item = QStandardItem(f"{volume_str} tweets\n")
+                volume_item.setFont(volume_font) # set the custom font to the QStandardItem
+                model.appendRow(volume_item)
+
+                count += 1
+        
+        # display the list of trends in the widget.
+        self.ui.listView_4.setModel(model)
+        
+            
+    def show_trends_hashtags(self):
+        # authenticate the Twitter API requests with the Twitter API keys and access tokens
+        auth = tweepy.OAuth1UserHandler(
+            config.consumer_key, config.consumer_secret, config.access_token, config.access_token_secret
+        )
+        # make requests to the Twitter API
+        api = tweepy.API(auth)
+        # calls the pull_trends_hashtags method from the PullTwitterData class
+        trends_keyword = PullTwitterData().pull_trends_hashtags(api, config.WOEid)
         # Qt model used to display data in a QListView widget
         model = QStandardItemModel()
         # create a custom font

@@ -442,7 +442,7 @@ class Ui_MainWindow(object):
         self.scrollArea_3.setWidgetResizable(True)
         self.scrollArea_3.setObjectName("scrollArea_3")
         self.scrollAreaWidgetContents_4 = QtWidgets.QWidget()
-        self.scrollAreaWidgetContents_4.setGeometry(QtCore.QRect(0, -842, 723, 5041))
+        self.scrollAreaWidgetContents_4.setGeometry(QtCore.QRect(0, 0, 723, 5041))
         self.scrollAreaWidgetContents_4.setAutoFillBackground(False)
         self.scrollAreaWidgetContents_4.setStyleSheet("")
         self.scrollAreaWidgetContents_4.setObjectName("scrollAreaWidgetContents_4")
@@ -961,7 +961,7 @@ class Ui_MainWindow(object):
         self.scrollArea_2.setWidgetResizable(True)
         self.scrollArea_2.setObjectName("scrollArea_2")
         self.scrollAreaWidgetContents_2 = QtWidgets.QWidget()
-        self.scrollAreaWidgetContents_2.setGeometry(QtCore.QRect(0, 0, 94, 94))
+        self.scrollAreaWidgetContents_2.setGeometry(QtCore.QRect(0, 0, 737, 325))
         self.scrollAreaWidgetContents_2.setObjectName("scrollAreaWidgetContents_2")
         self.verticalLayout_53 = QtWidgets.QVBoxLayout(self.scrollAreaWidgetContents_2)
         self.verticalLayout_53.setObjectName("verticalLayout_53")
@@ -1161,7 +1161,7 @@ class Ui_MainWindow(object):
         self.scrollArea_4.setWidgetResizable(True)
         self.scrollArea_4.setObjectName("scrollArea_4")
         self.scrollAreaWidgetContents_5 = QtWidgets.QWidget()
-        self.scrollAreaWidgetContents_5.setGeometry(QtCore.QRect(0, 0, 723, 5165))
+        self.scrollAreaWidgetContents_5.setGeometry(QtCore.QRect(0, 0, 317, 5165))
         self.scrollAreaWidgetContents_5.setObjectName("scrollAreaWidgetContents_5")
         self.verticalLayout_9 = QtWidgets.QVBoxLayout(self.scrollAreaWidgetContents_5)
         self.verticalLayout_9.setObjectName("verticalLayout_9")
@@ -1467,7 +1467,60 @@ class Ui_MainWindow(object):
         self.lineEdit_search.setObjectName("lineEdit_search")
         self.horizontalLayout_18.addWidget(self.lineEdit_search)
         self.verticalLayout_14.addWidget(self.frame_search, 0, QtCore.Qt.AlignTop)
-        self.frame_trends = QtWidgets.QFrame(self.home)
+        self.frame_choice = QtWidgets.QFrame(self.home)
+        self.frame_choice.setStyleSheet("QPushButton {\n"
+"    border: 2px solid rgba(19, 25, 49, 255);\n"
+"    border-radius: 20px;\n"
+"    background-color: rgba(19, 25, 49, 255);\n"
+"    color: white;\n"
+"    font: 1000 12pt \"Segoe UI Variable Small\";\n"
+"}\n"
+"\n"
+"QPushButton:hover {\n"
+"    background-color: rgba(19, 25, 49, 200);\n"
+"    color: white;\n"
+"}\n"
+"\n"
+"QPushButton:pressed {\n"
+"    border: 2px solid rgba(19, 25, 49, 255);\n"
+"    background-color: rgba(0, 0, 0, 255);\n"
+"    color: white;\n"
+"    font-weight: bold;\n"
+"}\n"
+"")
+        self.frame_choice.setFrameShape(QtWidgets.QFrame.StyledPanel)
+        self.frame_choice.setFrameShadow(QtWidgets.QFrame.Raised)
+        self.frame_choice.setObjectName("frame_choice")
+        self.horizontalLayout_20 = QtWidgets.QHBoxLayout(self.frame_choice)
+        self.horizontalLayout_20.setObjectName("horizontalLayout_20")
+        self.pushButton_4 = QtWidgets.QPushButton(self.frame_choice)
+        icon6 = QtGui.QIcon()
+        icon6.addPixmap(QtGui.QPixmap(":/icons/icon/hashtag.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.pushButton_4.setIcon(icon6)
+        self.pushButton_4.setObjectName("pushButton_4")
+        self.horizontalLayout_20.addWidget(self.pushButton_4)
+        self.pushButton_5 = QtWidgets.QPushButton(self.frame_choice)
+        icon7 = QtGui.QIcon()
+        icon7.addPixmap(QtGui.QPixmap(":/icons/icon/speech-bubble.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.pushButton_5.setIcon(icon7)
+        self.pushButton_5.setObjectName("pushButton_5")
+        self.horizontalLayout_20.addWidget(self.pushButton_5)
+        self.verticalLayout_14.addWidget(self.frame_choice)
+        self.frame = QtWidgets.QFrame(self.home)
+        self.frame.setFrameShape(QtWidgets.QFrame.StyledPanel)
+        self.frame.setFrameShadow(QtWidgets.QFrame.Raised)
+        self.frame.setObjectName("frame")
+        self.verticalLayout_61 = QtWidgets.QVBoxLayout(self.frame)
+        self.verticalLayout_61.setContentsMargins(0, 0, 0, 0)
+        self.verticalLayout_61.setSpacing(0)
+        self.verticalLayout_61.setObjectName("verticalLayout_61")
+        self.stackedWidget_2 = QtWidgets.QStackedWidget(self.frame)
+        self.stackedWidget_2.setObjectName("stackedWidget_2")
+        self.page_hashtag = QtWidgets.QWidget()
+        self.page_hashtag.setObjectName("page_hashtag")
+        self.verticalLayout_63 = QtWidgets.QVBoxLayout(self.page_hashtag)
+        self.verticalLayout_63.setObjectName("verticalLayout_63")
+        self.frame_trends = QtWidgets.QFrame(self.page_hashtag)
         self.frame_trends.setStyleSheet("QScrollBar:vertical {\n"
 "    border: none;\n"
 "    background: rgb(45, 45, 68);\n"
@@ -1616,7 +1669,7 @@ class Ui_MainWindow(object):
         self.label_14.setStyleSheet("font: 1000 16pt \"Segoe UI Variable Small\";")
         self.label_14.setObjectName("label_14")
         self.verticalLayout_51.addWidget(self.label_14)
-        self.verticalLayout_20.addWidget(self.frame_5, 0, QtCore.Qt.AlignTop)
+        self.verticalLayout_20.addWidget(self.frame_5)
         self.scrollArea_5 = QtWidgets.QScrollArea(self.frame_trends)
         self.scrollArea_5.setStyleSheet("QScrollBar:vertical {\n"
 "    border: none;\n"
@@ -1750,7 +1803,7 @@ class Ui_MainWindow(object):
         self.scrollArea_5.setWidgetResizable(True)
         self.scrollArea_5.setObjectName("scrollArea_5")
         self.scrollAreaWidgetContents_3 = QtWidgets.QWidget()
-        self.scrollAreaWidgetContents_3.setGeometry(QtCore.QRect(0, 0, 737, 548))
+        self.scrollAreaWidgetContents_3.setGeometry(QtCore.QRect(0, 0, 715, 466))
         self.scrollAreaWidgetContents_3.setObjectName("scrollAreaWidgetContents_3")
         self.verticalLayout_50 = QtWidgets.QVBoxLayout(self.scrollAreaWidgetContents_3)
         self.verticalLayout_50.setObjectName("verticalLayout_50")
@@ -1762,7 +1815,311 @@ class Ui_MainWindow(object):
         self.verticalLayout_50.addWidget(self.listView_2)
         self.scrollArea_5.setWidget(self.scrollAreaWidgetContents_3)
         self.verticalLayout_20.addWidget(self.scrollArea_5)
-        self.verticalLayout_14.addWidget(self.frame_trends)
+        self.verticalLayout_63.addWidget(self.frame_trends)
+        self.stackedWidget_2.addWidget(self.page_hashtag)
+        self.page_nonhashtag = QtWidgets.QWidget()
+        self.page_nonhashtag.setObjectName("page_nonhashtag")
+        self.verticalLayout_67 = QtWidgets.QVBoxLayout(self.page_nonhashtag)
+        self.verticalLayout_67.setObjectName("verticalLayout_67")
+        self.frame_trends_2 = QtWidgets.QFrame(self.page_nonhashtag)
+        self.frame_trends_2.setStyleSheet("QScrollBar:vertical {\n"
+"    border: none;\n"
+"    background: rgb(45, 45, 68);\n"
+"    width: 14px;\n"
+"    margin: 15px 0 15px 0;\n"
+"    border-radius: 0px;\n"
+" }\n"
+"\n"
+"/*  HANDLE BAR VERTICAL */\n"
+"QScrollBar::handle:vertical {    \n"
+"    background-color: rgb(80, 80, 122);\n"
+"    min-height: 30px;\n"
+"    border-radius: 7px;\n"
+"}\n"
+"QScrollBar::handle:vertical:hover{    \n"
+"    background-color: rgb(255, 0, 127);\n"
+"}\n"
+"QScrollBar::handle:vertical:pressed {    \n"
+"    background-color: rgb(185, 0, 92);\n"
+"}\n"
+"\n"
+"/* BTN TOP - SCROLLBAR */\n"
+"QScrollBar::sub-line:vertical {\n"
+"    border: none;\n"
+"    background-color: rgb(59, 59, 90);\n"
+"    height: 15px;\n"
+"    border-top-left-radius: 7px;\n"
+"    border-top-right-radius: 7px;\n"
+"    subcontrol-position: top;\n"
+"    subcontrol-origin: margin;\n"
+"}\n"
+"QScrollBar::sub-line:vertical:hover {    \n"
+"    background-color: rgb(255, 0, 127);\n"
+"}\n"
+"QScrollBar::sub-line:vertical:pressed {    \n"
+"    background-color: rgb(185, 0, 92);\n"
+"}\n"
+"\n"
+"/* BTN BOTTOM - SCROLLBAR */\n"
+"QScrollBar::add-line:vertical {\n"
+"    border: none;\n"
+"    background-color: rgb(59, 59, 90);\n"
+"    height: 15px;\n"
+"    border-bottom-left-radius: 7px;\n"
+"    border-bottom-right-radius: 7px;\n"
+"    subcontrol-position: bottom;\n"
+"    subcontrol-origin: margin;\n"
+"}\n"
+"QScrollBar::add-line:vertical:hover {    \n"
+"    background-color: rgb(255, 0, 127);\n"
+"}\n"
+"QScrollBar::add-line:vertical:pressed {    \n"
+"    background-color: rgb(185, 0, 92);\n"
+"}\n"
+"\n"
+"/* RESET ARROW */\n"
+"QScrollBar::up-arrow:vertical, QScrollBar::down-arrow:vertical {\n"
+"    background: none;\n"
+"}\n"
+"QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical {\n"
+"    background: none;\n"
+"}\n"
+"/* HORIZONTAL SCROLLBAR */\n"
+"/* HORIZONTAL SCROLLBAR */\n"
+"QScrollBar:horizontal {\n"
+"    border: none;\n"
+"    background: rgb(45, 45, 68);\n"
+"    height: 14px;\n"
+"    margin: 0 15px 0 15px;\n"
+"    border-radius: 0px;\n"
+"}\n"
+"\n"
+"/* HANDLE BAR HORIZONTAL */\n"
+"QScrollBar::handle:horizontal {\n"
+"    background-color: rgb(80, 80, 122);\n"
+"    min-width: 30px;\n"
+"    border-radius: 7px;\n"
+"}\n"
+"QScrollBar::handle:horizontal:hover {\n"
+"    background-color: rgb(255, 0, 127);\n"
+"}\n"
+"QScrollBar::handle:horizontal:pressed {\n"
+"    background-color: rgb(185, 0, 92);\n"
+"}\n"
+"\n"
+"/* BTN LEFT - SCROLLBAR */\n"
+"QScrollBar::sub-line:horizontal {\n"
+"    border: none;\n"
+"    background-color: rgb(59, 59, 90);\n"
+"    width: 15px;\n"
+"    border-top-left-radius: 7px;\n"
+"    border-bottom-left-radius: 7px;\n"
+"    subcontrol-position: left;\n"
+"    subcontrol-origin: margin;\n"
+"}\n"
+"QScrollBar::sub-line:horizontal:hover {\n"
+"    background-color: rgb(255, 0, 127);\n"
+"}\n"
+"QScrollBar::sub-line:horizontal:pressed {\n"
+"    background-color: rgb(185, 0, 92);\n"
+"}\n"
+"\n"
+"/* BTN RIGHT - SCROLLBAR */\n"
+"QScrollBar::add-line:horizontal {\n"
+"    border: none;\n"
+"    background-color: rgb(59, 59, 90);\n"
+"    width: 15px;\n"
+"    border-top-right-radius: 7px;\n"
+"    border-bottom-right-radius: 7px;\n"
+"    subcontrol-position: right;\n"
+"    subcontrol-origin: margin;\n"
+"}\n"
+"QScrollBar::add-line:horizontal:hover {\n"
+"    background-color: rgb(255, 0, 127);\n"
+"}\n"
+"QScrollBar::add-line:horizontal:pressed {\n"
+"    background-color: rgb(185, 0, 92);\n"
+"}\n"
+"\n"
+"/* RESET ARROW */\n"
+"QScrollBar::left-arrow:horizontal, QScrollBar::right-arrow:horizontal {\n"
+"    background: none;\n"
+"}\n"
+"QScrollBar::add-page:horizontal, QScrollBar::sub-page:horizontal {\n"
+"    background: none;\n"
+"}\n"
+"\n"
+"")
+        self.frame_trends_2.setFrameShape(QtWidgets.QFrame.StyledPanel)
+        self.frame_trends_2.setFrameShadow(QtWidgets.QFrame.Raised)
+        self.frame_trends_2.setObjectName("frame_trends_2")
+        self.verticalLayout_64 = QtWidgets.QVBoxLayout(self.frame_trends_2)
+        self.verticalLayout_64.setContentsMargins(0, 0, 0, 0)
+        self.verticalLayout_64.setSpacing(0)
+        self.verticalLayout_64.setObjectName("verticalLayout_64")
+        self.frame_6 = QtWidgets.QFrame(self.frame_trends_2)
+        self.frame_6.setStyleSheet("font: 63 16pt \"Segoe UI Variable Text Semibold\";")
+        self.frame_6.setFrameShape(QtWidgets.QFrame.StyledPanel)
+        self.frame_6.setFrameShadow(QtWidgets.QFrame.Raised)
+        self.frame_6.setObjectName("frame_6")
+        self.verticalLayout_65 = QtWidgets.QVBoxLayout(self.frame_6)
+        self.verticalLayout_65.setContentsMargins(11, 0, 0, 0)
+        self.verticalLayout_65.setSpacing(0)
+        self.verticalLayout_65.setObjectName("verticalLayout_65")
+        self.label_21 = QtWidgets.QLabel(self.frame_6)
+        self.label_21.setStyleSheet("font: 1000 16pt \"Segoe UI Variable Small\";")
+        self.label_21.setObjectName("label_21")
+        self.verticalLayout_65.addWidget(self.label_21)
+        self.verticalLayout_64.addWidget(self.frame_6)
+        self.scrollArea_7 = QtWidgets.QScrollArea(self.frame_trends_2)
+        self.scrollArea_7.setStyleSheet("QScrollBar:vertical {\n"
+"    border: none;\n"
+"    background: rgb(45, 45, 68);\n"
+"    width: 14px;\n"
+"    margin: 15px 0 15px 0;\n"
+"    border-radius: 0px;\n"
+"}\n"
+"\n"
+"QScrollBar::handle:vertical {\n"
+"    background-color: rgb(80, 80, 122);\n"
+"    min-height: 30px;\n"
+"    border-radius: 7px;\n"
+"}\n"
+"\n"
+"QScrollBar::handle:vertical:hover {\n"
+"    background-color: rgb(255, 0, 127);\n"
+"}\n"
+"\n"
+"QScrollBar::handle:vertical:pressed {\n"
+"    background-color: rgb(185, 0, 92);\n"
+"}\n"
+"\n"
+"QScrollBar::sub-line:vertical {\n"
+"    border: none;\n"
+"    background-color: rgb(59, 59, 90);\n"
+"    height: 15px;\n"
+"    border-top-left-radius: 7px;\n"
+"    border-top-right-radius: 7px;\n"
+"    subcontrol-position: top;\n"
+"    subcontrol-origin: margin;\n"
+"}\n"
+"\n"
+"QScrollBar::sub-line:vertical:hover {\n"
+"    background-color: rgb(255, 0, 127);\n"
+"}\n"
+"\n"
+"QScrollBar::sub-line:vertical:pressed {\n"
+"    background-color: rgb(185, 0, 92);\n"
+"}\n"
+"\n"
+"QScrollBar::add-line:vertical {\n"
+"    border: none;\n"
+"    background-color: rgb(59, 59, 90);\n"
+"    height: 15px;\n"
+"    border-bottom-left-radius: 7px;\n"
+"    border-bottom-right-radius: 7px;\n"
+"    subcontrol-position: bottom;\n"
+"    subcontrol-origin: margin;\n"
+"}\n"
+"\n"
+"QScrollBar::add-line:vertical:hover {\n"
+"    background-color: rgb(255, 0, 127);\n"
+"}\n"
+"\n"
+"QScrollBar::add-line:vertical:pressed {\n"
+"    background-color: rgb(185, 0, 92);\n"
+"}\n"
+"\n"
+"QScrollBar::up-arrow:vertical, QScrollBar::down-arrow:vertical {\n"
+"    background: none;\n"
+"}\n"
+"\n"
+"QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical {\n"
+"    background: none;\n"
+"}\n"
+"\n"
+"QScrollBar:horizontal {\n"
+"    border: none;\n"
+"    background: rgb(45, 45, 68);\n"
+"    height: 14px;\n"
+"    margin: 0 15px 0 15px;\n"
+"    border-radius: 0px;\n"
+"}\n"
+"\n"
+"QScrollBar::handle:horizontal {\n"
+"    background-color: rgb(80, 80, 122);\n"
+"    min-width: 30px;\n"
+"    border-radius: 7px;\n"
+"}\n"
+"\n"
+"QScrollBar::handle:horizontal:hover {\n"
+"    background-color: rgb(255, 0, 127);\n"
+"}\n"
+"\n"
+"QScrollBar::handle:horizontal:pressed {\n"
+"    background-color: rgb(185, 0, 92);\n"
+"}\n"
+"\n"
+"QScrollBar::sub-line:horizontal {\n"
+"    border: none;\n"
+"    background-color: rgb(59, 59, 90);\n"
+"    width: 15px;\n"
+"    border-top-left-radius: 7px;\n"
+"    border-bottom-left-radius: 7px;\n"
+"    subcontrol-position: left;\n"
+"    subcontrol-origin: margin;\n"
+"}\n"
+"\n"
+"QScrollBar::sub-line:horizontal:hover {\n"
+"    background-color: rgb(255, 0, 127);\n"
+"}\n"
+"\n"
+"QScrollBar::sub-line:horizontal:pressed {\n"
+"    background-color: rgb(185, 0, 92);\n"
+"}\n"
+"\n"
+"QScrollBar::add-line:horizontal {\n"
+"    border: none;\n"
+"    background-color: rgb(59, 59, 90);\n"
+"    width: 15px;\n"
+"    border-top-right-radius: 7px;\n"
+"    border-bottom-right-radius: 7px;\n"
+"    subcontrol-position: right;\n"
+"    subcontrol-origin: margin;\n"
+"}\n"
+"\n"
+"QScrollBar::add-line:horizontal:hover {\n"
+"    background-color: rgb(255, 0, 127);\n"
+"}\n"
+"QScrollBar::add-line:horizontal:pressed {\n"
+"    background-color: rgb(185, 0, 92);\n"
+"}\n"
+"QScrollBar::left-arrow:horizontal, QScrollBar::right-arrow:horizontal {\n"
+"    background: none;\n"
+"}\n"
+"QScrollBar::add-page:horizontal, QScrollBar::sub-page:horizontal {\n"
+"    background: none;\n"
+"}\n"
+"")
+        self.scrollArea_7.setWidgetResizable(True)
+        self.scrollArea_7.setObjectName("scrollArea_7")
+        self.scrollAreaWidgetContents_8 = QtWidgets.QWidget()
+        self.scrollAreaWidgetContents_8.setGeometry(QtCore.QRect(0, 0, 715, 466))
+        self.scrollAreaWidgetContents_8.setObjectName("scrollAreaWidgetContents_8")
+        self.verticalLayout_66 = QtWidgets.QVBoxLayout(self.scrollAreaWidgetContents_8)
+        self.verticalLayout_66.setObjectName("verticalLayout_66")
+        self.listView_4 = QtWidgets.QListView(self.scrollAreaWidgetContents_8)
+        self.listView_4.setStyleSheet("background-color: rgb(19, 27, 47);\n"
+"color: rgb(255, 255, 255);\n"
+"")
+        self.listView_4.setObjectName("listView_4")
+        self.verticalLayout_66.addWidget(self.listView_4)
+        self.scrollArea_7.setWidget(self.scrollAreaWidgetContents_8)
+        self.verticalLayout_64.addWidget(self.scrollArea_7)
+        self.verticalLayout_67.addWidget(self.frame_trends_2)
+        self.stackedWidget_2.addWidget(self.page_nonhashtag)
+        self.verticalLayout_61.addWidget(self.stackedWidget_2)
+        self.verticalLayout_14.addWidget(self.frame)
         self.stackedWidget.addWidget(self.home)
         self.extract = QtWidgets.QWidget()
         self.extract.setStyleSheet("QScrollBar:vertical {\n"
@@ -2081,9 +2438,9 @@ class Ui_MainWindow(object):
         self.horizontalLayout_6.setObjectName("horizontalLayout_6")
         self.pushButton_3 = QtWidgets.QPushButton(self.frame_database)
         self.pushButton_3.setText("")
-        icon6 = QtGui.QIcon()
-        icon6.addPixmap(QtGui.QPixmap(":/icons/icon/database (1).png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-        self.pushButton_3.setIcon(icon6)
+        icon8 = QtGui.QIcon()
+        icon8.addPixmap(QtGui.QPixmap(":/icons/icon/database (1).png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.pushButton_3.setIcon(icon8)
         self.pushButton_3.setObjectName("pushButton_3")
         self.horizontalLayout_6.addWidget(self.pushButton_3)
         self.label_3 = QtWidgets.QLabel(self.frame_database)
@@ -2153,9 +2510,9 @@ class Ui_MainWindow(object):
         self.gridLayout_2.addWidget(self.label_12, 0, 1, 1, 1, QtCore.Qt.AlignLeft)
         self.pushButton = QtWidgets.QPushButton(self.frame_13)
         self.pushButton.setText("")
-        icon7 = QtGui.QIcon()
-        icon7.addPixmap(QtGui.QPixmap(":/icons/icon/calendar.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-        self.pushButton.setIcon(icon7)
+        icon9 = QtGui.QIcon()
+        icon9.addPixmap(QtGui.QPixmap(":/icons/icon/calendar.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.pushButton.setIcon(icon9)
         self.pushButton.setObjectName("pushButton")
         self.gridLayout_2.addWidget(self.pushButton, 0, 0, 1, 1, QtCore.Qt.AlignLeft)
         self.horizontalLayout_8.addWidget(self.frame_13, 0, QtCore.Qt.AlignLeft)
@@ -2646,6 +3003,7 @@ class Ui_MainWindow(object):
 
         self.retranslateUi(MainWindow)
         self.stackedWidget.setCurrentIndex(3)
+        self.stackedWidget_2.setCurrentIndex(0)
         self.pushButton_menu.toggled['bool'].connect(self.frame_minmenu.setVisible) # type: ignore
         self.pushButton_menu.toggled['bool'].connect(self.choiceMenu_frame.setHidden) # type: ignore
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
@@ -2685,7 +3043,10 @@ class Ui_MainWindow(object):
         self.label_23.setText(_translate("MainWindow", "Ranking Top 10 Positive"))
         self.label_24.setText(_translate("MainWindow", "Ranking Top 10 Neutral"))
         self.lineEdit_search.setPlaceholderText(_translate("MainWindow", "   Search"))
+        self.pushButton_4.setText(_translate("MainWindow", "Top Hashtags"))
+        self.pushButton_5.setText(_translate("MainWindow", "Non-Hashtag Trends"))
         self.label_14.setText(_translate("MainWindow", "Twitter trends"))
+        self.label_21.setText(_translate("MainWindow", "Twitter trends"))
         self.label_9.setText(_translate("MainWindow", "Keyword"))
         self.label_10.setText(_translate("MainWindow", "Search type"))
         self.label_11.setText(_translate("MainWindow", "Search limit"))
