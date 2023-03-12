@@ -19,8 +19,6 @@ from tweepy_search import *
 from pytagcloud import *
 import tempfile
 
-from urllib.request import urlopen
-import json
 class MainWindow(QMainWindow):
     def __init__(self):
         QMainWindow.__init__(self)
@@ -58,6 +56,7 @@ class MainWindow(QMainWindow):
         # call the show_trends method to show in Listview
         self.show_trends_word()
         self.show_trends_hashtags()
+        
         # display a drop-down list containing the three items: "Popular", "Recent", and "Mixed"
         self.ui.comboBox_searchtype.addItems(["Popular","Recent","Mixed"])
         # connect the search button with the search_twitter function

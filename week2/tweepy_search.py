@@ -10,6 +10,9 @@ from dateutil import tz #use for timezone converting
 import datetime   #use for timezone converting
 import twitterDataProcessing
 
+# import for check geolocation
+from opencage.geocoder import OpenCageGeocode
+
 # from GUI_main import *
 #you can edit mongodb server, database name, collection name in file name "config.py"
 db_action = database_action.DatabaseAction()
@@ -126,6 +129,7 @@ class PullTwitterData(object):
       
       return self.count_tweets
    
+   
    def twitter_scrapping(self, tweet_data, tweet_keyword):
       #count tweet
       self.count_tweets = 0
@@ -144,12 +148,24 @@ class PullTwitterData(object):
          fav_count = tweet.favorite_count #favorite count
          retweet_count = tweet.retweet_count #retweet count
 
-         #get tweet location
+         # get tweet location
          if tweet.place is not None:
             tweet_location = tweet.place.full_name
+            # geocode the location using OpenCage Geocoder API
+            geocoder = OpenCageGeocode(config.opencage_key)
+            location_info_list = geocoder.geocode(tweet_location)
+            if location_info_list:
+               location_info = location_info_list[0]
+               if location_info.get('status', {}).get('code') == 200:
+                  location_name = location_info.get('formatted')
+                  country = location_info.get('components', {}).get('country')
+
+            else:
+               tweet_location = None
          else:
             tweet_location = None
 
+            
          #get tweet text
          try:
             tweet_text = tweet.retweeted_status.full_text
@@ -166,6 +182,47 @@ class PullTwitterData(object):
             config.database_name,
             config.collection_name)
          self.database_decision(tweet_id,tweet_username,tweet_date,tweet_text,fav_count,retweet_count,tweet_location,tweet_keyword)
+
+   # def twitter_scrapping(self, tweet_data, tweet_keyword):
+   #    #count tweet
+   #    self.count_tweets = 0
+
+   #    #timezone of your variable
+   #    from_zone = tz.gettz('UTC')
+   #    #timezone you want to convert
+   #    to_zone = tz.gettz(config.local_timezone)
+
+   #    #iterate the Tweet in tweets_list
+   #    for tweet in tweet_data:
+
+   #       tweet_id = tweet.id #tweet id
+   #       tweet_username = tweet.user.screen_name #tweet author
+   #       tweet_date = tweet.created_at #tweet date
+   #       fav_count = tweet.favorite_count #favorite count
+   #       retweet_count = tweet.retweet_count #retweet count
+
+   #       #get tweet location
+   #       if tweet.place is not None:
+   #          tweet_location = tweet.place.full_name
+   #       else:
+   #          tweet_location = None
+
+   #       #get tweet text
+   #       try:
+   #          tweet_text = tweet.retweeted_status.full_text
+   #       except AttributeError:
+   #          tweet_text = tweet.full_text
+
+   #       #convert time zone from UTC to GMT+7
+   #       #format the date
+   #       tweet_date = self.convert_timezone(from_zone, to_zone, tweet_date)
+
+   #       #connect to database
+   #       db_action.tweetdb_object(
+   #          config.mongo_client,
+   #          config.database_name,
+   #          config.collection_name)
+   #       self.database_decision(tweet_id,tweet_username,tweet_date,tweet_text,fav_count,retweet_count,tweet_location,tweet_keyword)
 
    #scarp twitter
    def search_twitter(self, api, keyword, search_type, num_tweet):
@@ -197,6 +254,7 @@ class PullTwitterData(object):
    
    def pull_trends(self, api, woeid, ranking_top):
       trends = api.get_place_trends(woeid)
+      print(trends)
       trends_list = trends[0]['trends'][:ranking_top]
       trends_keyword = []
 
