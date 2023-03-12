@@ -252,22 +252,22 @@ class PullTwitterData(object):
    
       return finish_text
    
-   def pull_trends(self, api, woeid, ranking_top):
-      trends = api.get_place_trends(woeid)
-      print(trends)
-      trends_list = trends[0]['trends'][:ranking_top]
-      trends_keyword = []
+   # def pull_trends(self, api, woeid, ranking_top):
+   #    trends = api.get_place_trends(woeid)
+   #    print(trends)
+   #    trends_list = trends[0]['trends'][:ranking_top]
+   #    trends_keyword = []
 
-      for trend in trends_list:
-         temp_dict = {}
-         print(trend['name'], trend['tweet_volume'])
+   #    for trend in trends_list:
+   #       temp_dict = {}
+   #       print(trend['name'], trend['tweet_volume'])
             
-         # if trend['name'][0] != '#':
-         #    trend['name'] = '#' + trend['name']
+   #       # if trend['name'][0] != '#':
+   #       #    trend['name'] = '#' + trend['name']
 
-         temp_dict[trend['name']] = trend['tweet_volume']
-         trends_keyword.append(temp_dict)
-      return trends_keyword
+   #       temp_dict[trend['name']] = trend['tweet_volume']
+   #       trends_keyword.append(temp_dict)
+   #    return trends_keyword
 
    def pull_trends_hashtags(self, api, woeid):
       trends = api.get_place_trends(woeid)

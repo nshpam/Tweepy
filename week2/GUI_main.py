@@ -328,16 +328,24 @@ class MainWindow(QMainWindow):
             # iterate through each key-value pair in the current trend dictionary
             for name, volume in trend.items():
                 # convert volume to thousands and format as string with "K" appended
-                volume_str = "{:.1f}K".format(volume/1000) if volume is not None else "-"
+                volume_str = "{:.1f}K".format(volume/1000) if volume is not None else ""
                 # representation of the form "trend_name (trend_volume)" for each trend in the trends_keyword list
                 item = QStandardItem(f"{count+1}. {name}")
                 item.setFont(font)  # set the custom font to the QStandardItem
                 # adds a new row of items to the model
                 model.appendRow(item)
                 # create a new QStandardItem for the trend volume
-                volume_item = QStandardItem(f"{volume_str} tweets\n")
-                volume_item.setFont(volume_font) # set the custom font to the QStandardItem
-                model.appendRow(volume_item)
+                if volume is not None:
+                # create a new QStandardItem for the trend volume if volume is not None
+                    volume_item = QStandardItem(f"{volume_str} tweets\n")
+                    volume_item.setFont(volume_font) # set the custom font to the QStandardItem
+                    model.appendRow(volume_item)
+                else:
+                    # create a placeholder QStandardItem if volume is None
+                    placeholder_item = QStandardItem(volume_str)
+                    placeholder_item.setFont(volume_font)
+                    model.appendRow(placeholder_item)
+
 
                 count += 1
         
@@ -375,16 +383,23 @@ class MainWindow(QMainWindow):
             # iterate through each key-value pair in the current trend dictionary
             for name, volume in trend.items():
                 # convert volume to thousands and format as string with "K" appended
-                volume_str = "{:.1f}K".format(volume/1000) if volume is not None else "-"
+                volume_str = "{:.1f}K".format(volume/1000) if volume is not None else ""
                 # representation of the form "trend_name (trend_volume)" for each trend in the trends_keyword list
                 item = QStandardItem(f"{count+1}. {name}")
                 item.setFont(font)  # set the custom font to the QStandardItem
                 # adds a new row of items to the model
                 model.appendRow(item)
                 # create a new QStandardItem for the trend volume
-                volume_item = QStandardItem(f"{volume_str} tweets\n")
-                volume_item.setFont(volume_font) # set the custom font to the QStandardItem
-                model.appendRow(volume_item)
+                if volume is not None:
+                # create a new QStandardItem for the trend volume if volume is not None
+                    volume_item = QStandardItem(f"{volume_str} tweets\n")
+                    volume_item.setFont(volume_font) # set the custom font to the QStandardItem
+                    model.appendRow(volume_item)
+                else:
+                    # create a placeholder QStandardItem if volume is None
+                    placeholder_item = QStandardItem(volume_str)
+                    placeholder_item.setFont(volume_font)
+                    model.appendRow(placeholder_item)
 
                 count += 1
         
