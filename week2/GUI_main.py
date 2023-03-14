@@ -326,7 +326,8 @@ class MainWindow(QMainWindow):
         # make requests to the Twitter API
         api = tweepy.API(auth)
         # calls the pull_trends_hashtags method from the PullTwitterData class
-        trends_keyword = PullTwitterData().pull_trends_word(api, config.WOEid)
+        trends_keyword = PullTwitterData().pull_trends(api, config.WOEid)
+        trends_keyword = trends_keyword["words"]
         # Qt model used to display data in a QListView widget
         model = QStandardItemModel()
         # create a custom font
@@ -342,32 +343,31 @@ class MainWindow(QMainWindow):
         volume_font = QFont(font_family)
         volume_font.setPointSize(12)
 
-        # counter for number of trends
-        count = 0
-        for trend in trends_keyword:
-            # iterate through each key-value pair in the current trend dictionary
-            for name, volume in trend.items():
-                # convert volume to thousands and format as string with "K" appended
-                volume_str = "{:.1f}K".format(volume/1000) if volume is not None else ""
-                # representation of the form "trend_name (trend_volume)" for each trend in the trends_keyword list
-                item = QStandardItem(f"{count+1}. {name}")
-                item.setFont(font)  # set the custom font to the QStandardItem
-                # adds a new row of items to the model
-                model.appendRow(item)
-                # create a new QStandardItem for the trend volume
-                if volume is not None:
-                # create a new QStandardItem for the trend volume if volume is not None
-                    volume_item = QStandardItem(f"{volume_str} tweets\n")
-                    volume_item.setFont(volume_font) # set the custom font to the QStandardItem
-                    model.appendRow(volume_item)
-                else:
-                    # create a placeholder QStandardItem if volume is None
-                    placeholder_item = QStandardItem(volume_str)
-                    placeholder_item.setFont(volume_font)
-                    model.appendRow(placeholder_item)
+        list_keys = list(trends_keyword.keys())
+        list_values = list(trends_keyword.values())
+        for i in range(len(list_keys)):
+            name = list_keys[i]
+            volume = list_values[i]
+            # convert volume to thousands and format as string with "K" appended
+            volume_str = "{:.1f}K".format(volume/1000) if volume is not None else ""
+            # representation of the form "trend_name (trend_volume)" for each trend in the trends_keyword list
+            item = QStandardItem(f"{i+1}. {name}")
+            item.setFont(font)  # set the custom font to the QStandardItem
+            # adds a new row of items to the model
+            model.appendRow(item)
+            # create a new QStandardItem for the trend volume
+            if volume is not None:
+            # create a new QStandardItem for the trend volume if volume is not None
+                volume_item = QStandardItem(f"{volume_str} tweets\n")
+                volume_item.setFont(volume_font) # set the custom font to the QStandardItem
+                model.appendRow(volume_item)
+            else:
+                # create a placeholder QStandardItem if volume is None
+                placeholder_item = QStandardItem(volume_str)
+                placeholder_item.setFont(volume_font)
+                model.appendRow(placeholder_item)
 
 
-                count += 1
         
         # display the list of trends in the widget.
         self.ui.listView_4.setModel(model)
@@ -381,7 +381,8 @@ class MainWindow(QMainWindow):
         # make requests to the Twitter API
         api = tweepy.API(auth)
         # calls the pull_trends_hashtags method from the PullTwitterData class
-        trends_keyword = PullTwitterData().pull_trends_hashtags(api, config.WOEid)
+        trends_keyword = PullTwitterData().pull_trends(api, config.WOEid)
+        trends_keyword = trends_keyword["hashtags"]
         # Qt model used to display data in a QListView widget
         model = QStandardItemModel()
         # create a custom font
@@ -397,31 +398,30 @@ class MainWindow(QMainWindow):
         volume_font = QFont(font_family)
         volume_font.setPointSize(12)
 
-        # counter for number of trends
-        count = 0
-        for trend in trends_keyword:
-            # iterate through each key-value pair in the current trend dictionary
-            for name, volume in trend.items():
-                # convert volume to thousands and format as string with "K" appended
-                volume_str = "{:.1f}K".format(volume/1000) if volume is not None else ""
-                # representation of the form "trend_name (trend_volume)" for each trend in the trends_keyword list
-                item = QStandardItem(f"{count+1}. {name}")
-                item.setFont(font)  # set the custom font to the QStandardItem
-                # adds a new row of items to the model
-                model.appendRow(item)
-                # create a new QStandardItem for the trend volume
-                if volume is not None:
-                # create a new QStandardItem for the trend volume if volume is not None
-                    volume_item = QStandardItem(f"{volume_str} tweets\n")
-                    volume_item.setFont(volume_font) # set the custom font to the QStandardItem
-                    model.appendRow(volume_item)
-                else:
-                    # create a placeholder QStandardItem if volume is None
-                    placeholder_item = QStandardItem(volume_str)
-                    placeholder_item.setFont(volume_font)
-                    model.appendRow(placeholder_item)
+        list_keys = list(trends_keyword.keys())
+        list_values = list(trends_keyword.values())
+        for i in range(len(list_keys)):
+            name = list_keys[i]
+            volume = list_values[i]
+            # convert volume to thousands and format as string with "K" appended
+            volume_str = "{:.1f}K".format(volume/1000) if volume is not None else ""
+            # representation of the form "trend_name (trend_volume)" for each trend in the trends_keyword list
+            item = QStandardItem(f"{i+1}. {name}")
+            item.setFont(font)  # set the custom font to the QStandardItem
+            # adds a new row of items to the model
+            model.appendRow(item)
+            # create a new QStandardItem for the trend volume
+            if volume is not None:
+            # create a new QStandardItem for the trend volume if volume is not None
+                volume_item = QStandardItem(f"{volume_str} tweets\n")
+                volume_item.setFont(volume_font) # set the custom font to the QStandardItem
+                model.appendRow(volume_item)
+            else:
+                # create a placeholder QStandardItem if volume is None
+                placeholder_item = QStandardItem(volume_str)
+                placeholder_item.setFont(volume_font)
+                model.appendRow(placeholder_item)
 
-                count += 1
         
         # display the list of trends in the widget.
         self.ui.listView_2.setModel(model)

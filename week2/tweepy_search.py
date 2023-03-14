@@ -129,60 +129,18 @@ class PullTwitterData(object):
       
       return self.count_tweets
    
+   def check_location(self):
+      geocoder = OpenCageGeocode(config.opencage_key)
+      location_info_list = geocoder.geocode(tweet_location)
+      if location_info_list:
+         location_info = location_info_list[0]
+         if location_info.get('status', {}).get('code') == 200:
+            location_name = location_info.get('formatted')
+            country = location_info.get('components', {}).get('country')
+
+      else:
+         tweet_location = None
    
-   def twitter_scrapping(self, tweet_data, tweet_keyword):
-      #count tweet
-      self.count_tweets = 0
-
-      #timezone of your variable
-      from_zone = tz.gettz('UTC')
-      #timezone you want to convert
-      to_zone = tz.gettz(config.local_timezone)
-
-      #iterate the Tweet in tweets_list
-      for tweet in tweet_data:
-
-         tweet_id = tweet.id #tweet id
-         tweet_username = tweet.user.screen_name #tweet author
-         tweet_date = tweet.created_at #tweet date
-         fav_count = tweet.favorite_count #favorite count
-         retweet_count = tweet.retweet_count #retweet count
-
-         # get tweet location
-         if tweet.place is not None:
-            tweet_location = tweet.place.full_name
-            # geocode the location using OpenCage Geocoder API
-            geocoder = OpenCageGeocode(config.opencage_key)
-            location_info_list = geocoder.geocode(tweet_location)
-            if location_info_list:
-               location_info = location_info_list[0]
-               if location_info.get('status', {}).get('code') == 200:
-                  location_name = location_info.get('formatted')
-                  country = location_info.get('components', {}).get('country')
-
-            else:
-               tweet_location = None
-         else:
-            tweet_location = None
-
-            
-         #get tweet text
-         try:
-            tweet_text = tweet.retweeted_status.full_text
-         except AttributeError:
-            tweet_text = tweet.full_text
-
-         #convert time zone from UTC to GMT+7
-         #format the date
-         tweet_date = self.convert_timezone(from_zone, to_zone, tweet_date)
-
-         #connect to database
-         db_action.tweetdb_object(
-            config.mongo_client,
-            config.database_name,
-            config.collection_name)
-         self.database_decision(tweet_id,tweet_username,tweet_date,tweet_text,fav_count,retweet_count,tweet_location,tweet_keyword)
-
    # def twitter_scrapping(self, tweet_data, tweet_keyword):
    #    #count tweet
    #    self.count_tweets = 0
@@ -201,12 +159,24 @@ class PullTwitterData(object):
    #       fav_count = tweet.favorite_count #favorite count
    #       retweet_count = tweet.retweet_count #retweet count
 
-   #       #get tweet location
-   #       if tweet.place is not None:
-   #          tweet_location = tweet.place.full_name
-   #       else:
-   #          tweet_location = None
+         # get tweet location
+         # if tweet.place is not None:
+         #    tweet_location = tweet.place.full_name
+         #    # geocode the location using OpenCage Geocoder API
+         #    geocoder = OpenCageGeocode(config.opencage_key)
+         #    location_info_list = geocoder.geocode(tweet_location)
+         #    if location_info_list:
+         #       location_info = location_info_list[0]
+         #       if location_info.get('status', {}).get('code') == 200:
+         #          location_name = location_info.get('formatted')
+         #          country = location_info.get('components', {}).get('country')
 
+         #    else:
+         #       tweet_location = None
+         # else:
+         #    tweet_location = None
+
+            
    #       #get tweet text
    #       try:
    #          tweet_text = tweet.retweeted_status.full_text
@@ -223,6 +193,47 @@ class PullTwitterData(object):
    #          config.database_name,
    #          config.collection_name)
    #       self.database_decision(tweet_id,tweet_username,tweet_date,tweet_text,fav_count,retweet_count,tweet_location,tweet_keyword)
+
+   def twitter_scrapping(self, tweet_data, tweet_keyword):
+      #count tweet
+      self.count_tweets = 0
+
+      #timezone of your variable
+      from_zone = tz.gettz('UTC')
+      #timezone you want to convert
+      to_zone = tz.gettz(config.local_timezone)
+
+      #iterate the Tweet in tweets_list
+      for tweet in tweet_data:
+
+         tweet_id = tweet.id #tweet id
+         tweet_username = tweet.user.screen_name #tweet author
+         tweet_date = tweet.created_at #tweet date
+         fav_count = tweet.favorite_count #favorite count
+         retweet_count = tweet.retweet_count #retweet count
+
+         #get tweet location
+         if tweet.place is not None:
+            tweet_location = tweet.place.full_name
+         else:
+            tweet_location = None
+
+         #get tweet text
+         try:
+            tweet_text = tweet.retweeted_status.full_text
+         except AttributeError:
+            tweet_text = tweet.full_text
+
+         #convert time zone from UTC to GMT+7
+         #format the date
+         tweet_date = self.convert_timezone(from_zone, to_zone, tweet_date)
+
+         #connect to database
+         db_action.tweetdb_object(
+            config.mongo_client,
+            config.database_name,
+            config.collection_name)
+         self.database_decision(tweet_id,tweet_username,tweet_date,tweet_text,fav_count,retweet_count,tweet_location,tweet_keyword)
 
    #scarp twitter
    def search_twitter(self, api, keyword, search_type, num_tweet):
@@ -252,74 +263,35 @@ class PullTwitterData(object):
    
       return finish_text
    
-   def pull_trends(self, api, woeid, ranking_top):
+   def pull_trends(self, api, woeid):
       trends = api.get_place_trends(woeid)
-      trends_list = trends[0]['trends'][:ranking_top]
-      trends_keyword = []
-
+      trends_list = trends[0]['trends']
+      hashtags_dict = {}
+      words_dict = {}
+      trends_dict = {}
+      
       for trend in trends_list:
-         temp_dict = {}
-         print(trend['name'], trend['tweet_volume'])
-            
-         # if trend['name'][0] != '#':
-         #    trend['name'] = '#' + trend['name']
-
-         temp_dict[trend['name']] = trend['tweet_volume']
-         trends_keyword.append(temp_dict)
-      return trends_keyword
-   
-   def pull_trends_hashtags(self, api, woeid):
-      trends_word = []
-      trends_dict = []
-
-      while len(trends_word) < 10:
-         trends_list = api.get_place_trends(woeid)[0]['trends']
-
-         for trend in trends_list:
-            if trend['name'][0] == '#' and len(trends_word) < 10:
-               trends_word.append(trend['name'])
-               temp_dict = {trend['name']: trend['tweet_volume']}
-               trends_dict.append(temp_dict)
-
-         if len(trends_word) < 10:
-            remaining_trends = self.pull_trends(api, woeid, 10 - len(trends_word))
-            for trend in remaining_trends:
-               trend_name = list(trend.keys())[0]
-               if trend_name[0] == '#' and len(trends_word) < 10:
-                  trends_word.append(trend_name)
-                  trends_dict.append(trend)
-
+         if trend["name"][0] == "#" and len(hashtags_dict) < 10:
+            hashtags_dict[trend["name"]] = trend["tweet_volume"]
+         elif trend["name"][0] != "#" and len(words_dict) < 10:
+            words_dict[trend["name"]] = trend["tweet_volume"]
+      print(len(list(hashtags_dict.values())))
+      print(len(list(words_dict.values())))
+      trends_dict["hashtags"]=hashtags_dict
+      trends_dict["words"]=words_dict
       return trends_dict
+ 
+
+if __name__ == '__main__':
    
-   def pull_trends_word(self, api, woeid):
-      trends_word = []
-      trends_dict = []
 
-      while len(trends_word) < 10:
-         trends_list = api.get_place_trends(woeid)[0]['trends']
-
-         for trend in trends_list:
-            if trend['name'][0] != '#' and len(trends_word) < 10:
-               trends_word.append(trend['name'])
-               temp_dict = {trend['name']: trend['tweet_volume']}
-               trends_dict.append(temp_dict)
-
-         if len(trends_word) < 10:
-            remaining_trends = self.pull_trends(api, woeid, 10 - len(trends_word))
-            for trend in remaining_trends:
-               trend_name = list(trend.keys())[0]
-               if trend_name[0] != '#' and len(trends_word) < 10:
-                  trends_word.append(trend_name)
-                  trends_dict.append(trend)
-
-      return trends_dict
-
-# if __name__ == '__main__':
-
-   # auth = tweepy.OAuth1UserHandler(
-   #    config.consumer_key, config.consumer_secret, config.access_token, config.access_token_secret
-   #    )
-   # api = tweepy.API(auth)
+   auth = tweepy.OAuth1UserHandler(
+      config.consumer_key, config.consumer_secret, config.access_token, config.access_token_secret
+      )
+   api = tweepy.API(auth)
+   trends = PullTwitterData().pull_trends(api, config.WOEid)
+   print(trends["hashtags"])
+   
 #    #search by keyword
 #    PullTwitterData().search_twitter(api, config.search_word)
 

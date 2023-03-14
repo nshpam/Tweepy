@@ -1,10 +1,44 @@
 import unittest
-from twitterDataProcessing import FilterData
+from twitterDataProcessing import FilterData, ConnectLextoPlus
+from unittest.mock import patch, MagicMock
+
+class TestConnectLextoPlus(unittest.TestCase):
+    def setUp(self):
+        self.connect_api = ConnectLextoPlus()
+        self.api_key = '1234'
+        self.url = 'https://example.com/api'
+
+    def get_mock_response(self):
+        return {'status_code': 200, 'text': 'Mock response'}
+
+    @patch('requests.get')
+    def test_connect_api_success(self, mock_get):
+        mock_response = MagicMock()
+        mock_response.status_code = 200
+        mock_response.text = 'Mock response'
+        mock_get.return_value = mock_response
+
+        data = {'input': 'ข้อความที่ต้องการตัดคำ'}
+        response = self.connect_api.ConnectApi(self.api_key, self.url, data)
+
+        mock_get.assert_called_once_with(self.url, params=data, headers={'Apikey': self.api_key})
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.text, 'Mock response')
+
+    @patch('requests.get')
+    def test_connect_api_failure(self, mock_get):
+        mock_get.return_value.status_code = 404
+
+        data = {'input': 'ข้อความที่ต้องการตัดคำ'}
+        response = self.connect_api.ConnectApi(self.api_key, self.url, data)
+
+        mock_get.assert_called_once_with(self.url, params=data, headers={'Apikey': self.api_key})
+        self.assertEqual(response.status_code, 404)
 
 class TestFilterData(unittest.TestCase):
     def setUp(self):
         self.filter_data = FilterData()
-        
+  
     # Test Filter url function
     def test_FilterUrl(self):
         # Test with URL starting with https://
