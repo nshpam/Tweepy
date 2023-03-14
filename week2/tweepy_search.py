@@ -159,22 +159,22 @@ class PullTwitterData(object):
    #       fav_count = tweet.favorite_count #favorite count
    #       retweet_count = tweet.retweet_count #retweet count
 
-         # get tweet location
-         # if tweet.place is not None:
-         #    tweet_location = tweet.place.full_name
-         #    # geocode the location using OpenCage Geocoder API
-         #    geocoder = OpenCageGeocode(config.opencage_key)
-         #    location_info_list = geocoder.geocode(tweet_location)
-         #    if location_info_list:
-         #       location_info = location_info_list[0]
-         #       if location_info.get('status', {}).get('code') == 200:
-         #          location_name = location_info.get('formatted')
-         #          country = location_info.get('components', {}).get('country')
+   #       # get tweet location
+   #       if tweet.place is not None:
+   #          tweet_location = tweet.place.full_name
+   #          # geocode the location using OpenCage Geocoder API
+   #          geocoder = OpenCageGeocode(config.opencage_key)
+   #          location_info_list = geocoder.geocode(tweet_location)
+   #          if location_info_list:
+   #             location_info = location_info_list[0]
+   #             if location_info.get('status', {}).get('code') == 200:
+   #                location_name = location_info.get('formatted')
+   #                country = location_info.get('components', {}).get('country')
 
-         #    else:
-         #       tweet_location = None
-         # else:
-         #    tweet_location = None
+   #          else:
+   #             tweet_location = None
+   #       else:
+   #          tweet_location = None
 
             
    #       #get tweet text
