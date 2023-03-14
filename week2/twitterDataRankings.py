@@ -109,7 +109,6 @@ class Ranking():
 
             top_word.append(temp)
             top_f.append(temp2)
-        print(top_dict)
         return top_dict
         
     def rank_list(self):
@@ -142,10 +141,10 @@ class Ranking():
         rank_set = list(enumerate(sorted(set(ranking_frequency), reverse=True), start=1))
 
         # print(rank_set)
-        #ranking by word
+        #ranking by key
         print(self.rank_word(rank_set, ranking_key, ranking_frequency))
 
-        #ranking by key
+        #ranking by hashtags
 
         #ranking by frequency but showing its sentiments
         # self.sentiment_cal(self.rank_word( rank_set, ranking_key, ranking_frequency))
