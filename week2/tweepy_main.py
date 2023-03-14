@@ -27,7 +27,7 @@ class MainOperation():
         self.db_action = database_action.DatabaseAction()
 
     #extract and load twitter data
-    def Extract(self, keyword):
+    def ExtractByKeyword(self, keyword):
         print('Extract begin...')
         
         #connect to tweepy
@@ -40,6 +40,9 @@ class MainOperation():
         tweepy_search.PullTwitterData().search_twitter(api, keyword, self.search_type, self.search_limit)
 
         print('Extract end...')
+    
+    def ExtractByTime(self, keyword, time_list):
+        pass
     
     #transform
     def check_previous(self, previous, time_list):
@@ -103,7 +106,7 @@ class MainOperation():
         #transform period
         return self.transform_period(checkpoint, end_d, time_list, interval)
     
-    def CheckDB(self, start_d, end_d, collection_name):
+    def CheckDB(self, keyword, start_d, end_d, collection_name):
         db_action = self.db_action
         time_list = []
         collection = db_action.tweetdb_object(config.mongo_client, config.database_name, collection_name)
@@ -250,11 +253,11 @@ class MainOperation():
         print('date to sentiment',process_date)
         return process_date
 
-    def SentimentByTime(self, start_d, end_d):
+    def SentimentByTime(self, keyword, start_d, end_d):
 
         while True:
             #check if all data avaliable
-            sentiment_date = self.CheckDB(start_d, end_d, config.collection_name_5)
+            sentiment_date = self.CheckDB(keyword, start_d, end_d, config.collection_name_5)
 
             if sentiment_date == []:
                 print('show data visualization')
