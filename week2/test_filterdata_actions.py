@@ -1,15 +1,26 @@
 import unittest
 from twitterDataProcessing import FilterData, ConnectLextoPlus
 from unittest.mock import patch, MagicMock
-
 class TestConnectLextoPlus(unittest.TestCase):
     def setUp(self):
         self.connect_api = ConnectLextoPlus()
         self.api_key = '1234'
         self.url = 'https://example.com/api'
+        
+        
+    def get_mock_response(self, api_key, url_to_send, data_dict):
+        with patch.object(ConnectLextoPlus, 'ConnectApi') as mock_method:
+            mock_connected = MagicMock()
+            mock_connected.status_code = 200
+            mock_connected.text = 'This API method connects correctly.'
+            mock_method.return_value = mock_connected
 
-    def get_mock_response(self):
-        return {'status_code': 200, 'text': 'Mock response'}
+            response = self.connect_api.ConnectApi(api_key, url_to_send, data_dict)
+
+            mock_method.assert_called_once_with(api_key, url_to_send, data_dict)
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(response.text, 'This API method connects correctly.')
+
 
     @patch('requests.get')
     def test_connect_api_success(self, mock_get):

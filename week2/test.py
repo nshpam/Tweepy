@@ -165,7 +165,7 @@ api = tweepy.API(auth)
 
 tweets = tweepy.Cursor(
          api.search_tweets ,
-         q='#อาหาร' + ' -filter:retweets', 
+         q='#รีวิวหนัง' + ' -filter:retweets', 
          tweet_mode=config.search_mode,
          result_type=config.search_type
          ).items(config.num_tweet)
