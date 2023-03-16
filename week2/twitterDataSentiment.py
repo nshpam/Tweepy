@@ -2,6 +2,7 @@ import config
 import database_action
 import requests
 import time
+import datetime
 
 db_action = database_action.DatabaseAction()
 
@@ -12,21 +13,39 @@ class SentimentAnalysis():
 
     #pull clean data from database
     def PullCleanByKeyword(self, keyword):
+        #turn off printing database status
         db_action.not_print_raw()
-        cursor = db_action.tweetdb_object(config.mongo_client, config.database_name, config.collection_name_2)
+        collection = db_action.tweetdb_object(config.mongo_client, config.database_name, config.collection_name_2)
         query_object = db_action.tweetdb_create_object(["keyword"], [keyword])
-        show_cursor = db_action.tweetdb_find(config.collection_name_2, cursor, query_object)
-
-        return show_cursor
+        cursor = db_action.tweetdb_find(config.collection_name_2, collection, query_object)
+        #no keyword match
+        if cursor.count() == 0:
+            return None
+        #keyword match
+        return cursor
     
+    #the date_list is the date that need to be sentiment which not sentiment yet
     def PullCleanByTime(self, keyword, date_list):
-        cleaned_list = []
+        cursor_dict = {}
+        temp_list_1 = [] #storing the date that can perform sentiment
+        temp_list_2 = [] #storing the date that can't perform sentiment
+        #turn off printing database status
         db_action.not_print_raw()
+        #connect with cleaned database
         collection = db_action.tweetdb_object(config.mongo_client, config.database_name, config.collection_name_2)
         
         for date in date_list:
             query_object = db_action.tweetdb_create_object(['keyword', 'date'],[keyword, date])
-            show_cursor = db_action.tweetdb_find(config.collection_name_2, cursor, query_object)
+            cursor = db_action.tweetdb_find(config.collection_name_2, collection, query_object)
+            if cursor.count() == 0:
+                temp_list_2.append(cursor)
+            else:
+                temp_list_1.append(cursor)
+        
+        cursor_dict['sentiment'] = temp_list_1
+        cursor_dict['transform'] = temp_list_2
+        
+        return cursor_dict
     
     #analyze which intension the data is.
     def intention_analysis(self, intention):
@@ -55,103 +74,98 @@ class SentimentAnalysis():
     
         return converted_polar
 
-    def SentimentByTime(self, keyword, cursor, date_list):
+    def SentimentByTime(self, cursor_list):
 
         sentiment_dict = {}
-
-        for doc in cursor:
-            pass
-
-        for doc in cursor:
-            if doc['keyword'] == keyword:
-                for date in date_list:
-                    if doc['date'].date() == date:
-
-                        #sentiment
-                        res = requests.get(config.SSense_URL, headers={'Apikey':config.LextoPlus_API_key}, params={'text':' '.join(doc['text'])})
-                        try:
-                            raw = res.json()
-
-                            if raw['alert'] != []:
-                                print('ALERT! :',raw['alert'])
-
-                            #converting polar for calculation
-                            polar = self.convert_polarity(raw['sentiment']['polarity'])
-                            #intension analysis
-                            conclusion = self.intention_analysis(raw['intention'])
-
-                            sentiment_dict[doc['id']] = [doc['keyword'], doc['date'], raw['preprocess']['input'], raw['sentiment']['score'], polar, conclusion]
-
-                            # data_field = ['id', 'keyword', 'date', 'text', 'score', 'polarity', 'intention']
-                            # data_list = [doc['id'], doc['keyword'], doc['date'], raw['preprocess']['input'], raw['sentiment']['score'], polar, conclusion]
-                            # query_object = db_action.tweetdb_create_object(data_field, data_list)
-
-                            # collection = db_action.tweetdb_object(config.mongo_client, config.database_name, config.collection_name_5)
-                            # #insert to db
-                            # db_action.tweetdb_insert(config.collection_name_5, collection, query_object)
-
-                        except:
-                            print('sentiment error')
-                            return []
-            time.sleep(0.5)
-        return sentiment_dict
-
-    def SentimentByKeyword(self, keyword, cursor):
-        sentiment_dict = {}
-        for doc in cursor:
-            if doc['keyword'] == keyword:
+        #cursor_list is filtered by keyword and date already
+        for cursor in cursor_list:
+            for doc in cursor:
                 #sentiment
                 res = requests.get(config.SSense_URL, headers={'Apikey':config.LextoPlus_API_key}, params={'text':' '.join(doc['text'])})
                 try:
                     raw = res.json()
-                    
+
                     if raw['alert'] != []:
-                        print('ALERT :', raw['alert'])
-                    
+                        print('ALERT! :', raw['alert'])
+
                     #converting polar for calculation
                     polar = self.convert_polarity(raw['sentiment']['polarity'])
-                    #intension analysis
+                    #intention analysis
                     conclusion = self.intention_analysis(raw['intention'])
 
                     sentiment_dict[doc['id']] = [doc['keyword'], doc['date'], raw['preprocess']['input'], raw['sentiment']['score'], polar, conclusion]
                 except:
-                    print('sentiment error')
-                    return []
-            time.sleep(0.5)
+                    sentiment_dict[doc['id']] = ['error']
+                    print('sentiment error :', doc['keyword'], doc['date'])
+                    # return sentiment_dict
+                time.sleep(0.2)
+        return sentiment_dict
+
+    def SentimentByKeyword(self, cursor):
+        sentiment_dict = {}
+        for doc in cursor:
+           
+            #sentiment
+            res = requests.get(config.SSense_URL, headers={'Apikey':config.LextoPlus_API_key}, params={'text':' '.join(doc['text'])})
+            try:
+                raw = res.json()
+                    
+                if raw['alert'] != []:
+                    print('ALERT :', raw['alert'])
+                    
+                #converting polar for calculation
+                polar = self.convert_polarity(raw['sentiment']['polarity'])
+                #intension analysis
+                conclusion = self.intention_analysis(raw['intention'])
+
+                sentiment_dict[doc['id']] = [doc['keyword'], doc['date'], raw['preprocess']['input'], raw['sentiment']['score'], polar, conclusion]
+            except:
+                print('sentiment error')
+                return {}
+            time.sleep(0.2)
         return sentiment_dict
     
     def Perform(self, keyword, date_list, sentiment_type):
 
-        #start the timer
-        tic = time.perf_counter()
         self.count_db = 0
-        
-        
+        sentiment_dict = {}
         #sentiment by time
         if sentiment_type == 'time':
-            cursor = self.PullCleanByTime(keyword, date_list)
-            sentiment_data = self.SentimentByTime(keyword, cursor, date_list)
-            if sentiment_data != []:
-                #insert data
-                return True
-            #Failed to sentiment
-            return False
+            #create cursor list for sentimenting by time
+            #which cursor list has been filter by keyword and date already 
+            cursor_list = self.PullCleanByTime(keyword, date_list)
+            #perform the sentiment by time and return the sentiment dict
+            sentiment_dict['sentiment'] = self.SentimentByTime(cursor_list['sentiment'])
+            sentiment_dict['transform'] = cursor_list['transform']
+            
         #sentiment by keyword
         elif sentiment_type == 'keyword':
-            sentiment_data = self.SentimentByKeyword(keyword, cursor, )
+            #create cursor for sentimenting by keyword
+            #which cursor has been filter by keyword already 
+            cursor = self.PullCleanByKeyword(keyword)
+            #if keyword match
+            if cursor != None:
+                #perform the sentiment by keyword and return sentiment dict
+                sentiment_dict = self.SentimentByKeyword(cursor)
+            else:
+                return None
         #invalid sentiment type
         else:
-            return False
-
-        #stop the timer
-        toc = time.perf_counter()
-
-        #display total work time of this thread
-        print(f"RUN TIME : {toc - tic:0.4f} seconds")
-        print('TOTAL TOKENIZATION :', self.count_token + self.count_untoken)
-                
+            return 'Invalid sentiment type'
+        
+        return sentiment_dict
 
 if __name__ == '__main__':
-    SentimentAnalysis().Sentiment()
 
-    print('finish insertion')
+    date_list = [datetime.date(2022, 12, 30).day,
+             datetime.date(2022, 12, 31).day,
+             datetime.date(2023, 1, 11).day,
+             datetime.date(2023, 1, 12).day,
+             datetime.date(2023, 1, 13).day,
+             datetime.date(2023, 1, 14).day,
+             datetime.date(2023, 1, 15).day,
+             datetime.date(2023, 1, 16).day,
+             datetime.date(2023, 1, 17).day,
+             datetime.date(2023, 1, 18).day]
+
+    SentimentAnalysis().Perform(config.search_word, date_list, 'time')

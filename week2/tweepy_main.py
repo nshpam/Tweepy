@@ -251,7 +251,7 @@ class MainOperation():
             cp2+=interval
 
         print('date to sentiment',process_date)
-        return process_date
+        return process_date 
 
     def SentimentByTime(self, keyword, start_d, end_d):
 

@@ -270,23 +270,21 @@ class MainOperation():
 
     #sentiment by time
     def SentimentByTime(self, keyword, start_d, end_d):
-        CheckSentiment = False
-        CheckTransform = False
-        CheckExtract = False
+        temp_date = []
+
+        #check sentiment database
+        sentiment_date = self.CheckDBTimeline(keyword, start_d, end_d, config.collection_name_5)
 
         while True:
-            #check sentiment database
-            sentiment_date = self.CheckDBTimeline(keyword, start_d, end_d, config.collection_name_5)
-
             if sentiment_date==[]:
                 print('show data visualization')
                 break
             #data need to be sentiment before use
             else:
-                #check if sentiment type
                 sentiment_date = sorted(sentiment_date)
                 check_con = self.CheckConsecutive(sentiment_date)
 
+                #check if the specific date in cleaned database
                 #continuous timeline
                 if check_con:
                     cleaned_date = self.CheckDBTimeline(keyword, sentiment_date[0], sentiment_date[-1], config.collection_name_2)
@@ -294,20 +292,28 @@ class MainOperation():
                 else:
                     cleaned_date = self.CheckDBTimelist(keyword, sentiment_date, config.collection_name_2)
                 
-                temp_date = []
+                #if that date don't have cleaned data then transform
+                if cleaned_date != []:
+                    #transform until every data of the specific date can't be transform
+                    print('transform')
+                #if have that date in cleaned data then sentiment
+                else:
+                    #sentiment until every data of the specific date can't be sentiment
+                    print('sentiment')
                 
+                #will be in transform function
+                #find the date that hasn't sentiment
                 for date in sentiment_date:
                     if date not in cleaned_date:
+                        #insert the date that hasn't sentiment
                         temp_date.append(date)
 
-                #have data to process sentiment
-                if temp_date == []:
-                    print('sentiment')
-                    sentiment = twitterDataSentiment.SentimentAnalysis()
-                    sentiment.Perform(keyword, cleaned_date)
-                else:
+                #check if every date has been sentiment
+                #if not then extract
+                if temp_date != []:
                     print('extract')
-                
+                else:
+                    print('finish the task')
 
         #check if sentiment this keyword on this period
         #check timeline type
