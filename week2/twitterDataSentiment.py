@@ -2,7 +2,7 @@ import config
 import database_action
 import requests
 import time
-import datetime
+# import datetime
 
 #initialize database action function
 db_action = database_action.DatabaseAction()
@@ -37,9 +37,9 @@ class SentimentAnalysis():
     #the date_list is the date that need to be sentiment which not sentiment yet
     def PullCleanByTime(self, keyword, date_list):
         sentiment_dict = {} #storing the date that can perform sentiment
-        extract_list = [] #storing the date that can't perform sentiment
-        data_dict = {} #storing the data for sentimental and extracting
-        check_extract = [] #temperary storing date
+        transform_list = [] #storing the date that can't perform sentiment
+        data_dict = {} #storing the data for sentimental and transformation
+        check_transform = [] #temperary storing date
 
         db_action.not_print_raw() #turn off printing database status
 
@@ -57,16 +57,16 @@ class SentimentAnalysis():
             for date in date_list:
                 if doc['date'].date() == date:
                     sentiment_dict[doc['id']] = [doc['keyword'], doc['date'].date(), doc['text']]
-                    check_extract.append(date)
+                    check_transform.append(date)
 
         #check which date should be extract
         for date in date_list:
-            if date not in check_extract:
-                extract_list.append(date)
+            if date not in check_transform:
+                transform_list.append(date)
         
         #collect sentiment data and date to extract
         data_dict['sentiment'] = sentiment_dict
-        data_dict['extract'] = extract_list
+        data_dict['tranform'] = transform_list
 
         return data_dict
     
@@ -168,7 +168,7 @@ class SentimentAnalysis():
             #delay for SSense API
             time.sleep(0.2)
         return sentiment_dict
-    
+
     def Perform(self, keyword, date_list, sentiment_type):
         sentiment_dict = {}
 
@@ -184,7 +184,7 @@ class SentimentAnalysis():
             
             #perform the sentiment by time and return the sentiment dict
             sentiment_dict['sentiment'] = self.SentimentByTime(data_dict['sentiment'])
-            sentiment_dict['extract'] = data_dict['extract']
+            sentiment_dict['transform'] = data_dict['transform']
             
         #sentiment by keyword
         elif sentiment_type == 'keyword':

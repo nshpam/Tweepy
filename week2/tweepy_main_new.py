@@ -1,6 +1,6 @@
 import tweepy_search
 import twitterDataSentiment
-#import twitterDataProcessing
+import twitterDataProcessing
 #import twitterDataRankings
 import config
 import datetime
@@ -78,14 +78,13 @@ class MainOperation():
 
         return checkpoint
 
-    #check if the keyword exists in the collection
-    def CheckKeyword(self, cursor):
-
-        #keyword exists
-        if cursor.count()>0:
-            return True
-        #keyword doesn't exists
-        return False
+    # #Check if have this keyword in database
+    def IsMatch(self, cursor):
+        #keyword not match
+        if cursor.count()==0:
+            return False
+        #keyword match
+        return True
 
     #get all timeline in the database
     def GetAllTimeline(self, cursor):
@@ -99,6 +98,29 @@ class MainOperation():
 
         return time_list
     
+    def CheckRemain(self, process_date, date_list):
+        remain_list = []
+        
+        #check which date are remain from the process
+        for date in date_list:
+            if date not in process_date:
+                remain_list.append(date)
+        
+        return remain_list
+    
+    def NextProcess(self, cur_process):
+        if cur_process == 'visualize':
+            next_process = 'sentiment'
+        elif cur_process == 'sentiment':
+            next_process = 'transform'
+        elif cur_process == 'transform':
+            next_process = 'extract'
+        elif cur_process == 'extract':
+            next_process = 'pull'
+        else:
+            return 'Invalid process'
+        return next_process
+
     #check if it's a timeline or a day
     def CheckOneDay(self, start_d, end_d):
         if start_d == end_d:
@@ -107,19 +129,22 @@ class MainOperation():
     
     #always continuous timeline
     #create the date that need to be process
-    def CreateTimeline(self, start_d, end_d, checkpoint, time_list, even):
+    def CreateTimeline(self, start_d, end_d, checkpoint, time_list, even, cur_process):
         interval = datetime.timedelta(days=1)
         end_d += interval
         time_delta = (end_d - start_d)
         process_date = []
+        data_dict = {}
         cp1 = checkpoint[0]
         cp2 = checkpoint[1]
+        date_list = []
         
         print(start_d, end_d)
 
         #odd number
         if not even:
             cp = end_d-time_delta
+            date_list.append(cp)
             #check the first checkpoint
             if cp not in time_list :
                 process_date.append(cp)
@@ -128,6 +153,8 @@ class MainOperation():
             #cp1 meet the start point, cp2 meet the end point
             if cp1 == start_d-interval or cp2 == end_d+interval:
                 break
+            date_list.append(cp1)
+            date_list.append(cp2)
             #check checkpoint 1
             if cp1 not in time_list:
                 process_date.append(cp1)
@@ -136,56 +163,61 @@ class MainOperation():
             if cp2 not in time_list:
                 process_date.append(cp2)
             cp2+=interval
+        
+        data_dict[cur_process] = self.CheckRemain(process_date, date_list)
+        data_dict[self.NextProcess(cur_process)] = process_date
 
-        print('date to sentiment(continuous)',process_date)
+        # print('date to sentiment(continuous)',process_date)
         return process_date
 
     #continuous timeline
     #check the date that need to be process
-    def CheckDBTimeline(self, keyword, start_d, end_d, collection_name):
+    def CheckDBTimeline(self, keyword, start_d, end_d, collection_name, cur_process):
         db_action = self.db_action
         time_list = []
-        process_date = []
+        data_dict = {}
         db_action.not_print_raw() #turn off status printing
 
         #select the collection
         collection = db_action.tweetdb_object(config.mongo_client, config.database_name, collection_name)
         query_object_1 = db_action.tweetdb_create_object(['keyword'],[keyword])
-        cursor_1 = db_action.tweetdb_find(collection_name, collection, query_object_1)
-
-        #keyword exists
-        if self.CheckKeyword(keyword, cursor_1):
-            
-            #get all time in this keyword
-            time_list = self.GetAllTimeline(cursor_1)
-            
-            #one day search
-            if self.CheckOneDay(start_d, end_d):
-                #no data in this time period
-                if start_d not in time_list:
-                    process_date = [start_d]
-
-            #period day search
-            else:
-                #create a checkpoint
-                checkpoint = self.SetContinuousCheckPoint(start_d, end_d)
-                #contain the data that identify odd day / even day already
-                process_date = self.CreateTimeline(start_d, end_d, checkpoint, time_list, checkpoint[2])
-            return process_date
+        cursor = db_action.tweetdb_find(collection_name, collection, query_object_1)
         
-        #keyword doesn't exists
-        else:
+        if not self.IsMatch(keyword, cursor):
             print("Query does not exist in the collection.")
-            return [None]
+            return None
+            
+        #get all time in this keyword
+        time_list = self.GetAllTimeline(cursor)
+            
+        #one day search
+        if self.CheckOneDay(start_d, end_d):
+            #no data in this time period
+            if start_d not in time_list:
+                data_dict[cur_process] = []
+                data_dict[self.NextProcess(cur_process)] = [start_d]
+            else:
+                data_dict[cur_process] = [start_d]
+                data_dict[self.NextProcess(cur_process)] = []
+
+        #period day search
+        else:
+            #create a checkpoint
+            checkpoint = self.SetContinuousCheckPoint(start_d, end_d)
+            #contain the data that identify odd day / even day already
+            data_dict = self.CreateTimeline(start_d, end_d, checkpoint, time_list, checkpoint[2], cur_process)
+        return data_dict
 
     #either continuous timeline or discrete timeline
     #create the date that need to be process
-    def CreateTimelist(self, date_list, checkpoint, time_list, even):
+    def CreateTimelist(self, date_list, checkpoint, time_list, even, cur_process):
         interval = 1
         time_delta = len(date_list)
         process_date = []
         cp1 = checkpoint[0]
         cp2 = checkpoint[1]
+
+        data_dict = {}
 
         #odd number
         if not even:
@@ -206,16 +238,18 @@ class MainOperation():
             if date_list[cp2] not in time_list:
                 process_date.append(date_list[cp2])
             cp2 += interval
-        
-        print('date to sentiment(discrete)', process_date)
-        return process_date
+
+        data_dict[cur_process] = self.CheckRemain(process_date, date_list)
+        data_dict[self.NextProcess(cur_process)] = process_date
+
+        return data_dict
     
     #discrete timeline or continuous timeline
     #create the date that need to be process
-    def CheckDBTimelist(self, keyword, date_list, collection_name):
+    def CheckDBTimelist(self, keyword, date_list, collection_name, cur_process):
         db_action  = self.db_action
         time_list = []
-        process_date = []
+        data_dict = {}
         db_action.not_print_raw() #turn off status printing
 
         #select the collection
@@ -223,26 +257,29 @@ class MainOperation():
         query_object_1 = db_action.tweetdb_create_object(['keyword'],[keyword])
         cursor_1 = db_action.tweetdb_find(collection_name, collection, query_object_1)
         
-        #keyword exists
-        if self.CheckKeyword(keyword, cursor_1):
-            #get all time in this keyword
-            time_list = self.GetAllTimeline(cursor_1)
-
-            #one day search
-            if self.CheckOneDay(date_list[0], date_list[-1]):
-                if date_list[0] not in time_list:
-                    process_date = [date_list[0]]
-            else:
-                #create a checkpoint
-                #return index of the date
-                checkpoint = self.SetDiscreteCheckPoint(date_list)
-                #contain the data that identify odd day / even day already
-                process_date = self.CreateTimelist(date_list, checkpoint, time_list, checkpoint[2])
-            return process_date
         #keyword doesn't exists
-        else:
+        if not self.IsMatch(keyword, cursor_1):
             print('Query does not exist in the collection')
-            return [None]
+            return None
+
+        #get all time in this keyword
+        time_list = self.GetAllTimeline(cursor_1)
+
+        #one day search
+        if self.CheckOneDay(date_list[0], date_list[-1]):
+            if date_list[0] not in time_list:
+                data_dict[cur_process] = []
+                data_dict[self.NextProcess(cur_process)] = [date_list[0]]
+            else:
+                data_dict[cur_process] = [date_list[0]]
+                data_dict[self.NextProcess(cur_process)] = []
+        else:
+            #create a checkpoint
+            #return index of the date
+            checkpoint = self.SetDiscreteCheckPoint(date_list)
+            #contain the data that identify odd day / even day already
+            data_dict = self.CreateTimelist(date_list, checkpoint, time_list, checkpoint[2], cur_process)
+        return data_dict
 
     #can only extract 7 days ago period
     def Extract(self, keyword):
@@ -256,70 +293,74 @@ class MainOperation():
     #transform by keyword (# or word)
     #transform by time
 
-    #sentiment by keyword (# or word)
-    def SentimentByKeyword(self, keyword):
-
-        CheckSentiment = False
-        CheckTransform = False
-        CheckExtract = False
-
-        #check if sentiment this keyword
-        #check the timeline type
-        #check if transformed this keyword
-        #check if extract this keyword
-
     #sentiment by time
     def SentimentByTime(self, keyword, start_d, end_d):
-        temp_date = []
+        process_date = []
+        data_dict = {}
+        db_action = self.db_action
 
         #check sentiment database
         #return only the date that need to be sentiment
-        sentiment_date = self.CheckDBTimeline(keyword, start_d, end_d, config.collection_name_5)
-
-        while True:
-            if sentiment_date==[]:
-                print('show data visualization')
-                break
-            #data need to be sentiment before use
-            else:
-                sentiment_date = sorted(sentiment_date)
-                check_con = self.CheckConsecutive(sentiment_date)
-
-                #check if the specific date in cleaned database
-                #continuous timeline
-                if check_con:
-                    cleaned_date = self.CheckDBTimeline(keyword, sentiment_date[0], sentiment_date[-1], config.collection_name_2)
-                #discrete timeline
-                else:
-                    cleaned_date = self.CheckDBTimelist(keyword, sentiment_date, config.collection_name_2)
-                
-                #if that date don't have cleaned data then transform
-                if cleaned_date != []:
-                    #transform until every data of the specific date can't be transform
-                    print('transform')
-                #if have that date in cleaned data then sentiment
-                else:
-                    #sentiment until every data of the specific date can't be sentiment
-                    print('sentiment')
-                
-                #will be in transform function
-                #find the date that hasn't sentiment
-                for date in sentiment_date:
-                    if date not in cleaned_date:
-                        #insert the date that hasn't sentiment
-                        temp_date.append(date)
-
-                #check if every date has been sentiment
-                #if not then extract
-                if temp_date != []:
-                    print('extract')
-                else:
-                    print('finish the task')
+        #always continuous timeline
+        sentiment_date = self.CheckDBTimeline(keyword, start_d, end_d, config.collection_name_5, 'visualize')
+        
+        #keyword not match
+        if sentiment_date == None:
+            return 'keyword not match'
+        #all data has been sentiment
+        elif sentiment_date['visualize'] != []:
+            return 'show data visualization'
+        #perform sentiment
+        elif sentiment_date['sentiment'] != []:
+            #sort the date
+            process_date = sorted(sentiment_date['sentiment'])
+            #sentiment
+            sentiment = twitterDataSentiment.SentimentAnalysis()
+            data_dict = sentiment.Perform(keyword, process_date, 'time')
+            sentiment_data = list(data_dict['sentiment'].values())
+            
+            #insert data to sentiment database
+            #create collection
+            collection = db_action.tweetdb_object(config.mongo_client, config.database_name, config.collection_name_5)
+            #create data object
+            data_field = ['keyword', 'date', 'input', 'score', 'polar', 'conclusion']
+            for data in sentiment_data:
+                date_list = [data[0], data[1], data[2], data[3], data[4], data[5]]
+                query_object = db_action.tweetdb_create_object(data_field, date_list)
+                db_action.tweetdb_insert(config.collection_name_5, collection, query_object)
+            
+            return data_dict['transform']
+        else:
+            return 'Invalid response'
 
         #check if sentiment this keyword on this period
         #check timeline type
         #check if transformed this keyword on this period
         #check if extract this keyword on this period
+
+    def TransformByTime(self, keyword, date_list):
+        process_date = sorted(date_list) #sort date
+        data_dict = {}
+        db_action = self.db_action
+        
+        #check timeline type
+        #continuous timeline
+        if self.CheckConsecutive(date_list):
+            transform_date = self.CheckDBTimeline(keyword, date_list[0], date_list[-1], config.collection_name_2, 'sentiment')
+        else:
+            transform_date = self.CheckDBTimelist(keyword, date_list, config.collection_name_2, 'sentiment')
+        
+        #keyword not match
+        if transform_date == None:
+            return 'keyword not match'
+        #all data has been transformed ready to sentiment
+        elif transform_date['sentiment'] != []:
+            return 'sentiment'
+        elif transform_date['transform'] != []:
+            #transform
+            pass
+        else:
+            return 'Invalid response'
 
 if __name__ == '__main__':
     mainoperation = MainOperation()

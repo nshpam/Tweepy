@@ -17,13 +17,12 @@ import datetime
 
 db_action = database_action.DatabaseAction()
 
+#connect to Lexto+ API
 class ConnectLextoPlus():
-
     def ConnectApi(self, api_key, url_to_send, data_dict):
         headers = {'Apikey' : api_key}
         res = requests.get(url_to_send,params=data_dict,headers=headers)
         return res
-
 
 #Filter class
 class FilterData():
@@ -147,13 +146,16 @@ class Tokenization():
         self.count_untoken = count_untoken
         self.count_token = count_token
         self.cursor = cursor
-    
-    def ScanRawData(self, raw_object):
-        if raw_object.text != '' and raw_object.status_code == 200:
-            raw_json = raw_object.json()
-            return raw_json
-        else:
-            return None
+
+    def IsMatch(self, cursor):
+        #no keyword match
+        if cursor.count() == 0:
+            return False
+        #keyword match
+        return True
+
+    def PullCleanByKeyword(self):
+        pass
 
     def PullTweets(self, keyword):
         collection = db_action.tweetdb_object(config.mongo_client, config.database_name, config.collection_name)
@@ -204,7 +206,7 @@ class Tokenization():
                         tokened_dict[doc['id']] = [doc['keyword'], doc['date'], doc['text'].split()]
                 else:
                     continue
-            time.sleep(1)
+            time.sleep(0.1)
 
         #stop the timer
         toc = time.perf_counter()
@@ -238,7 +240,7 @@ class Tokenization():
 
                 self.count_untoken += 1
                 tokened_dict[doc['id']] = [doc['keyword'], doc['date'], doc['text'].split()]
-            time.sleep(1)
+            time.sleep(0.1)
                 
         #stop the timer
         toc = time.perf_counter()
