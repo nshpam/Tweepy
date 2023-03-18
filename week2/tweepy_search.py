@@ -8,6 +8,7 @@ import tweepy     #use for twitter scrapping
 # import pymongo    #use for connecting to mongodb
 from dateutil import tz #use for timezone converting
 import datetime   #use for timezone converting
+from twitterDataProcessing import *
 import twitterDataProcessing
 
 # import for check geolocation
@@ -223,6 +224,9 @@ class PullTwitterData(object):
             tweet_text = tweet.retweeted_status.full_text
          except AttributeError:
             tweet_text = tweet.full_text
+            
+         # Filter out the keyword from the tweet text
+         tweet_text = FilterData().FilterOutKeyword(tweet_text, tweet_keyword)
 
          #convert time zone from UTC to GMT+7
          #format the date
@@ -237,12 +241,15 @@ class PullTwitterData(object):
 
    #scarp twitter
    def search_twitter(self, api, keyword, search_type, num_tweet):
+      
+      # Filter out the keyword from the search query
+      filtered_keyword = FilterData().FilterOutKeyword(keyword, "keyword")
 
       #use Cursor to serach
       #tweepy.Cursor(search API, word + filter, search mode, search type).items(search limit)
       tweets = tweepy.Cursor(
          api.search_tweets ,
-         q=keyword + ' -filter:retweets', 
+         q=filtered_keyword + ' -filter:retweets', 
          tweet_mode=config.search_mode,
          result_type=search_type
          ).items(num_tweet)

@@ -128,6 +128,17 @@ class FilterData():
                         temp_text += ' ' + list_word
         
         return temp_text.lower().lstrip().rstrip()
+    
+    # new function to filter out a specific keyword
+    def FilterOutKeyword(self, text, keyword):
+        filtered_text = ''
+        words = text.split()
+
+        for word in words:
+            if word.lower() != keyword.lower():
+                filtered_text += ' ' + word
+
+        return filtered_text.strip()
 
 #Tokenization function
 class Tokenization():
