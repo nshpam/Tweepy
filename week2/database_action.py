@@ -120,6 +120,7 @@ class DatabaseAction():
         return self.cursor
     
     #query database
+    #twitterDataSentiment.py
     def tweetdb_find(self, col_name, col_to_find, query_object):
 
         self.cursor = col_to_find.find(query_object)
