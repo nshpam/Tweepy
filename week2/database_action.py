@@ -127,7 +127,7 @@ class DatabaseAction():
         if self.arp:
             print('SEARCH FROM : %s'%col_name)
             print('FOUND :', list(self.cursor))
-        return self.cursor
+        return self.cursor 
     
     #update database
     def tweetdb_update(self, col_name, col_to_update, data_to_update, query_field, query):
@@ -172,20 +172,6 @@ class DatabaseAction():
         print('CLEAR ALL DATA IN %s' %col_name)
         
         return self.cmd
-    
-    #history log
-    def tweetdb_history(self, action, last_id):
-        
-        history_db = self.tweetdb_object(config.mongo_client, config.database_name, config.history_db)
-        collect_history = history_db.insert_one({
-            'action':action,
-            'last_id': last_id
-            })
-
-        if self.arp:
-            print('COLLECT HISTORY : %s'%action)
-            
-        return collect_history
         
 if __name__ == '__main__':
     db_action = DatabaseAction()

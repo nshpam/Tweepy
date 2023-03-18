@@ -26,26 +26,38 @@ class SentimentAnalysis():
     
     #the date_list is the date that need to be sentiment which not sentiment yet
     def PullCleanByTime(self, keyword, date_list):
-        cursor_dict = {}
-        temp_list_1 = [] #storing the date that can perform sentiment
-        temp_list_2 = [] #storing the date that can't perform sentiment
+        sentiment_dict = {} #storing the date that can perform sentiment
+        extract_list = [] #storing the date that can't perform sentiment
+        data_dict = {}
+        check_extract = []
         #turn off printing database status
         db_action.not_print_raw()
         #connect with cleaned database
         collection = db_action.tweetdb_object(config.mongo_client, config.database_name, config.collection_name_2)
+        query_object = db_action.tweetdb_create_object(['keyword'],[keyword])
+        cursor = db_action.tweetdb_find(config.collection_name_2, collection, query_object)
         
+        #no keyword found
+        if cursor.count() == 0:
+            return None
+
+        #pull all time from database
+        for doc in cursor:
+            for date in date_list:
+                if doc['date'].date() == date:
+                    sentiment_dict[doc['id']] = [doc['keyword'], doc['date'].date(), doc['text']]
+                    check_extract.append(date)
+
+        #check which date should be extract
         for date in date_list:
-            query_object = db_action.tweetdb_create_object(['keyword', 'date'],[keyword, date])
-            cursor = db_action.tweetdb_find(config.collection_name_2, collection, query_object)
-            if cursor.count() == 0:
-                temp_list_2.append(cursor)
-            else:
-                temp_list_1.append(cursor)
+            if date not in check_extract:
+                extract_list.append(date)
         
-        cursor_dict['sentiment'] = temp_list_1
-        cursor_dict['transform'] = temp_list_2
-        
-        return cursor_dict
+        #collect sentiment data
+        data_dict['sentiment'] = sentiment_dict
+        data_dict['extract'] = extract_list
+
+        return data_dict
     
     #analyze which intension the data is.
     def intention_analysis(self, intention):
@@ -74,31 +86,31 @@ class SentimentAnalysis():
     
         return converted_polar
 
-    def SentimentByTime(self, cursor_list):
+    def SentimentByTime(self, sentiment_dict):
 
-        sentiment_dict = {}
+        sentiment_key = list(sentiment_dict.keys())
+        sentiment_data = list(sentiment_dict.values())
+
         #cursor_list is filtered by keyword and date already
-        for cursor in cursor_list:
-            for doc in cursor:
-                #sentiment
-                res = requests.get(config.SSense_URL, headers={'Apikey':config.LextoPlus_API_key}, params={'text':' '.join(doc['text'])})
-                try:
-                    raw = res.json()
+        for i in range(len(sentiment_data)):
+            #sentiment
+            res = requests.get(config.SSense_URL, headers={'Apikey':config.LextoPlus_API_key}, params={'text':' '.join(sentiment_data[i][2])})
 
-                    if raw['alert'] != []:
-                        print('ALERT! :', raw['alert'])
+            try:
+                raw = res.json()
 
-                    #converting polar for calculation
-                    polar = self.convert_polarity(raw['sentiment']['polarity'])
-                    #intention analysis
-                    conclusion = self.intention_analysis(raw['intention'])
+                if raw['alert'] != []:
+                    print('ALERT! :', raw['alert'])
+                #converting polar for calculation
+                polar = self.convert_polarity(raw['sentiment']['polarity'])
+                #intention analysis
+                conclusion = self.intention_analysis(raw['intention'])
 
-                    sentiment_dict[doc['id']] = [doc['keyword'], doc['date'], raw['preprocess']['input'], raw['sentiment']['score'], polar, conclusion]
-                except:
-                    sentiment_dict[doc['id']] = ['error']
-                    print('sentiment error :', doc['keyword'], doc['date'])
-                    # return sentiment_dict
-                time.sleep(0.2)
+                sentiment_dict[sentiment_key[i]] = [sentiment_data[i][0], sentiment_data[i][1], raw['preprocess']['input'], raw['sentiment']['score'], polar, conclusion]
+            except:
+                sentiment_dict[sentiment_key[i]] = ['error']
+                print('sentiment error :', sentiment_data[i][0], sentiment_data[i][1])
+            time.sleep(0.1)
         return sentiment_dict
 
     def SentimentByKeyword(self, cursor):
@@ -133,10 +145,10 @@ class SentimentAnalysis():
         if sentiment_type == 'time':
             #create cursor list for sentimenting by time
             #which cursor list has been filter by keyword and date already 
-            cursor_list = self.PullCleanByTime(keyword, date_list)
+            data_dict = self.PullCleanByTime(keyword, date_list)
             #perform the sentiment by time and return the sentiment dict
-            sentiment_dict['sentiment'] = self.SentimentByTime(cursor_list['sentiment'])
-            sentiment_dict['transform'] = cursor_list['transform']
+            sentiment_dict['sentiment'] = self.SentimentByTime(data_dict['sentiment'])
+            sentiment_dict['extract'] = data_dict['extract']
             
         #sentiment by keyword
         elif sentiment_type == 'keyword':
@@ -157,15 +169,28 @@ class SentimentAnalysis():
 
 if __name__ == '__main__':
 
-    date_list = [datetime.date(2022, 12, 30).day,
-             datetime.date(2022, 12, 31).day,
-             datetime.date(2023, 1, 11).day,
-             datetime.date(2023, 1, 12).day,
-             datetime.date(2023, 1, 13).day,
-             datetime.date(2023, 1, 14).day,
-             datetime.date(2023, 1, 15).day,
-             datetime.date(2023, 1, 16).day,
-             datetime.date(2023, 1, 17).day,
-             datetime.date(2023, 1, 18).day]
+    #all sentiment (date_list = [])
+    #no such a case date_list will only be the date that need to be process only
+    #which date_list already filter from tweepy_main.py already
 
-    SentimentAnalysis().Perform(config.search_word, date_list, 'time')
+    #all not sentiment but all have in cleaned database [FINISH]
+    #all not sentiment but some have in cleaned database [FINISH]
+    #all not sentiment but none have in cleaned database [FINISH]
+    date_list = [datetime.datetime(2023, 1, 15).date(),
+             datetime.datetime(2023, 1, 16).date(),
+             datetime.datetime(2023, 1, 17).date(),
+             datetime.datetime(2023, 1, 18).date()]
+
+    sentiment_dict = SentimentAnalysis().Perform(config.search_word, date_list, 'time')
+    print('sentiment :', sentiment_dict['sentiment'])
+    print('extract :', sentiment_dict['extract'])
+    
+    
+    #test from tweepy_main.py
+    #some sentiment and the one that not sentiment have in cleaned database
+    #some sentiment and the one that not sentiment don't have in cleaned database
+    #some sentiment and the one that not sentiment some have in cleaned database
+
+    
+
+    

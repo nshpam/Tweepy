@@ -273,6 +273,7 @@ class MainOperation():
         temp_date = []
 
         #check sentiment database
+        #return only the date that need to be sentiment
         sentiment_date = self.CheckDBTimeline(keyword, start_d, end_d, config.collection_name_5)
 
         while True:
