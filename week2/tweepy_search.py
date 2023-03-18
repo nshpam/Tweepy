@@ -11,9 +11,6 @@ import datetime   #use for timezone converting
 from twitterDataProcessing import *
 import twitterDataProcessing
 
-# import for check geolocation
-from opencage.geocoder import OpenCageGeocode
-
 # from GUI_main import *
 #you can edit mongodb server, database name, collection name in file name "config.py"
 db_action = database_action.DatabaseAction()
@@ -129,19 +126,7 @@ class PullTwitterData(object):
          self.count_tweets+=1
       
       return self.count_tweets
-   
-   def check_location(self):
-      geocoder = OpenCageGeocode(config.opencage_key)
-      location_info_list = geocoder.geocode(tweet_location)
-      if location_info_list:
-         location_info = location_info_list[0]
-         if location_info.get('status', {}).get('code') == 200:
-            location_name = location_info.get('formatted')
-            country = location_info.get('components', {}).get('country')
 
-      else:
-         tweet_location = None
-   
    # def twitter_scrapping(self, tweet_data, tweet_keyword):
    #    #count tweet
    #    self.count_tweets = 0
@@ -215,7 +200,8 @@ class PullTwitterData(object):
 
          #get tweet location
          if tweet.place is not None:
-            tweet_location = tweet.place.full_name
+            # tweet_location = tweet.place.full_name
+            tweet_location = tweet.place.bounding_box.coordinates[0][0]
          else:
             tweet_location = None
 
