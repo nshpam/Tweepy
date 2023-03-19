@@ -64,6 +64,7 @@ class FilterData():
             if self.FilterUrl(word):
                 clean_json+=' '
                 continue
+            word = self.FilterOutKeyword(word)
             word = self.FilterNum(word)
             word = self.FilterSpecialChar(word)
 
@@ -85,7 +86,6 @@ class FilterData():
                 return True
             except:
                 return False
-            # return False
 
     #Filter number function
     def FilterNum(self, raw_text):
@@ -129,15 +129,27 @@ class FilterData():
         return temp_text.lower().lstrip().rstrip()
     
     # new function to filter out a specific keyword
-    def FilterOutKeyword(self, text, keyword):
-        filtered_text = ''
-        words = text.split()
+    def FilterOutKeyword(self, raw_text):
+        remove_word = []
+        hashtags = raw_text.split('#')
 
-        for word in words:
-            if word.lower() != keyword.lower():
-                filtered_text += ' ' + word
-
-        return filtered_text.strip()
+        for tag in hashtags:
+            if tag.startswith(' '):
+                continue
+            try: 
+                hashtag = raw_text[raw_text.index(tag)-1]
+                if hashtag == '#':
+                    check_hashtags = tag.split()
+                    filter_hashtags = tag
+                    if len(check_hashtags)>1:
+                        filter_hashtags = check_hashtags[0]
+                    remove_word.append(hashtag+filter_hashtags)
+            except:
+                continue
+        
+        for word in remove_word:
+            raw_text = raw_text.replace(word,'')
+        return raw_text.lstrip().rstrip()
 
 #Tokenization function
 class Tokenization():

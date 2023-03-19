@@ -5,18 +5,53 @@ import calendar
 import datetime
 import database_action
 import numpy as np
+import twitterDataProcessing
 
-db_action = database_action.DatabaseAction()
-collection = db_action.tweetdb_object(config.mongo_client, config.database_name, config.collection_name_2)
+# input = 'ยาพลังช้างก็มาจ้า!!#TheLostHeroOfAyodhya#ขุนแหย  #หนังไทย #หนังสนุก #ดูหนัง #หนังตลก #รีวิวหนัง #moive22hd #ดูหนังเต็มเรื่อง #ดูหนังมันส์ๆ #ดูหนังสนุกๆ #ดูหนังในโรงภาพยนตร์ https://t.co/NQecJ2jzVz'
+input = 'ยาพลังช้างก็มาจ้า!! # TheLostHeroOfAyodhya#ขุนแหย  #หนังไทย #หนังสนุก #ดูหนัง #หนังตลก #รีวิวหนัง #moive22hd #ดูหนังเต็มเรื่อง #ดูหนังมันส์ๆ #ดูหนังสนุกๆ #ดูหนังในโรงภาพยนตร์ https://t.co/NQecJ2jzVz'
 
-cursor = collection.find({
-  "keyword": '#รีวิวหนัง',
-  "date": datetime.datetime(2022, 12, 31, 0, 0, 0, 0)
-})
+print(twitterDataProcessing.FilterData().Filters(input))
 
-if cursor.count()==0:
-    print('no data found')
-else:
-    for doc in cursor:
-        print(doc)
-        break
+# hashtags = input.split('#')
+# remove_word = []
+# test = '#ดูหนังในโรงภาพยนตร์ https://t.co/NQecJ2jzVz'.split()
+
+# #find the word to remove
+# for word in hashtags:
+
+#     if word.startswith(' '):
+#        print(word)
+#        continue
+#     try: 
+#       hashtag = input[input.index(word)-1]
+#       if hashtag == '#':
+#         check_hashtags = word.split()
+#         filter_hashtags = word
+#         # print(check_hashtags)
+#         if len(check_hashtags)>1:
+#             filter_hashtags = check_hashtags[0]
+#         remove_word.append(hashtag+filter_hashtags)
+#     except:
+#       continue
+
+# # print(remove_word)
+
+# for word in remove_word:
+#    input = input.replace(word,'')
+  
+# print(input)
+  
+
+
+
+    
+    
+
+# output_string = ""
+# for word in hashtags:
+#     if not word.startswith("#"):
+#         output_string += word + " "
+#     elif len(word) > 1:
+#         output_string = output_string.rstrip() + " "
+
+# print(output_string.strip())
