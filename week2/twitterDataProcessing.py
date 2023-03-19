@@ -17,13 +17,6 @@ import datetime
 
 db_action = database_action.DatabaseAction()
 
-#connect to Lexto+ API
-class ConnectLextoPlus():
-    def ConnectApi(self, api_key, url_to_send, data_dict):
-        headers = {'Apikey' : api_key}
-        res = requests.get(url_to_send,params=data_dict,headers=headers)
-        return res
-
 #Filter class
 class FilterData():
 
