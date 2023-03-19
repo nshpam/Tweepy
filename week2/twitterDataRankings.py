@@ -142,7 +142,9 @@ class Ranking():
 
         # print(rank_set)
         #ranking by key
-        print(self.rank_word(rank_set, ranking_key, ranking_frequency))
+        # print(self.rank_word(rank_set, ranking_key, ranking_frequency))
+        # return the top words and their frequencies
+        return ranking_key[:config.ranking_top], ranking_frequency[:config.ranking_top]
 
         #ranking by hashtags
 
@@ -152,4 +154,5 @@ class Ranking():
 if __name__ == '__main__':
 
     # cProfile.run('Ranking().rank_list()')
-    Ranking().rank_list()
+    # Ranking().rank_list()
+    top_words, top_frequencies = Ranking().rank_list()
