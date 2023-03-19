@@ -145,7 +145,7 @@ class MainOperation():
     #create the date that need to be process
     def CreateTimeline(self, start_d, end_d, checkpoint, time_list, even, cur_process):
         interval = datetime.timedelta(days=1)
-        end_d += interval
+        # end_d += interval
         time_delta = (end_d - start_d)
         process_date = []
         data_dict = {}
@@ -157,16 +157,19 @@ class MainOperation():
 
         #odd number
         if not even:
-            cp = end_d-time_delta
+            cp = checkpoint[0]+interval
             date_list.append(cp)
             #check the first checkpoint
             if cp not in time_list :
                 process_date.append(cp)
             
         while True:
+            
             #cp1 meet the start point, cp2 meet the end point
             if cp1 == start_d-interval or cp2 == end_d+interval:
                 break
+            print('cp1',cp1)
+            print('cp2',cp2)
             date_list.append(cp1)
             date_list.append(cp2)
             #check checkpoint 1
@@ -197,6 +200,7 @@ class MainOperation():
         query_object_1 = db_action.tweetdb_create_object(['keyword'],[keyword])
         cursor = db_action.tweetdb_find(collection_name, collection, query_object_1)
         
+        #no keyword match
         if not self.IsMatch(cursor):
             data_dict[cur_process] = []
             data_dict[self.NextProcess(cur_process)] = self.CreateDateList(start_d, end_d)
@@ -221,6 +225,7 @@ class MainOperation():
             checkpoint = self.SetContinuousCheckPoint(start_d, end_d)
             #contain the data that identify odd day / even day already
             data_dict = self.CreateTimeline(start_d, end_d, checkpoint, time_list, checkpoint[2], cur_process)
+            
         return data_dict
 
     #either continuous timeline or discrete timeline
@@ -320,9 +325,6 @@ class MainOperation():
         #always continuous timeline
         sentiment_date = self.CheckDBTimeline(keyword, start_d, end_d, config.collection_name_5, 'visualize')
 
-        print(sentiment_date)
-        return
-
         if sentiment_date['visualize'] != []:
             return 'show data visualization'
         #perform sentiment
@@ -344,8 +346,7 @@ class MainOperation():
             for data in sentiment_data:
                 date_list = [data[0], datetime.datetime.combine(data[1], datetime.time.min), data[2], data[3], data[4], data[5]]
                 query_object = db_action.tweetdb_create_object(data_field, date_list)
-                # db_action.tweetdb_insert(config.collection_name_5, collection, query_object)
-            # print('sentiment', data_dict)
+                db_action.tweetdb_insert(config.collection_name_5, collection, query_object)
             return data_dict['transform']
         else:
             return 'Invalid response'
@@ -382,7 +383,7 @@ class MainOperation():
 if __name__ == '__main__':
     mainoperation = MainOperation()
 
-    start_date = datetime.date(2022, 12, 14) #y m d
+    start_date = datetime.date(2023, 1, 14) #y m d
     # end_date = datetime.date(2023, 1, 15)
     end_date = datetime.date(2023, 1, 16)
     
