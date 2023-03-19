@@ -147,9 +147,9 @@ class Tokenization():
         self.count_token = count_token
         self.cursor = cursor
 
-    def IsMatch(self, cursor):
+    def IsMatch(self, collection, query_object):
         #no keyword match
-        if cursor.count() == 0:
+        if collection.count_documents(query_object) == 0:
             return False
         #keyword match
         return True

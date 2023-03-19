@@ -200,9 +200,11 @@ class SentimentAnalysis():
             
             #no keyword match
             if cursor == None:
+                sentiment_dict['sentiment'] = []
+                sentiment_dict['transform'] = [keyword]
                 return None
             #perform the sentiment by keyword and return sentiment dict
-            sentiment_dict = self.SentimentByKeyword(cursor)
+            sentiment_dict['sentiment'] = self.SentimentByKeyword(cursor)
                 
         #invalid sentiment type
         else:

@@ -314,6 +314,11 @@ class MainOperation():
     #transform by keyword (# or word)
     #transform by time
 
+    def SentimentByKeyword(self, keyword):
+        #sentiment
+        sentiment = twitterDataSentiment.SentimentAnalysis()
+        data_dict = sentiment.Perform(keyword, [], 'keyword')
+
     #sentiment by time
     def SentimentByTime(self, keyword, start_d, end_d):
         process_date = []
@@ -335,6 +340,9 @@ class MainOperation():
             #sentiment
             sentiment = twitterDataSentiment.SentimentAnalysis()
             data_dict = sentiment.Perform(keyword, process_date, 'time')
+
+            if data_dict['sentiment'] == []:
+                return data_dict['transform']
 
             sentiment_data = list(data_dict['sentiment'].values())
             
