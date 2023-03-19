@@ -317,12 +317,13 @@ class MainOperation():
         #sentiment
         sentiment = twitterDataSentiment.SentimentAnalysis()
         data_dict = sentiment.Perform(keyword, [], 'keyword')
-        #collect sentiment data
-        sentiment_data = list(data_dict['sentiment'].values())
-        
+
         #keyword not match in sentiment database
         if data_dict['sentiment'] == []:
             return data_dict['transform']
+        
+        #collect sentiment data
+        sentiment_data = list(data_dict['sentiment'].values())
         
         db_action.not_print_raw() #turn off printing database status
 
@@ -333,8 +334,8 @@ class MainOperation():
         #create data object
         data_field = ['id', 'keyword', 'date', 'input', 'score', 'polar', 'conclusion']
         for data in sentiment_data:
-            date_list = [data[0], data[1], datetime.datetime.combine(data[2], datetime.time.min), data[3], data[4], data[5], data[6]]
-            query_object = db_action.tweetdb_create_object(data_field, date_list)
+            data_list = [data[0], data[1], datetime.datetime.combine(data[2], datetime.time.min), data[3], data[4], data[5], data[6]]
+            query_object = db_action.tweetdb_create_object(data_field, data_list)
             
             #check duplicate data before insertion
             check_query = db_action.tweetdb_create_object(["id"],[data[0]])
@@ -401,13 +402,29 @@ class MainOperation():
 
         #transform
         tokenization = twitterDataProcessing.Tokenization()
-        data_dict = tokenization.Perform(keyword, [], 'keyword')
-        #collect transform data
-        transform_data = list(data_dict['transform'].values())
+        tokenization_dict = tokenization.Perform(keyword, [], 'keyword')
 
         #keyword not match in transform database
-        if data_dict['transform'] == []:
-            return data_dict['extract']
+        #no cleaning, normalize
+        if tokenization_dict['transform'] == []:
+            return tokenization_dict['extract']
+        
+        #collect tokenize data
+        tokenize_data = list(tokenization_dict['transform'].values())
+        
+        #perform normalization process
+        normalize = twitterDataProcessing.Normailize()
+        normalize_dict = normalize.Perform(tokenize_data)
+        #collect normalize data
+        normalize_data = list(normalize_dict['transform'].values())
+
+        #perform cleaning process
+        cleaning = twitterDataProcessing.CleanThaiAndEng()
+        cleaned_dict = cleaning.Perform(normalize_data)
+
+        transform_data = list(cleaned_dict['transform'].values())
+
+        data_dict = cleaned_dict
         
         db_action.not_print_raw() #turn off printing database status
 
@@ -415,6 +432,22 @@ class MainOperation():
         #create collection
         collection = db_action.tweetdb_object(config.mongo_client, config.database_name, config.collection_name_2)
 
+        #create data object
+        data_field = ['id', 'keyword', 'date', 'text']
+        for data in transform_data:
+            data_list = [data[0], data[1], datetime.datetime.combine(data[2], datetime.time.min), data[3]]
+            query_object = db_action.tweetdb_create_object(data_field, data_list)
+
+            #check duplicate data before insertion
+            check_query = db_action.tweetdb_create_object(["id"],[data[0]])
+
+            if not self.IsMatch(collection, check_query):
+                # print('insert')
+                db_action.tweetdb_insert(config.collection_name_2, collection, query_object)
+
+            print(query_object)
+
+        return data_dict['extract']
 
     def TransformByTime(self, keyword, date_list):
         process_date = sorted(date_list) #sort date
@@ -447,8 +480,11 @@ if __name__ == '__main__':
     # end_date = datetime.date(2023, 1, 15)
     end_date = datetime.date(2023, 1, 16)
     
-    # transform = mainoperation.SentimentByKeyword(config.search_word)
-
-    transform = mainoperation.SentimentByTime(config.search_word, start_date, end_date)
+    transform = mainoperation.SentimentByKeyword(config.search_word)
+    # transform = mainoperation.SentimentByTime(config.search_word, start_date, end_date)
     
     print('transform', transform)
+
+    extract = mainoperation.TransformByKeyword(config.search_word)
+
+    print('extract', extract)

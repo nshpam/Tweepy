@@ -346,16 +346,31 @@ class Tokenization():
 # Removing noise from the data
 class CleanThaiAndEng():
 
-    def cleaning(self, sentence):
-        #clean thai word
-        sentence = self.cleanThaiStopword(sentence)
+    def Perform(self, data_list):
+        
+        cleaning_dict = {}
+        data_dict = {}
+        
+        for data in data_list:
+            clean_list = []
+            #clean thai word
+            sentence = self.CleanThaiStopword(data[3])
 
-        #clean english word
-        sentence = self.cleanEnglishStopword(sentence)
-        return sentence
+            #clean english word
+            sentence = self.CleanEnglishStopword(data[3])
+
+            clean_list.append(sentence)
+            #collect cleaned data
+            data_dict[data[0]] = [data[0], data[1], data[2], clean_list]
+        
+        #construct normalization dict
+        cleaning_dict['transform'] = data_dict
+        cleaning_dict['extract'] = []
+            
+        return cleaning_dict
     
     #Clean Thai stopwords function (use pythainlp)
-    def cleanThaiStopword(self, sentence):
+    def CleanThaiStopword(self, sentence):
 
         #dictionary-based stopword
         stop_words = list(thai_stopwords())
@@ -370,7 +385,7 @@ class CleanThaiAndEng():
         return result
     
     #Clean English stopwords function (use nltk)
-    def cleanEnglishStopword(self, sentence):
+    def CleanEnglishStopword(self, sentence):
 
         #dictionary-based stopword
         stop_words = stopwords.words('english')
@@ -387,66 +402,32 @@ class CleanThaiAndEng():
 #Normalization function
 class Normailize():
 
-    # Normalizing English words
-    def NormalizingEnglishword(self, sentence):
-        lemmatizer = WordNetLemmatizer()
-        nltk_lemma_list = []
-
+    def Perform(self, data_list):
         #normalization settings ( n (noun) | v (verb) | a (adjective) | r (adverb) | s (satellite adjective) )
         #POS tag (part-of-speech)
         pos_list = ['n','v','a','r','s']
-        for word in sentence:
-            if word != '':
-                for mode in pos_list:
-                    temp = lemmatizer.lemmatize(word,pos=mode)
-                    word = temp
-                    
-                nltk_lemma_list.append(temp)
-        return nltk_lemma_list
+        lemmatizer = WordNetLemmatizer()
+        normalize_dict = {}
+        data_dict = {}
 
-class Transform():
+        for data in data_list:
+            nltk_lemma_list = []
+            #iterate tokenization data
+            for word in data[3]:
+                if word != '':
+                    for mode in pos_list:
+                        temp = lemmatizer.lemmatize(word,pos=mode)
+                        word = temp
+                        
+                    nltk_lemma_list.append(temp)
+            #collect normalization data
+            data_dict[data[0]] = [data[0], data[1], data[2], nltk_lemma_list]
 
-    def __init__(self, collection_name='', count_db=0, collection=None):
-        self.collection_name = collection_name
-        self.count_db = count_db
-        self.collection = collection
+        #construct normalization dict
+        normalize_dict['transform'] = data_dict
+        normalize_dict['extract'] = []
 
-    #check duplicate id in cleaned_data collection
-    def check_cleaned_database(self, id):
-        query_object = db_action.tweetdb_create_object(["id"],[id])
-        cursor = db_action.tweetdb_find(self.collection_name, self.collection, query_object)
-        return cursor
-    
-    def insert_cleaned_database(self, id, keyword, date, word):
-        data_field = ['id','keyword','date','text']
-        data_list = [id, keyword, date, word]
-        clean_object = db_action.tweetdb_create_object(data_field, data_list)
-        db_action.tweetdb_insert(self.collection_name, self.collection, clean_object)
-
-    def perform(self, id_list, data_list):
-        self.count_db = 0
-        self.collection_name = config.collection_name_2
-        self.collection = db_action.tweetdb_object(config.mongo_client, config.database_name, self.collection_name)
-
-        for i in range(len(data_list)):
-            self.count_db += 1
-            word = data_list[i][2]
-            word = Normailize().NormalizingEnglishword(word)
-            word = CleanThaiAndEng().cleaning(word)
-
-            if word != []:
-                #check duplicate id in cleaned_data collection
-                cursor = self.check_cleaned_database(id_list[i])
-
-                #if not duplicate then insert
-                if list(cursor) == []:
-                    self.insert_cleaned_database(id_list[i], data_list[i][0], data_list[i][1], word)
-                else:
-                    print('duplicate data :', id_list[i])
-            else:
-                print('failed to insert :',word)
-        
-        print('TOTAL TWITTER INSERT TO DATABASE :',self.count_db)
+        return normalize_dict
 
 if __name__ == '__main__':
     
@@ -460,14 +441,3 @@ if __name__ == '__main__':
     # data_dict = tokenization.Tokenization(config.search_word, date_list, 'time')
     data_dict = tokenization.Perform(config.search_word, [], 'keyword')
     print(data_dict)
-
-#     tweet_dict = Tokenization().LextoPlusTokenization(
-#         config.LextoPlus_API_key,
-#         config.LextoPlus_URL,
-#         config.search_word
-#     )
-
-#     tweet_dict_keys = list(tweet_dict.keys())
-#     tweet_dict_values = list(tweet_dict.values())
-
-#     Transform().perform(tweet_dict_keys, tweet_dict_values)
