@@ -50,6 +50,8 @@ class SentimentAnalysis():
         
         #check if have the keyword
         if not self.IsMatch(cursor):
+            # data_dict['sentiment'] = []
+            # data_dict['tranform'] = transform_list
             return None
 
         #pull all time from database
@@ -66,7 +68,7 @@ class SentimentAnalysis():
         
         #collect sentiment data and date to extract
         data_dict['sentiment'] = sentiment_dict
-        data_dict['tranform'] = transform_list
+        data_dict['transform'] = transform_list
 
         return data_dict
     
@@ -99,7 +101,7 @@ class SentimentAnalysis():
 
     #sentiment by date
     def SentimentByTime(self, sentiment_dict):
-        
+
         #seperating id and data
         sentiment_key = list(sentiment_dict.keys())
         sentiment_data = list(sentiment_dict.values())
@@ -164,7 +166,7 @@ class SentimentAnalysis():
             except:
                 print('sentiment error')
                 #collect data for insertion
-                sentiment_dict[doc['id']] = ['eror']
+                sentiment_dict[doc['id']] = ['error']
             #delay for SSense API
             time.sleep(0.2)
         return sentiment_dict
@@ -180,11 +182,15 @@ class SentimentAnalysis():
 
             #no keyword match
             if data_dict == None:
-                return None
+                sentiment_dict['sentiment'] = []
+                sentiment_dict['transform'] = date_list
+                return sentiment_dict
             
             #perform the sentiment by time and return the sentiment dict
             sentiment_dict['sentiment'] = self.SentimentByTime(data_dict['sentiment'])
             sentiment_dict['transform'] = data_dict['transform']
+
+            # print(sentiment_dict)
             
         #sentiment by keyword
         elif sentiment_type == 'keyword':

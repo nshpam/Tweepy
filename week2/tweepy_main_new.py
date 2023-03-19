@@ -23,8 +23,8 @@ class MainOperation():
         self.keyword = config.search_word
         self.search_type = config.search_type
         self.search_limit = config.num_tweet
-        self.start_date = datetime.date(2022, 12, 30) #y m d
-        self.end_date = datetime.date(2023, 1, 16)
+        # self.start_date = datetime.date(2022, 12, 30) #y m d
+        # self.end_date = datetime.date(2023, 1, 16)
         self.db_action = database_action.DatabaseAction()
 
     #connect to tweepy
@@ -126,6 +126,20 @@ class MainOperation():
         if start_d == end_d:
             return True
         return False
+
+    def CreateDateList(self, start_d, end_d):
+        interval = datetime.timedelta(days=1)
+        end_d += interval
+        time_delta = (end_d - start_d)
+        date_list = []
+        
+        # print(type(time_delta), time_delta.days)
+
+        for i in range(time_delta.days):
+            date_list.append(start_d)
+            start_d+=interval
+        
+        return date_list
     
     #always continuous timeline
     #create the date that need to be process
@@ -168,7 +182,7 @@ class MainOperation():
         data_dict[self.NextProcess(cur_process)] = process_date
 
         # print('date to sentiment(continuous)',process_date)
-        return process_date
+        return data_dict
 
     #continuous timeline
     #check the date that need to be process
@@ -183,9 +197,10 @@ class MainOperation():
         query_object_1 = db_action.tweetdb_create_object(['keyword'],[keyword])
         cursor = db_action.tweetdb_find(collection_name, collection, query_object_1)
         
-        if not self.IsMatch(keyword, cursor):
-            print("Query does not exist in the collection.")
-            return None
+        if not self.IsMatch(cursor):
+            data_dict[cur_process] = []
+            data_dict[self.NextProcess(cur_process)] = self.CreateDateList(start_d, end_d)
+            return data_dict
             
         #get all time in this keyword
         time_list = self.GetAllTimeline(cursor)
@@ -258,9 +273,10 @@ class MainOperation():
         cursor_1 = db_action.tweetdb_find(collection_name, collection, query_object_1)
         
         #keyword doesn't exists
-        if not self.IsMatch(keyword, cursor_1):
-            print('Query does not exist in the collection')
-            return None
+        if not self.IsMatch(cursor_1):
+            data_dict[cur_process] = []
+            data_dict[self.NextProcess(cur_process)] = date_list
+            return data_dict
 
         #get all time in this keyword
         time_list = self.GetAllTimeline(cursor_1)
@@ -303,20 +319,21 @@ class MainOperation():
         #return only the date that need to be sentiment
         #always continuous timeline
         sentiment_date = self.CheckDBTimeline(keyword, start_d, end_d, config.collection_name_5, 'visualize')
-        
-        #keyword not match
-        if sentiment_date == None:
-            return 'keyword not match'
-        #all data has been sentiment
-        elif sentiment_date['visualize'] != []:
+
+        print(sentiment_date)
+        return
+
+        if sentiment_date['visualize'] != []:
             return 'show data visualization'
         #perform sentiment
         elif sentiment_date['sentiment'] != []:
             #sort the date
             process_date = sorted(sentiment_date['sentiment'])
+           
             #sentiment
             sentiment = twitterDataSentiment.SentimentAnalysis()
             data_dict = sentiment.Perform(keyword, process_date, 'time')
+
             sentiment_data = list(data_dict['sentiment'].values())
             
             #insert data to sentiment database
@@ -325,10 +342,10 @@ class MainOperation():
             #create data object
             data_field = ['keyword', 'date', 'input', 'score', 'polar', 'conclusion']
             for data in sentiment_data:
-                date_list = [data[0], data[1], data[2], data[3], data[4], data[5]]
+                date_list = [data[0], datetime.datetime.combine(data[1], datetime.time.min), data[2], data[3], data[4], data[5]]
                 query_object = db_action.tweetdb_create_object(data_field, date_list)
-                db_action.tweetdb_insert(config.collection_name_5, collection, query_object)
-            
+                # db_action.tweetdb_insert(config.collection_name_5, collection, query_object)
+            # print('sentiment', data_dict)
             return data_dict['transform']
         else:
             return 'Invalid response'
@@ -365,8 +382,9 @@ class MainOperation():
 if __name__ == '__main__':
     mainoperation = MainOperation()
 
-    start_date = datetime.date(2022, 12, 30) #y m d
+    start_date = datetime.date(2022, 12, 14) #y m d
     # end_date = datetime.date(2023, 1, 15)
     end_date = datetime.date(2023, 1, 16)
-
-    # mainoperation.CheckDB('#มั่วๆ', [], config.collection_name_5)
+    
+    transform = mainoperation.SentimentByTime(config.search_word, start_date, end_date)
+    print('transform', transform)
