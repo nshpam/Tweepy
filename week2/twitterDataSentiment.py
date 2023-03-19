@@ -133,7 +133,7 @@ class SentimentAnalysis():
                 sentiment_dict[sentiment_key[i]] = ['error']
                 print('sentiment error :', sentiment_data[i][0], sentiment_data[i][1])
             #delay for SSense API
-            time.sleep(0.1)
+            time.sleep(0.5)
         return sentiment_dict
 
     #sentiment by keyword
@@ -167,8 +167,10 @@ class SentimentAnalysis():
                 print('sentiment error')
                 #collect data for insertion
                 sentiment_dict[doc['id']] = ['error']
+                print(doc['id'],doc['keyword'], doc['date'], ' '.join(doc['text']))
+                # print(sentiment_dict)
             #delay for SSense API
-            time.sleep(0.2)
+            time.sleep(0.5)
         return sentiment_dict
 
     def Perform(self, keyword, date_list, sentiment_type):
@@ -202,9 +204,10 @@ class SentimentAnalysis():
             if cursor == None:
                 sentiment_dict['sentiment'] = []
                 sentiment_dict['transform'] = [keyword]
-                return None
+                return sentiment_dict
             #perform the sentiment by keyword and return sentiment dict
             sentiment_dict['sentiment'] = self.SentimentByKeyword(cursor)
+            sentiment_dict['transform'] = []
                 
         #invalid sentiment type
         else:
