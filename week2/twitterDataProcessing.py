@@ -64,7 +64,7 @@ class FilterData():
             if self.FilterUrl(word):
                 clean_json+=' '
                 continue
-            word = self.FilterOutKeyword(word)
+            word = self.FilterHashtags(word)
             word = self.FilterNum(word)
             word = self.FilterSpecialChar(word)
 
@@ -128,8 +128,8 @@ class FilterData():
         
         return temp_text.lower().lstrip().rstrip()
     
-    # new function to filter out a specific keyword
-    def FilterOutKeyword(self, raw_text):
+    #Filter out the hashtags
+    def FilterHashtags(self, raw_text):
         remove_word = []
         hashtags = raw_text.split('#')
 
@@ -166,11 +166,46 @@ class Tokenization():
         #keyword match
         return True
 
-    def PullCleanByKeyword(self, keyword):
+    #pull tweets by keyword
+    def PullTweetsByKeyword(self, keyword):
         db_action.not_print_raw() #turn off printing database status
 
-    def PullCleanByTime(self):
-        pass
+        #create collection
+        collection = db_action.tweetdb_object(config.mongo_client, config.database_name, config.collection_name)
+        #create query object
+        query_object = db_action.tweetdb_create_object(["keyword"], [keyword])
+        #query
+        cursor = db_action.tweetdb_find(config.collection_name, collection, query_object)
+
+        #check if have the keyword
+        if not self.IsMatch(collection, query_object):
+            return None
+        return cursor
+
+    def PullTweetsByTime(self, keyword, date_list):
+        transform_dict = {} #storing the data that can transform
+        extract_list = [] #storing the data that can't transform
+        data_dict = {} #storing the data for transformation and extraction
+        check_extract = [] #temparary storing date
+
+        db_action.not_print_raw() #turn off printing database status
+
+        #connect with tweets database
+        #create collection
+        collection = db_action.tweetdb_object(config.mongo_client, config.database_name, config.collection_name)
+        query_object = db_action.tweetdb_create_object(["keyword"], [keyword])
+        cursor = db_action.tweetdb_find(config.collection_name, collection, query_object)
+
+        #check if have the keyword
+        if not self.IsMatch(collection, query_object):
+            return None
+
+        #pull all time from database
+        for doc in cursor:
+            for date in date_list:
+                if doc['date'].date() == date:
+                    transform_dict[doc['id']] = [doc['keyword'], doc['date'].date(), doc['text']]
+                    check_extract.append(date)
 
     def PullTweets(self, keyword):
         collection = db_action.tweetdb_object(config.mongo_client, config.database_name, config.collection_name)

@@ -2,6 +2,7 @@ import config
 import database_action
 import requests
 import time
+#for testing
 # import datetime
 
 #initialize database action function
@@ -36,7 +37,7 @@ class SentimentAnalysis():
     
     #the date_list is the date that need to be sentiment which not sentiment yet
     def PullCleanByTime(self, keyword, date_list):
-        sentiment_dict = {} #storing the date that can perform sentiment
+        sentiment_dict = {} #storing the data that can perform sentiment
         transform_list = [] #storing the date that can't perform sentiment
         data_dict = {} #storing the data for sentimental and transformation
         check_transform = [] #temperary storing date
@@ -50,8 +51,6 @@ class SentimentAnalysis():
         
         #check if have the keyword
         if not self.IsMatch(collection, query_object):
-            # data_dict['sentiment'] = []
-            # data_dict['tranform'] = transform_list
             return None
 
         #pull all time from database
@@ -72,16 +71,19 @@ class SentimentAnalysis():
 
         return data_dict
     
-    #analyze which intension the data is
+    #analyze which intention the data is
     def intention_analysis(self, intention):
-
+        
+        #collect intention
         intention_type = list(intention.keys())
-        intension_int = list(intention.values())
+        #collection intention value
+        intention = list(intention.values())
         conclusion = {}
         
+        #create the conclusion base-on intention
         for i in range(len(intention_type)):
-            if intension_int[i] != '0':
-                conclusion[intention_type[i]] = intension_int[i]
+            if intention[i] != '0':
+                conclusion[intention_type[i]] = intention[i]
         
         return conclusion
     
@@ -90,6 +92,7 @@ class SentimentAnalysis():
 
         converted_polar = 0
 
+        #converting polarity into integers
         if polar == 'positive':
             converted_polar = 1
         elif polar == 'negative':
@@ -127,11 +130,11 @@ class SentimentAnalysis():
                 #intention analysis
                 conclusion = self.intention_analysis(raw['intention'])
                 #collect data for insertion
-                sentiment_dict[sentiment_key[i]] = [sentiment_data[i][0], sentiment_data[i][1], raw['preprocess']['input'], raw['sentiment']['score'], polar, conclusion]
+                sentiment_dict[sentiment_key[i]] = [sentiment_key[i] ,sentiment_data[i][0], sentiment_data[i][1], raw['preprocess']['input'], raw['sentiment']['score'], polar, conclusion]
             except:
                 #collect data for insertion
                 sentiment_dict[sentiment_key[i]] = ['error']
-                print('sentiment error :', sentiment_data[i][0], sentiment_data[i][1])
+                print('sentiment error :', sentiment_key[i], sentiment_data[i][0], sentiment_data[i][1])
             #delay for SSense API
             time.sleep(0.5)
         return sentiment_dict
@@ -159,16 +162,18 @@ class SentimentAnalysis():
                     
                 #converting polar for calculation
                 polar = self.convert_polarity(raw['sentiment']['polarity'])
-                #intension analysis
+                #intention analysis
                 conclusion = self.intention_analysis(raw['intention'])
                 #collect data for insertion
-                sentiment_dict[doc['id']] = [doc['keyword'], doc['date'], raw['preprocess']['input'], raw['sentiment']['score'], polar, conclusion]
+                sentiment_dict[doc['id']] = [doc['id'], doc['keyword'], doc['date'], raw['preprocess']['input'], raw['sentiment']['score'], polar, conclusion]
+            
             except:
-                print('sentiment error')
                 #collect data for insertion
                 sentiment_dict[doc['id']] = ['error']
+                
+                #print the error on console
+                print('sentiment error')
                 print(doc['id'],doc['keyword'], doc['date'], ' '.join(doc['text']))
-                # print(sentiment_dict)
             #delay for SSense API
             time.sleep(0.5)
         return sentiment_dict
@@ -191,8 +196,6 @@ class SentimentAnalysis():
             #perform the sentiment by time and return the sentiment dict
             sentiment_dict['sentiment'] = self.SentimentByTime(data_dict['sentiment'])
             sentiment_dict['transform'] = data_dict['transform']
-
-            # print(sentiment_dict)
             
         #sentiment by keyword
         elif sentiment_type == 'keyword':
