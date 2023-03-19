@@ -11,9 +11,9 @@ db_action = database_action.DatabaseAction()
 class SentimentAnalysis():
     
     #Check if have the keyword in database
-    def IsMatch(self, cursor):
+    def IsMatch(self, collection, query_object):
         #no keyword match
-        if cursor.count() == 0:
+        if collection.count_documents(query_object) == 0:
             return False
         #keyword match
         return True
@@ -30,7 +30,7 @@ class SentimentAnalysis():
         cursor = db_action.tweetdb_find(config.collection_name_2, collection, query_object)
         
         #check if have the keyword
-        if not self.IsMatch(cursor):
+        if not self.IsMatch(collection, query_object):
             return None
         return cursor
     
@@ -49,7 +49,7 @@ class SentimentAnalysis():
         cursor = db_action.tweetdb_find(config.collection_name_2, collection, query_object)
         
         #check if have the keyword
-        if not self.IsMatch(cursor):
+        if not self.IsMatch(collection, query_object):
             # data_dict['sentiment'] = []
             # data_dict['tranform'] = transform_list
             return None

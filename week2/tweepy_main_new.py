@@ -78,10 +78,10 @@ class MainOperation():
 
         return checkpoint
 
-    # #Check if have this keyword in database
-    def IsMatch(self, cursor):
+    #Check if have this keyword in database
+    def IsMatch(self, collection, query_object):
         #keyword not match
-        if cursor.count()==0:
+        if collection.count_documents(query_object) == 0:
             return False
         #keyword match
         return True
@@ -201,7 +201,7 @@ class MainOperation():
         cursor = db_action.tweetdb_find(collection_name, collection, query_object_1)
         
         #no keyword match
-        if not self.IsMatch(cursor):
+        if not self.IsMatch(collection, query_object_1):
             data_dict[cur_process] = []
             data_dict[self.NextProcess(cur_process)] = self.CreateDateList(start_d, end_d)
             return data_dict
@@ -278,7 +278,7 @@ class MainOperation():
         cursor_1 = db_action.tweetdb_find(collection_name, collection, query_object_1)
         
         #keyword doesn't exists
-        if not self.IsMatch(cursor_1):
+        if not self.IsMatch(collection, query_object_1):
             data_dict[cur_process] = []
             data_dict[self.NextProcess(cur_process)] = date_list
             return data_dict
@@ -325,7 +325,7 @@ class MainOperation():
         #always continuous timeline
         sentiment_date = self.CheckDBTimeline(keyword, start_d, end_d, config.collection_name_5, 'visualize')
 
-        if sentiment_date['visualize'] != []:
+        if sentiment_date['visualize'] != [] and sentiment_date['sentiment'] == []:
             return 'show data visualization'
         #perform sentiment
         elif sentiment_date['sentiment'] != []:

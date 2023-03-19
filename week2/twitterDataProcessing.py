@@ -154,7 +154,10 @@ class Tokenization():
         #keyword match
         return True
 
-    def PullCleanByKeyword(self):
+    def PullCleanByKeyword(self, keyword):
+        db_action.not_print_raw() #turn off printing database status
+
+    def PullCleanByTime(self):
         pass
 
     def PullTweets(self, keyword):
