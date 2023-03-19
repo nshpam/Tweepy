@@ -207,14 +207,16 @@ class Tokenization():
                     transform_dict[doc['id']] = [doc['keyword'], doc['date'].date(), doc['text']]
                     check_extract.append(date)
 
-    def PullTweets(self, keyword):
-        collection = db_action.tweetdb_object(config.mongo_client, config.database_name, config.collection_name)
-
-        db_action.not_print_raw()
+        #check which date should be extract
+        for date in date_list:
+            if date not in check_extract:
+                extract_list.append(date)
         
-        query_object = db_action.tweetdb_create_object(["keyword"], [keyword])
-        cursor = db_action.tweetdb_find(config.collection_name, collection, query_object)
-        return cursor
+        #collect sentiment data and date to extract
+        data_dict['transform'] = transform_dict
+        data_dict['extract'] = extract_list
+
+        return data_dict
     
     def TokenizationPrepare(self, doc):
         #filter url, numeric and special characters
@@ -225,113 +227,119 @@ class Tokenization():
         doc_dict['norm'] = config.LextoPlus_Norm
         
         return doc_dict
-    
-    def TokenizationByTime(self, api_key, url, cursor, date_list):
-        #start the timer
-        tic = time.perf_counter()
+
+    def TokenizationByKeyword(self, cursor):
+
         tokened_dict = {}
 
-        #find by keyword already
+        #iterate all data in cursor
         for doc in cursor:
-            for date in date_list:
-                #found the date to be tokenize
-                if doc['date'].date() == date:
-                    doc_dict = self.TokenizationPrepare(doc)
-
-                    #connect with Lexto+ API
-                    res = ConnectLextoPlus().ConnectApi(api_key, url, doc_dict)
-
-                    try:
-                        tokened_dict[doc['id']] = [doc['keyword'], doc['date'], FilterData().FilteredFromLexto(res.json())]
-                        
-                        #check if the data can be filter by Lexto+
-                        if tokened_dict[doc['id']] == []:
-                            print(doc_dict)
-                            print(res.text)
-
-                        self.count_token += 1
-                    except:
-
-                        self.count_untoken += 1
-                        tokened_dict[doc['id']] = [doc['keyword'], doc['date'], doc['text'].split()]
-                else:
-                    continue
-            time.sleep(0.1)
-
-        #stop the timer
-        toc = time.perf_counter()
-
-        #display total work time of this thread
-        print(f"RUN TIME : {toc - tic:0.4f} seconds")
-        print('TOTAL TOKENIZATION :', self.count_token + self.count_untoken)
-        
-        return tokened_dict
-
-    def TokenizationByKeyword(self, api_key, url, cursor):
-        #start the timer
-        tic = time.perf_counter()
-        tokened_dict = {}
-
-        for doc in cursor:
+            #prepare data dict before tokenization
             doc_dict = self.TokenizationPrepare(doc)
 
-            #connect with Lexto+ API
-            res = ConnectLextoPlus().ConnectApi(api_key, url, doc_dict)
+            #perform a tokenization
+            res = requests.get(config.LextoPlus_URL, headers={'Apikey':config.LextoPlus_API_key}, params=doc_dict)
+
             try:
-                tokened_dict[doc['id']] = [doc['keyword'], doc['date'], FilterData().FilteredFromLexto(res.json())]
-                        
-                #check if the data can be filter by Lexto+
+                raw = res.json()
+
+                #filter data
+                filtered_raw = FilterData().FilteredFromLexto(raw)
+                
+                #collect data
+                tokened_dict[doc['id']] = [doc['id'], doc['keyword'], doc['date'], filtered_raw]
+
+                #check if the data is tokenized by Lexto+
                 if tokened_dict[doc['id']] == []:
                     print(doc_dict)
                     print(res.text)
-
-                self.count_token += 1
-            except:
-
-                self.count_untoken += 1
-                tokened_dict[doc['id']] = [doc['keyword'], doc['date'], doc['text'].split()]
-            time.sleep(0.1)
+            
+            except Exception as e:
+                #collect data for insertion
+                tokened_dict[doc['id']] = ['error']
                 
-        #stop the timer
-        toc = time.perf_counter()
+                #print the error on console
+                print('error:',e)
+                print(doc_dict)
 
-        #display total work time of this thread
-        print(f"RUN TIME : {toc - tic:0.4f} seconds")
-        print('TOTAL TOKENIZATION :', self.count_token + self.count_untoken)
-
+            #delay for Lexto+ API
+            time.sleep(0.5)
         return tokened_dict
-    
-# Read file from database
-    def LextoPlusTokenization(self, api_key, url, keyword, date_list):
 
-        print('Start Tokenization')
-        #start the timer
-        tic = time.perf_counter()
+    def TokenizationByTime(self, tokened_raw):
 
+        #each element in tokened_raw is added normalize already
         tokened_dict = {}
-        #database iteration
 
-        cursor = self.PullTweets(keyword)
-        #check the operation
-        if date_list == ['keyword']:
-            #perform tokenization by keyword
-            tokened_dict = self.TokenizationByKeyword(api_key, url, cursor)
-        
-        #elif date_list == []:
-        #     #check tweets database
-        #     #sentiment
-        #     print('extract') 
-        else:
+        #iterate data in tokened data
+        for id in tokened_raw:
+            
+            #add normalize configuration before tokenization
+            doc_dict = self.TokenizationPrepare({'text': tokened_raw[id][2]})  
+
+            #perform a tokenization
+            res = requests.get(config.LextoPlus_URL, headers={'Apikey':config.LextoPlus_API_key}, params=doc_dict)
+
+            try:
+                raw = res.json()
+
+                #filter data
+                filtered_raw = FilterData().FilteredFromLexto(raw)
+
+                #collect data
+                tokened_dict[id] = [id, tokened_raw[id][0], tokened_raw[id][1], filtered_raw]
+
+                #check if the data is tokenized by Lexto+
+                if tokened_dict[id] == []:
+                    print(tokened_dict[id])
+                    print(res.text)
+            
+            except Exception as e:
+                #collect data for insertion
+                tokened_dict[id] = ['error']
+                
+                #print the error on console
+                print('error:',e)
+                print(id, tokened_raw[id][0], tokened_raw[id][1], tokened_raw[id][2])
+            
+            #delay for Lexto+ API
+            time.sleep(0.5)
+        return tokened_dict
+
+    def Perform(self, keyword, date_list, tokenize_type):
+        tokened_dict = {}
+
+        #tokenization by time
+        if tokenize_type == 'time':
+            #create data list for stokenization
+            data_dict = self.PullTweetsByTime(keyword, date_list)
+
+            #no keyword match
+            if data_dict == None:
+                tokened_dict['transform'] = []
+                tokened_dict['extract'] = date_list
+                return tokened_dict
+
             #perform tokenization by time
-            tokened_dict = self.TokenizationByTime(api_key, url, cursor, date_list)
-        
-        #stop the timer
-        toc = time.perf_counter()
+            tokened_dict['transform'] = self.TokenizationByTime(data_dict['transform'])
+            tokened_dict['extract'] = data_dict['extract']
+        #tokenization by keyword
+        elif tokenize_type == 'keyword':
+            #create cursor
+            cursor = self.PullTweetsByKeyword(keyword)
 
-        #display total work time of this thread
-        print(f"RUN TIME : {toc - tic:0.4f} seconds")
-        print('TOTAL TOKENIZATION :', self.count_token + self.count_untoken)
-
+            #no keyword match
+            if cursor == None:
+                tokened_dict['transform'] = []
+                tokened_dict['extract'] = [keyword]
+                return tokened_dict
+            
+            #perform the tokenization by keyword
+            tokened_dict['transform'] = self.TokenizationByKeyword(cursor)
+            tokened_dict['extract'] = []
+        #invalid tokenization type
+        else:
+            return 'Invalid tokenization type'
         return tokened_dict
 
 #Clean Thai stopwords and English stopwords function
@@ -440,7 +448,18 @@ class Transform():
         
         print('TOTAL TWITTER INSERT TO DATABASE :',self.count_db)
 
-# if __name__ == '__main__':
+if __name__ == '__main__':
+    
+    tokenization = Tokenization()
+
+    # date_list = [datetime.datetime(2023, 1, 11).date(),
+    #          datetime.datetime(2023, 1, 12).date(),
+    #          datetime.datetime(2023, 1, 13).date(),
+    #          datetime.datetime(2023, 1, 15).date()]
+
+    # data_dict = tokenization.Tokenization(config.search_word, date_list, 'time')
+    data_dict = tokenization.Perform(config.search_word, [], 'keyword')
+    print(data_dict)
 
 #     tweet_dict = Tokenization().LextoPlusTokenization(
 #         config.LextoPlus_API_key,

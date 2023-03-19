@@ -102,43 +102,6 @@ class SentimentAnalysis():
     
         return converted_polar
 
-    #sentiment by date
-    def SentimentByTime(self, sentiment_dict):
-
-        #seperating id and data
-        sentiment_key = list(sentiment_dict.keys())
-        sentiment_data = list(sentiment_dict.values())
-
-        #cursor_list is filtered by keyword and date already
-        for i in range(len(sentiment_data)):
-            #sentiment with SSense
-            res = requests.get(config.SSense_URL, headers={'Apikey':config.LextoPlus_API_key}, params={'text':' '.join(sentiment_data[i][2])})
-
-            #catch the response from SSense
-            try:
-                #convert SSense reponse into Json format
-                raw = res.json()
-
-                #return alert from sentiment
-                if raw['alert'] != []:
-                    print('ALERT:',raw['alert'])
-                    sentiment_dict[sentiment_key[i]] = [raw['alert']]
-                    continue
-
-                #converting polar for calculation
-                polar = self.convert_polarity(raw['sentiment']['polarity'])
-                #intention analysis
-                conclusion = self.intention_analysis(raw['intention'])
-                #collect data for insertion
-                sentiment_dict[sentiment_key[i]] = [sentiment_key[i] ,sentiment_data[i][0], sentiment_data[i][1], raw['preprocess']['input'], raw['sentiment']['score'], polar, conclusion]
-            except:
-                #collect data for insertion
-                sentiment_dict[sentiment_key[i]] = ['error']
-                print('sentiment error :', sentiment_key[i], sentiment_data[i][0], sentiment_data[i][1])
-            #delay for SSense API
-            time.sleep(0.5)
-        return sentiment_dict
-
     #sentiment by keyword
     def SentimentByKeyword(self, cursor):
         sentiment_dict = {}
@@ -178,6 +141,46 @@ class SentimentAnalysis():
             time.sleep(0.5)
         return sentiment_dict
 
+    #sentiment by date
+    def SentimentByTime(self, sentiment_raw):
+        
+        sentiment_dict = {}
+
+        #seperating id and data
+        sentiment_key = list(sentiment_raw.keys())
+        sentiment_data = list(sentiment_raw.values())
+
+        #iterate data in sentiment data
+        for i in range(len(sentiment_data)):
+            #sentiment with SSense
+            res = requests.get(config.SSense_URL, headers={'Apikey':config.LextoPlus_API_key}, params={'text':' '.join(sentiment_data[i][2])})
+
+            #catch the response from SSense
+            try:
+                #convert SSense reponse into Json format
+                raw = res.json()
+
+                #return alert from sentiment
+                if raw['alert'] != []:
+                    print('ALERT:',raw['alert'])
+                    sentiment_dict[sentiment_key[i]] = [raw['alert']]
+                    continue
+
+                #converting polar for calculation
+                polar = self.convert_polarity(raw['sentiment']['polarity'])
+                #intention analysis
+                conclusion = self.intention_analysis(raw['intention'])
+                #collect data for insertion
+                sentiment_dict[sentiment_key[i]] = [sentiment_key[i] ,sentiment_data[i][0], sentiment_data[i][1], raw['preprocess']['input'], raw['sentiment']['score'], polar, conclusion]
+            except:
+                #collect data for insertion
+                sentiment_dict[sentiment_key[i]] = ['error']
+                print('sentiment error :', sentiment_key[i], sentiment_data[i][0], sentiment_data[i][1])
+            #delay for SSense API
+            time.sleep(0.5)
+        return sentiment_dict
+    
+    #perform the sentiment base-on sentiment_type
     def Perform(self, keyword, date_list, sentiment_type):
         sentiment_dict = {}
 

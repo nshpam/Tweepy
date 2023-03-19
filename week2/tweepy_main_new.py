@@ -396,6 +396,26 @@ class MainOperation():
         #check if transformed this keyword on this period
         #check if extract this keyword on this period
 
+    def TransformByKeyword(self, keyword):
+        db_action = self.db_action
+
+        #transform
+        tokenization = twitterDataProcessing.Tokenization()
+        data_dict = tokenization.Perform(keyword, [], 'keyword')
+        #collect transform data
+        transform_data = list(data_dict['transform'].values())
+
+        #keyword not match in transform database
+        if data_dict['transform'] == []:
+            return data_dict['extract']
+        
+        db_action.not_print_raw() #turn off printing database status
+
+        #insert data to sentiment database
+        #create collection
+        collection = db_action.tweetdb_object(config.mongo_client, config.database_name, config.collection_name_2)
+
+
     def TransformByTime(self, keyword, date_list):
         process_date = sorted(date_list) #sort date
         data_dict = {}
