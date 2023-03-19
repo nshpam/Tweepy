@@ -168,8 +168,6 @@ class MainOperation():
             #cp1 meet the start point, cp2 meet the end point
             if cp1 == start_d-interval or cp2 == end_d+interval:
                 break
-            print('cp1',cp1)
-            print('cp2',cp2)
             date_list.append(cp1)
             date_list.append(cp2)
             #check checkpoint 1
@@ -325,16 +323,24 @@ class MainOperation():
         #keyword not match in sentiment database
         if data_dict['sentiment'] == []:
             return data_dict['transform']
+        
+        db_action.not_print_raw() #turn off printing database status
 
         #insert data to sentiment database
         #create collection
         collection = db_action.tweetdb_object(config.mongo_client, config.database_name, config.collection_name_5)
+        
         #create data object
-        data_field = ['keyword', 'date', 'input', 'score', 'polar', 'conclusion']
+        data_field = ['id', 'keyword', 'date', 'input', 'score', 'polar', 'conclusion']
         for data in sentiment_data:
-            date_list = [data[0], datetime.datetime.combine(data[1], datetime.time.min), data[2], data[3], data[4], data[5]]
+            date_list = [data[0], data[1], datetime.datetime.combine(data[2], datetime.time.min), data[3], data[4], data[5], data[6]]
             query_object = db_action.tweetdb_create_object(data_field, date_list)
-            db_action.tweetdb_insert(config.collection_name_5, collection, query_object)
+            
+            #check duplicate data before insertion
+            check_query = db_action.tweetdb_create_object(["id"],[data[0]])
+            
+            if not self.IsMatch(collection, check_query):
+                db_action.tweetdb_insert(config.collection_name_5, collection, query_object)
         
         return data_dict['transform']
         
@@ -370,11 +376,17 @@ class MainOperation():
             #create collection
             collection = db_action.tweetdb_object(config.mongo_client, config.database_name, config.collection_name_5)
             #create data object
-            data_field = ['keyword', 'date', 'input', 'score', 'polar', 'conclusion']
+            data_field = ['id','keyword', 'date', 'input', 'score', 'polar', 'conclusion']
             for data in sentiment_data:
-                date_list = [data[0], datetime.datetime.combine(data[1], datetime.time.min), data[2], data[3], data[4], data[5]]
+                date_list = [data[0], data[1], datetime.datetime.combine(data[2], datetime.time.min), data[3], data[4], data[5], data[6]]
                 query_object = db_action.tweetdb_create_object(data_field, date_list)
-                db_action.tweetdb_insert(config.collection_name_5, collection, query_object)
+
+                #check duplicate data before insertion
+                check_query = db_action.tweetdb_create_object(["id"],[data[0]])
+                
+                if not self.IsMatch(collection, check_query):
+                    db_action.tweetdb_insert(config.collection_name_5, collection, query_object)
+
             return data_dict['transform']
         else:
             return 'Invalid response'
@@ -415,8 +427,8 @@ if __name__ == '__main__':
     # end_date = datetime.date(2023, 1, 15)
     end_date = datetime.date(2023, 1, 16)
     
-    transform = mainoperation.SentimentByKeyword(config.search_word)
+    # transform = mainoperation.SentimentByKeyword(config.search_word)
 
-    # transform = mainoperation.SentimentByTime(config.search_word, start_date, end_date)
+    transform = mainoperation.SentimentByTime(config.search_word, start_date, end_date)
     
     print('transform', transform)
