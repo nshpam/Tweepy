@@ -69,6 +69,8 @@ class MainWindow(QMainWindow):
         self.ui.pushButton_iconsentiment.clicked.connect(lambda: self.ui.stackedWidget.setCurrentIndex(0))
         # Click the navigation icon to go to the Home page.
         self.ui.pushButton_iconrankings.clicked.connect(lambda: self.ui.stackedWidget.setCurrentIndex(2))
+        # when click extract botton will show input user in terminal
+        self.ui.pushButton_extract_2.clicked.connect(lambda: self.print_search_params())
         
         self.ui.pushButton_4.clicked.connect(lambda: self.ui.stackedWidget_2.setCurrentIndex(0))
         self.ui.pushButton_5.clicked.connect(lambda: self.ui.stackedWidget_2.setCurrentIndex(1))
@@ -87,10 +89,6 @@ class MainWindow(QMainWindow):
         
         # display a drop-down list containing the three items: "Popular", "Recent", and "Mixed"
         self.ui.comboBox_searchtype.addItems(["Popular","Recent","Mixed"])
-        # connect the search button with the search_twitter function
-        self.ui.comboBox_searchtype.currentIndexChanged.connect(self.search_twitter)
-        
-        
         # Add chart view to QFrame (Overview of hashtags)
         self.create_pie_chart()
         self.ui.frame_21.layout().addWidget(self.chart_view)
@@ -278,9 +276,6 @@ class MainWindow(QMainWindow):
         api = tweepy.API(auth)
         # create an instance of PullTwitterData
         self.twitter_data = PullTwitterData()
-        # # call the search_twitter function from the PullTwitterData object
-        # result_text = self.twitter_data.search_twitter(api, search_word, search_type, num_tweet)
-       
         # set the maximum value for the progress bar
         self.ui.progressBar.setMaximum(num_tweet)
 
@@ -294,6 +289,17 @@ class MainWindow(QMainWindow):
         self.timer.timeout.connect(self.update_progress)
         self.timer.start(100)
         
+        # connect the cancel button to the slot function
+        self.ui.pushButton_2.clicked.connect(self.cancel_search)
+        
+    def cancel_search(self):
+        # stop the timer
+        self.timer.stop()
+        # stop the thread
+        self.thread.terminate()
+        # switch to the home page
+        self.ui.stackedWidget.setCurrentIndex(4)
+        
     def update_progress(self):
         # update the progress bar value based on the current progress of the search thread
         progress = self.ui.progressBar.value()
@@ -304,10 +310,23 @@ class MainWindow(QMainWindow):
     def on_search_finished(self):
         # switch to the new page
         self.ui.stackedWidget.setCurrentIndex(0)
-
         
-    # def do_search(self):
-    
+    def print_search_params(self):
+        # get the search keyword from the input textbox
+        search_word = self.ui.lineEdit_keyword.text()
+
+        # get the selected search type from the combo box
+        search_type = self.ui.comboBox_searchtype.currentText()
+
+        # get the selected search limit from the spin box
+        num_tweet = self.ui.spinBox_searchlimit.value()
+
+        # print the search parameters to the terminal
+        print("Search Word:", search_word)
+        print("Search Type:", search_type)
+        print("Number of Tweets:", num_tweet)
+
+            
     def show_trends_word(self):
         # authenticate the Twitter API requests with the Twitter API keys and access tokens
         auth = tweepy.OAuth1UserHandler(
