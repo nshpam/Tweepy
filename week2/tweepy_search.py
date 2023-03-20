@@ -5,7 +5,6 @@ import database_action
 
 #import library
 import tweepy     #use for twitter scrapping
-# import pymongo    #use for connecting to mongodb
 from dateutil import tz #use for timezone converting
 import datetime   #use for timezone converting
 from twitterDataProcessing import *
