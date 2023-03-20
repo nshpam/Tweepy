@@ -22,6 +22,30 @@ from twitterDataRankings import *
 from pytagcloud import *
 import tempfile
 
+class SearchThread(QThread):
+    progress_changed = pyqtSignal(int)
+    finished = pyqtSignal(object)
+
+    def __init__(self, api, search_word, search_type, num_tweet, parent=None):
+        super().__init__(parent)
+        self.api = api
+        self.search_word = search_word
+        self.search_type = search_type
+        self.num_tweet = num_tweet
+
+    def run(self):
+        twitter_data = PullTwitterData()
+        tweets = []
+        total_tweets = self.num_tweet
+        progress = 0
+        for i, tweet in enumerate(twitter_data.search_twitter(self.api, self.search_word, self.search_type, self.num_tweet)):
+            tweets.append(tweet)
+            i += 1
+            if i % 10 == 0 or total_tweets >= 10 or total_tweets <= 10:
+                progress = int(i / total_tweets * 100)
+                self.progress_changed.emit(progress)
+        self.progress_changed.emit(100)
+        self.finished.emit(tweets)
 class MainWindow(QMainWindow):
     def __init__(self):
         QMainWindow.__init__(self)
@@ -48,13 +72,14 @@ class MainWindow(QMainWindow):
         
         self.ui.pushButton_4.clicked.connect(lambda: self.ui.stackedWidget_2.setCurrentIndex(0))
         self.ui.pushButton_5.clicked.connect(lambda: self.ui.stackedWidget_2.setCurrentIndex(1))
-        
+        # Click botton to scrap tweets.
+        self.ui.pushButton_extract_2.clicked.connect(lambda: self.search_twitter())
         # link the textChanged signal of the search lineEdit object to a function
         self.ui.lineEdit_search.textChanged.connect(self.auto_fill)
         # set the icon in the search bar located on the right side
         search_action = self.ui.lineEdit_search.addAction(QIcon("icon/magnifying-glass.png"),QLineEdit.ActionPosition.TrailingPosition)
-        # # connection between a search action and a function that will be executed when the action is triggered by the user.
-        # search_action.triggered.connect(self.do_search)
+        # connection between a search action and a function that will be executed when the action is triggered by the user.
+        search_action.triggered.connect(lambda: self.ui.stackedWidget.setCurrentIndex(4))
         
         # call the show_trends method to show in Listview
         self.show_trends_word()
@@ -232,6 +257,8 @@ class MainWindow(QMainWindow):
         self.ui.lineEdit_keyword.setText(text)
     
     def search_twitter(self):
+        # switch to the progress page
+        self.ui.stackedWidget.setCurrentIndex(1)
        
         # get the search keyword from the input textbox
         search_word = self.ui.lineEdit_keyword.text()
@@ -246,11 +273,33 @@ class MainWindow(QMainWindow):
         api = tweepy.API(auth)
         # create an instance of PullTwitterData
         self.twitter_data = PullTwitterData()
-        # call the search_twitter function from the PullTwitterData object
-        result_text = self.twitter_data.search_twitter(api, search_word, search_type, num_tweet)
+        # # call the search_twitter function from the PullTwitterData object
+        # result_text = self.twitter_data.search_twitter(api, search_word, search_type, num_tweet)
+       
+        # set the maximum value for the progress bar
+        self.ui.progressBar.setMaximum(num_tweet)
 
-        # print the result in the terminal
-        print(result_text)
+        # create a thread to run the search_twitter function
+        self.thread = SearchThread(api, search_word, search_type, num_tweet)
+        self.thread.progress_changed.connect(self.ui.progressBar.setValue)
+        self.thread.finished.connect(self.on_search_finished)
+        self.thread.start()
+        # create a QTimer to update the progress bar every 100ms
+        self.timer = QTimer()
+        self.timer.timeout.connect(self.update_progress)
+        self.timer.start(100)
+        
+    def update_progress(self):
+        # update the progress bar value based on the current progress of the search thread
+        progress = self.ui.progressBar.value()
+        if progress < 100:
+            progress += 1
+            self.ui.progressBar.setValue(progress)
+            
+    def on_search_finished(self):
+        # switch to the new page
+        self.ui.stackedWidget.setCurrentIndex(0)
+
         
     # def do_search(self):
     
