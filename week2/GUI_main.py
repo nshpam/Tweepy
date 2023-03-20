@@ -267,6 +267,11 @@ class MainWindow(QMainWindow):
         search_type = self.ui.comboBox_searchtype.currentText()
         # get the selected search limit from the spin box
         num_tweet = self.ui.spinBox_searchlimit.value()
+        
+        # set the text of the labels to the search parameters
+        self.ui.label_26.setText(search_word)
+        self.ui.label_28.setText(search_type)
+        self.ui.label_30.setText(str(num_tweet))
         # create an instance of the Twitter API
         auth = tweepy.OAuthHandler(config.consumer_key, config.consumer_secret)
         auth.set_access_token(config.access_token, config.access_token_secret)
