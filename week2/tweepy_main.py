@@ -1,4 +1,4 @@
-import tweepy_search
+import tweepy_extract
 import twitterDataSentiment
 import twitterDataProcessing
 #import twitterDataRankings
@@ -299,11 +299,11 @@ class MainOperation():
             data_dict = self.CreateTimelist(date_list, checkpoint, time_list, checkpoint[2], cur_process)
         return data_dict
 
-    def SentimentByKeyword(self, keyword):
+    def SentimentByKeyword(self, keyword, id_list):
         db_action = self.db_action
         #sentiment
         sentiment = twitterDataSentiment.SentimentAnalysis()
-        data_dict = sentiment.Perform(keyword, [], 'keyword')
+        data_dict = sentiment.Perform(keyword, [], 'keyword', id_list)
 
         #keyword not match in sentiment database
         if data_dict['sentiment'] == []:
@@ -385,12 +385,12 @@ class MainOperation():
         #check if transformed this keyword on this period
         #check if extract this keyword on this period
 
-    def TransformByKeyword(self, keyword):
+    def TransformByKeyword(self, keyword, id_list):
         db_action = self.db_action
 
         #tokenize
         tokenization = twitterDataProcessing.Tokenization()
-        tokenization_dict = tokenization.Perform(keyword, [], 'keyword')
+        tokenization_dict = tokenization.Perform(keyword, [], 'keyword', id_list)
 
         #keyword not match in transform database
         #don't clean and normalize
@@ -506,29 +506,238 @@ class MainOperation():
         else:
             return 'Invalid response'
 
-    #can only extract 7 days ago period
-    def ExtractByKeyword(self, keyword):
-        pass
+    def UpdateExtract(self, id, fav_count, retweet_count):
+        db_action = self.db_action
 
-    def ExtractByTime(self, keyword, date_list):
-        pass
+        data_field = ['favorite_count', 'retweet_count']
+        data_list = [fav_count, retweet_count]
+        query_object = db_action.tweetdb_create_object(data_field,data_list)
+        collection = db_action.tweetdb_object(config.mongo_client, config.database_name, config.collection_name)
+
+        db_action.tweetdb_update(config.collection_name, collection, id)
+
+    def RemoveTweetsURL(self, cursor):
+        all_data = []
+        filters = twitterDataProcessing.FilterData()
+
+        for doc in cursor:
+            raw_list = doc['text'].split()
+            clean_data = ''
+            for word in raw_list:
+                if not filters.FilterUrl(word):
+                    clean_data+=word
+            all_data.append(clean_data)
+        
+        return all_data
+
+    def IsContext(self, text):
+        db_action = self.db_action
+        collection = db_action.tweetdb_object(config.mongo_client, config.database_name, config.collection_name)
+        query_object = db_action.tweetdb_create_object(["text"],[1])
+        cursor = db_action.tweetdb_show_collection(config.collection_name, collection, query_object)
+
+        raw_list = text.split()
+        clean_data = ''
+        filters = twitterDataProcessing.FilterData()
+
+        for word in raw_list:
+            if not filters.FilterUrl(word):
+                clean_data += word
+        
+        if clean_data in self.RemoveTweetsURL(cursor):
+            return True
+        return False
+
+
+    #can only extract 7 days ago period
+    def Extract(self, keyword, settings):
+        db_action = self.db_action
+        db_action.not_print_raw()
+
+        #check if have data of this keyword
+        collection_1 = db_action.tweetdb_object(config.mongo_client, config.database_name, config.collection_name)
+
+        extract = tweepy_extract.ExtractTwitter()
+        #search the twitter
+        tweet_list = extract.SearchTwitter(keyword, settings)
+        #extract twitter
+        tweet_dict = extract.Perform(keyword, tweet_list)
+        #list the id from extraction
+        extract_id = list(tweet_dict.keys())
+        return_id = []
+
+        collection_2 = db_action.tweetdb_object(config.mongo_client, config.database_name, config.collection_name)
+        data_field = ['id', 'keyword', 'username', 'date', 'location', 'text', 'favorite_count', 'retweet_count']
+
+        for id in extract_id:
+            query_object_2 = db_action.tweetdb_create_object(["keyword","id"], [keyword,id])
+            
+            #if duplicate id then update
+            if self.IsMatch(collection_2, query_object_2):
+                self.UpdateExtract(id, tweet_dict[id]['favorite_count'], tweet_dict[id]['retweet_count'])
+
+            #if not duplicate context then insert data 
+            elif not self.IsContext(tweet_dict[id]['text']):
+                data_list = [id, keyword, tweet_dict[id]['username'], tweet_dict[id]['date'], tweet_dict[id]['location'], tweet_dict[id]['text'], tweet_dict[id]['favorite_count'], tweet_dict[id]['retweet_count']]
+                query_object_3 = db_action.tweetdb_create_object(data_field, data_list)
+                #insert data
+                db_action.tweetdb_insert(config.collection_name, collection_1, query_object_3)
+                return_id.append(id)
+        
+        # print('return_id:',return_id)
+
+        return return_id
+
+    def IsExist(self, keyword):
+        db_action = self.db_action
+        db_action.not_print_raw()
+
+        #sentiment database
+        collection_1 = db_action.tweetdb_object(config.mongo_client, config.database_name, config.collection_name_5)
+        #cleaned database
+        collection_2 = db_action.tweetdb_object(config.mongo_client, config.database_name, config.collection_name_2)
+        #tweets database
+        collection_3 = db_action.tweetdb_object(config.mongo_client, config.database_name, config.collection_name)
+        query_object = db_action.tweetdb_create_object(["keyword"], [keyword])
+
+        if not self.IsMatch(collection_1, query_object) and not self.IsMatch(collection_2, query_object) and not self.IsMatch(collection_3, query_object):
+            return False
+        return True
+
+    def IsValidDate(self, start_d, end_d):
+        today = datetime.date.today()
+        interval = datetime.timedelta(days=1)
+        time_delta = end_d-start_d
+        check_date = start_d
+
+        for i in range(time_delta.days+1):
+            if check_date.day > today.day:
+                return False
+            check_date+=interval
+        return True
+
+    def IsLast7Days(self, start_d, end_d):
+        last7days = datetime.date.today() - datetime.timedelta(days=7)
+        interval = datetime.timedelta(days=1)
+        time_delta = end_d-start_d
+        check_date = start_d
+        not_process = []
+        process = []
+        data_dict = {}
+
+        for i in range(time_delta.days+1):
+            if check_date.day < last7days.day:
+                not_process.append(check_date)
+                check_date += interval
+                continue
+            process.append(check_date)
+            check_date += interval
+
+        if process == []:
+            data_dict['no_extract'] = not_process
+            data_dict['start'] = None
+            data_dict['end'] = None
+        else:
+            data_dict['no_extract'] = not_process
+            data_dict['start'] = process[0]
+            data_dict['end'] = process[-1]
+
+        return data_dict
+            
+    def Perform(self, keyword, settings, extract_type):
+        #database function setup
+        db_action = self.db_action
+        db_action.not_print_raw()
+        start_d = settings['start_d']
+        end_d = settings['end_d']
+        data_dict = {}
+
+        #check keyword in every database
+        if type(keyword) != type(''):
+            return 'Invalid Keyword'
+        #check if the timeline is incorrect
+        elif not self.IsValidDate(start_d, end_d):
+            return 'Invalid Timeline'
+
+        #extract by time
+        if extract_type == 'time':
+
+            #if keyword not exist then scarp all data from last 7 days
+            if not self.IsExist(keyword):
+                #check if the timeline match
+                #filter the date
+                filter_date = self.IsLast7Days(start_d, end_d)
+                
+                #timeline can't be extract
+                if filter_date['start'] == None and filter_date['end'] == None:
+                    return 'Cannot extract'
+
+                not_process = filter_date['no_extract']
+                start_d = filter_date['start']
+                end_d = filter_date['end']
+
+                #extract
+                process_id = self.Extract(keyword, settings)
+                # print('process_id:', process_id)
+                #transfrom
+                tokened_dict = self.TransformByKeyword(keyword, process_id)
+                # print('transform_dict:', tokened_dict)
+                #sentiment
+                sentiment_dict = self.SentimentByKeyword(keyword, process_id)
+                # print('sentiment_dict:',sentiment_dict)
+
+                #date of data that can't be process
+                data_dict['no_process_date'] = not_process
+                #id of new data that has been sentiment
+                data_dict['process_id'] = process_id
+
+                return data_dict 
+            else:
+                #check where the data is
+                pass
+        elif extract_type == 'keyword':
+            #extract
+            process_id = self.Extract(keyword, settings)
+            print('process_id:', process_id)
+            #transfrom
+            tokened_dict = self.TransformByKeyword(keyword, process_id)
+            print('transform_dict:', tokened_dict)
+            #sentiment
+            sentiment_dict = self.SentimentByKeyword(keyword, process_id)
+            print('sentiment_dict:',sentiment_dict)
+        else:
+            return 'Invalid type'
 
 if __name__ == '__main__':
     mainoperation = MainOperation()
+    settings = {
+        'search_type' : config.search_type,
+        'num_tweet' : config.num_tweet,
+        'start_d' : datetime.date(2023, 1, 17),
+        'end_d': datetime.date(2023, 1, 20)
+    }
 
-    start_date = datetime.date(2023, 1, 14) #y m d
-    end_date = datetime.date(2023, 1, 16)
+    print(mainoperation.Perform(config.search_word, settings, 'time'))
 
-    date_list = [datetime.datetime(2023, 1, 14).date(),
-             datetime.datetime(2023, 1, 15).date(),
-             datetime.datetime(2023, 1, 17).date()]
+    # new_date = mainoperation.IsLast7Days(settings['start_d'], settings['end_d'])
+    # check_date = mainoperation.IsValidDate(settings['start_d'], settings['end_d'])
+    # print(check_date)
+    # print(mainoperation.Extract(config.search_word, settings))
+    # print(mainoperation.IsExist('#รีวิวหนัง'))
+
+    # start_date = datetime.date(2023, 1, 14) #y m d
+    # end_date = datetime.date(2023, 1, 16)
+
+    # date_list = [datetime.datetime(2023, 1, 14).date(),
+    #          datetime.datetime(2023, 1, 15).date(),
+    #          datetime.datetime(2023, 1, 17).date()]
     
-    # transform = mainoperation.SentimentByKeyword(config.search_word)
-    transform = mainoperation.SentimentByTime(config.search_word, start_date, end_date)
+    # # transform = mainoperation.SentimentByKeyword(config.search_word)
+    # transform = mainoperation.SentimentByTime(config.search_word, start_date, end_date)
     
-    print('transform', transform)
+    # print('transform', transform)
 
-    # extract = mainoperation.TransformByKeyword(config.search_word)
-    extract = mainoperation.TransformByTime(config.search_word, transform)
+    # # extract = mainoperation.TransformByKeyword(config.search_word)
+    # extract = mainoperation.TransformByTime(config.search_word, transform)
 
-    print('extract', extract)
+    # print('extract', extract)

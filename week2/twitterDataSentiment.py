@@ -103,11 +103,13 @@ class SentimentAnalysis():
         return converted_polar
 
     #sentiment by keyword
-    def SentimentByKeyword(self, cursor):
+    def SentimentByKeyword(self, cursor, id_list):
         sentiment_dict = {}
 
         #iterate all data in cursor
         for doc in cursor:
+            if doc['id'] not in id_list:
+                continue
             #perform a sentiment
             res = requests.get(config.SSense_URL, headers={'Apikey':config.LextoPlus_API_key}, params={'text':' '.join(doc['text'])})
             
@@ -181,16 +183,13 @@ class SentimentAnalysis():
         return sentiment_dict
     
     #perform the sentiment base-on sentiment_type
-    def Perform(self, keyword, date_list, sentiment_type):
+    def Perform(self, keyword, date_list, sentiment_type, id_list=[]):
         sentiment_dict = {}
 
         #sentiment by time
         if sentiment_type == 'time':
             #create data list for sentiment 
             data_dict = self.PullCleanByTime(keyword, date_list)
-
-            # print(data_dict)
-            # return
 
             #no keyword match
             if data_dict == None:
@@ -214,7 +213,7 @@ class SentimentAnalysis():
                 sentiment_dict['transform'] = [keyword]
                 return sentiment_dict
             #perform the sentiment by keyword and return sentiment dict
-            sentiment_dict['sentiment'] = self.SentimentByKeyword(cursor)
+            sentiment_dict['sentiment'] = self.SentimentByKeyword(cursor, id_list)
             sentiment_dict['transform'] = []
                 
         #invalid sentiment type

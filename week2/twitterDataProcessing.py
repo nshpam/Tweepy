@@ -222,12 +222,14 @@ class Tokenization():
         
         return doc_dict
 
-    def TokenizationByKeyword(self, cursor):
+    def TokenizationByKeyword(self, cursor, id_list):
 
         tokened_dict = {}
 
         #iterate all data in cursor
         for doc in cursor:
+            if doc['id'] not in id_list:
+                continue
             #prepare data dict before tokenization
             doc_dict = self.TokenizationPrepare(doc)
 
@@ -300,12 +302,12 @@ class Tokenization():
             time.sleep(0.5)
         return tokened_dict
 
-    def Perform(self, keyword, date_list, tokenize_type):
+    def Perform(self, keyword, date_list=[], tokenize_type='', id_list=[]):
         tokened_dict = {}
 
         #tokenization by time
         if tokenize_type == 'time':
-            #create data list for stokenization
+            #create data list for tokenization
             data_dict = self.PullTweetsByTime(keyword, date_list)
 
             #no keyword match
@@ -329,7 +331,7 @@ class Tokenization():
                 return tokened_dict
             
             #perform the tokenization by keyword
-            tokened_dict['transform'] = self.TokenizationByKeyword(cursor)
+            tokened_dict['transform'] = self.TokenizationByKeyword(cursor, id_list)
             tokened_dict['extract'] = []
         #invalid tokenization type
         else:
