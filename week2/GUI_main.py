@@ -11,7 +11,6 @@ import plotly.graph_objs as go
 import plotly.offline as po
 import pandas as pd
 import plotly
-import folium
 
 import plotly.express as px
 from ui_gui import Ui_MainWindow
@@ -94,16 +93,16 @@ class MainWindow(QMainWindow):
         self.ui.frame_21.layout().addWidget(self.chart_view)
         
         # Add world cloud to QFrame 
-        self.create_word_cloud()
-        self.ui.frame_24.layout().addWidget(self.wordcloud_label)
+        # self.create_word_cloud()
+        # self.ui.frame_24.layout().addWidget(self.wordcloud_label)
         
         # Add world cloud to QFrame (Ranking Top 10 Words)
-        self.create_bar_chart()
-        self.ui.frame_33.layout().addWidget(self.horizontalbar_chart_view)
+        # self.create_bar_chart()
+        # self.ui.frame_33.layout().addWidget(self.horizontalbar_chart_view)
         
         # Call spatial_chart method and add it to the layout
-        self.plot_spatial_chart()
-        self.ui.frame_23.layout().addWidget(self.spatial_chart_view)
+        # self.plot_spatial_chart()
+        # self.ui.frame_23.layout().addWidget(self.spatial_chart_view)
         
         # show window
         self.show()

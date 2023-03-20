@@ -109,9 +109,7 @@ class MainOperation():
         return remain_list
     
     def NextProcess(self, cur_process):
-        if cur_process == 'visualize':
-            next_process = 'sentiment'
-        elif cur_process == 'sentiment':
+        if cur_process == 'sentiment':
             next_process = 'transform'
         elif cur_process == 'transform':
             next_process = 'extract'
@@ -200,8 +198,8 @@ class MainOperation():
         
         #no keyword match
         if not self.IsMatch(collection, query_object_1):
-            data_dict[cur_process] = []
-            data_dict[self.NextProcess(cur_process)] = self.CreateDateList(start_d, end_d)
+            data_dict[cur_process] = self.CreateDateList(start_d, end_d)
+            data_dict[self.NextProcess(cur_process)] = []
             return data_dict
             
         #get all time in this keyword
@@ -229,24 +227,25 @@ class MainOperation():
     #either continuous timeline or discrete timeline
     #create the date that need to be process
     def CreateTimelist(self, date_list, checkpoint, time_list, even, cur_process):
+
         interval = 1
         time_delta = len(date_list)
         process_date = []
-        cp1 = checkpoint[0]
-        cp2 = checkpoint[1]
+        cp1 = int(checkpoint[0])
+        cp2 = int(checkpoint[1])
 
         data_dict = {}
 
         #odd number
         if not even:
-            cp = time_delta/2
+            cp = int(time_delta/2)
             #check the first checkpoint
             if date_list[cp] not in time_list:
-                process_date.append(cp)
+                process_date.append(date_list[cp])
 
         while True:
             #cp1 meet the start point, cp2 meet the end point
-            if date_list[cp1] == 0 or date_list[cp2] == time_delta-1:
+            if cp1 == -1 or cp2 == len(date_list):
                 break
             #check checkpoint 1
             if date_list[cp1] not in time_list:
@@ -271,7 +270,7 @@ class MainOperation():
         db_action.not_print_raw() #turn off status printing
 
         #select the collection
-        collection = db_action.tweetdb_object(db_action.tweetdb_object(config.mongo_client, config.database_name, collection_name))
+        collection = db_action.tweetdb_object(config.mongo_client, config.database_name, collection_name)
         query_object_1 = db_action.tweetdb_create_object(['keyword'],[keyword])
         cursor_1 = db_action.tweetdb_find(collection_name, collection, query_object_1)
         
@@ -355,19 +354,20 @@ class MainOperation():
         #check sentiment database
         #return only the date that need to be sentiment
         #always continuous timeline
-        sentiment_date = self.CheckDBTimeline(keyword, start_d, end_d, config.collection_name_5, 'visualize')
+        sentiment_date = self.CheckDBTimeline(keyword, start_d, end_d, config.collection_name_5, 'sentiment')
 
-        if sentiment_date['visualize'] != [] and sentiment_date['sentiment'] == []:
+        if sentiment_date['sentiment'] == [] and sentiment_date['transform'] == []:
             return 'show data visualization'
         #perform sentiment
         elif sentiment_date['sentiment'] != []:
             #sort the date
             process_date = sorted(sentiment_date['sentiment'])
-           
+
             #sentiment
             sentiment = twitterDataSentiment.SentimentAnalysis()
             data_dict = sentiment.Perform(keyword, process_date, 'time')
 
+            #keyword not match
             if data_dict['sentiment'] == []:
                 return data_dict['transform']
 
@@ -387,8 +387,8 @@ class MainOperation():
                 
                 if not self.IsMatch(collection, check_query):
                     db_action.tweetdb_insert(config.collection_name_5, collection, query_object)
-
-            return data_dict['transform']
+            
+            return data_dict['transform'] + sentiment_date['transform']
         else:
             return 'Invalid response'
 
@@ -400,12 +400,12 @@ class MainOperation():
     def TransformByKeyword(self, keyword):
         db_action = self.db_action
 
-        #transform
+        #tokenize
         tokenization = twitterDataProcessing.Tokenization()
         tokenization_dict = tokenization.Perform(keyword, [], 'keyword')
 
         #keyword not match in transform database
-        #no cleaning, normalize
+        #don't clean and normalize
         if tokenization_dict['transform'] == []:
             return tokenization_dict['extract']
         
@@ -445,7 +445,7 @@ class MainOperation():
                 # print('insert')
                 db_action.tweetdb_insert(config.collection_name_2, collection, query_object)
 
-            print(query_object)
+            # print(query_object)
 
         return data_dict['extract']
 
@@ -453,23 +453,78 @@ class MainOperation():
         process_date = sorted(date_list) #sort date
         data_dict = {}
         db_action = self.db_action
-        
+
+        #transform each date into day
+        check_date = []
+        for date in date_list:
+            check_date.append(date.day)
+
         #check timeline type
         #continuous timeline
-        if self.CheckConsecutive(date_list):
-            transform_date = self.CheckDBTimeline(keyword, date_list[0], date_list[-1], config.collection_name_2, 'sentiment')
+        if self.CheckConsecutive(check_date):
+            transform_date = self.CheckDBTimeline(keyword, date_list[0], date_list[-1], config.collection_name_2, 'transform')
         else:
-            transform_date = self.CheckDBTimelist(keyword, date_list, config.collection_name_2, 'sentiment')
-        
-        #keyword not match
-        if transform_date == None:
-            return 'keyword not match'
+            transform_date = self.CheckDBTimelist(keyword, date_list, config.collection_name_2, 'transform')
+
+        # print(transform_date)
+        # return
+
         #all data has been transformed ready to sentiment
-        elif transform_date['sentiment'] != []:
+        if transform_date['transform'] == [] and transform_date['extract'] == []:
             return 'sentiment'
+        #perform transformation
         elif transform_date['transform'] != []:
-            #transform
-            pass
+            #sort the date
+            process_date = sorted(transform_date['transform'])
+
+            #tokenization
+            tokenization = twitterDataProcessing.Tokenization()
+            tokenization_dict = tokenization.Perform(keyword, process_date, 'time')
+
+            #keyword not match in transform database
+            #don't clean and normalize
+            if tokenization_dict['transform'] == []:
+                return tokenization_dict['extract']
+            
+            #collect tokenize data
+            tokenize_data = list(tokenization_dict['transform'].values())
+
+            #perform normalization process
+            normalize = twitterDataProcessing.Normailize()
+            normalize_dict = normalize.Perform(tokenize_data)
+            
+            #collect normalize data
+            normalize_data = list(normalize_dict['transform'].values())
+
+            #perform cleaning process
+            cleaning = twitterDataProcessing.CleanThaiAndEng()
+            cleaned_dict = cleaning.Perform(normalize_data)
+
+            transform_data = list(cleaned_dict['transform'].values())
+            data_dict = cleaned_dict
+
+            
+
+            db_action.not_print_raw() #turn off printing database status
+
+            #insert data to sentiment database
+            #create collection
+            collection = db_action.tweetdb_object(config.mongo_client, config.database_name, config.collection_name_2)
+
+            #create data object
+            data_field = ['id', 'keyword', 'date', 'text']
+            for data in transform_data:
+                data_list = [data[0], data[1], datetime.datetime.combine(data[2], datetime.time.min), data[3]]
+                query_object = db_action.tweetdb_create_object(data_field, data_list)
+
+                #check duplicate data before insertion
+                check_query = db_action.tweetdb_create_object(["id"],[data[0]])
+
+                if not self.IsMatch(collection, check_query):
+                    db_action.tweetdb_insert(config.collection_name_2, collection, query_object)
+        
+            return tokenization_dict['extract'] + transform_date['extract']
+        #invalid response
         else:
             return 'Invalid response'
 
@@ -477,14 +532,19 @@ if __name__ == '__main__':
     mainoperation = MainOperation()
 
     start_date = datetime.date(2023, 1, 14) #y m d
-    # end_date = datetime.date(2023, 1, 15)
+    # # end_date = datetime.date(2023, 1, 15)
     end_date = datetime.date(2023, 1, 16)
+
+    date_list = [datetime.datetime(2023, 1, 14).date(),
+             datetime.datetime(2023, 1, 15).date(),
+             datetime.datetime(2023, 1, 17).date()]
     
-    transform = mainoperation.SentimentByKeyword(config.search_word)
-    # transform = mainoperation.SentimentByTime(config.search_word, start_date, end_date)
+    # transform = mainoperation.SentimentByKeyword(config.search_word)
+    transform = mainoperation.SentimentByTime(config.search_word, start_date, end_date)
     
     print('transform', transform)
 
-    extract = mainoperation.TransformByKeyword(config.search_word)
+    # extract = mainoperation.TransformByKeyword(config.search_word)
+    extract = mainoperation.TransformByTime(config.search_word, transform)
 
     print('extract', extract)

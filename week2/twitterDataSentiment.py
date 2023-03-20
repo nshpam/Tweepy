@@ -186,9 +186,11 @@ class SentimentAnalysis():
 
         #sentiment by time
         if sentiment_type == 'time':
-            #create cursor list for sentimenting by time
-            #which cursor list has been filter by keyword and date already 
+            #create data list for sentiment 
             data_dict = self.PullCleanByTime(keyword, date_list)
+
+            # print(data_dict)
+            # return
 
             #no keyword match
             if data_dict == None:
@@ -196,7 +198,7 @@ class SentimentAnalysis():
                 sentiment_dict['transform'] = date_list
                 return sentiment_dict
             
-            #perform the sentiment by time and return the sentiment dict
+            #perform the sentiment by time
             sentiment_dict['sentiment'] = self.SentimentByTime(data_dict['sentiment'])
             sentiment_dict['transform'] = data_dict['transform']
             

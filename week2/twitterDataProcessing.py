@@ -202,6 +202,7 @@ class Tokenization():
 
         #check which date should be extract
         for date in date_list:
+            # print(date, check_extract)
             if date not in check_extract:
                 extract_list.append(date)
         
@@ -345,14 +346,12 @@ class CleanThaiAndEng():
         data_dict = {}
         
         for data in data_list:
-            clean_list = []
             #clean thai word
-            sentence = self.CleanThaiStopword(data[3])
+            clean_list = self.CleanThaiStopword(data[3])
 
             #clean english word
-            sentence = self.CleanEnglishStopword(data[3])
+            clean_list = self.CleanEnglishStopword(data[3])
 
-            clean_list.append(sentence)
             #collect cleaned data
             data_dict[data[0]] = [data[0], data[1], data[2], clean_list]
         
@@ -424,7 +423,7 @@ class Normailize():
 
 if __name__ == '__main__':
     
-    tokenization = Tokenization()
+    # tokenization = Tokenization()
 
     # date_list = [datetime.datetime(2023, 1, 11).date(),
     #          datetime.datetime(2023, 1, 12).date(),
@@ -432,5 +431,15 @@ if __name__ == '__main__':
     #          datetime.datetime(2023, 1, 15).date()]
 
     # data_dict = tokenization.Tokenization(config.search_word, date_list, 'time')
-    data_dict = tokenization.Perform(config.search_word, [], 'keyword')
-    print(data_dict)
+    # data_dict = tokenization.Perform(config.search_word, [], 'keyword')
+    # print(data_dict)
+
+    data_list = [
+        [1612279399994523648, '#รีวิวหนัง',
+        datetime.datetime(2023, 1, 9, 9, 45), ['bad', 'batch', 'ของ', 'โคลนนิ่ง', 'ชั้นยอด', 'และ', 'ทดลอง', 'เดินทาง', 'ผ่าน', 'กา', 'แล', 'ค', 'ซี', 'ที่', 'เปลี่ยนแปลง', 
+'ตลอดเวลา', 'หลัง', 'สงคราม', 'โคลน', 'ดู', 'star', 'war', 'the', 'bad', 'batch']],
+        [1612263483839754240, '#รีวิวหนัง', 
+         datetime.datetime(2023, 1, 9, 8, 42), ['copenhagen', 'cowboy', 'ที่', 'เล่า', 'ถึง', 'มิ', 'วนา', 'ง', 'เอก', 'สาว', 'ผู้เดินทาง', 'ผ่าน', 'แดน', 'อาชญากรรม', 'กร', 'ใน', 'โค', 'เปน', 'เฮ', 'เกน']]
+    ]
+
+    CleanThaiAndEng().Perform(data_list)
