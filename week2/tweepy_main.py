@@ -162,7 +162,10 @@ class MainOperation():
                 process_date.append(cp)
             
         while True:
-            
+
+            # print('cp1:',cp1, time_list, cp1 not in time_list)
+            # print('cp2:',cp2, time_list, cp2 not in time_list)
+
             #cp1 meet the start point, cp2 meet the end point
             if cp1 == start_d-interval or cp2 == end_d+interval:
                 break
@@ -177,10 +180,11 @@ class MainOperation():
                 process_date.append(cp2)
             cp2+=interval
         
+        # print('process_date:',process_date)
+
         data_dict[cur_process] = self.CheckRemain(process_date, date_list)
         data_dict[self.NextProcess(cur_process)] = process_date
 
-        # print('date to sentiment(continuous)',process_date)
         return data_dict
 
     #continuous timeline
@@ -377,6 +381,8 @@ class MainOperation():
                     db_action.tweetdb_insert(config.collection_name_5, collection, query_object)
             
             return data_dict['transform'] + sentiment_date['transform']
+        elif sentiment_date['transform'] != []:
+            return sentiment_date['transform']
         else:
             return 'Invalid response'
 
@@ -392,6 +398,8 @@ class MainOperation():
         tokenization = twitterDataProcessing.Tokenization()
         tokenization_dict = tokenization.Perform(keyword, [], 'keyword', id_list)
 
+        print('tokenize_dict:', tokenization_dict)
+
         #keyword not match in transform database
         #don't clean and normalize
         if tokenization_dict['transform'] == []:
@@ -400,15 +408,20 @@ class MainOperation():
         #collect tokenize data
         tokenize_data = list(tokenization_dict['transform'].values())
         
-        #perform normalization process
+        #perform normaorlization process
         normalize = twitterDataProcessing.Normailize()
         normalize_dict = normalize.Perform(tokenize_data)
+
+        print('normalize_dict:', normalize_dict)
+
         #collect normalize data
         normalize_data = list(normalize_dict['transform'].values())
 
         #perform cleaning process
         cleaning = twitterDataProcessing.CleanThaiAndEng()
         cleaned_dict = cleaning.Perform(normalize_data)
+
+        print('cleaned_dict:', cleaned_dict)
 
         transform_data = list(cleaned_dict['transform'].values())
 
@@ -437,6 +450,7 @@ class MainOperation():
     def TransformByTime(self, keyword, date_list):
         process_date = sorted(date_list) #sort date
         db_action = self.db_action
+        data_dict = {}
 
         #transform each date into day
         check_date = []
@@ -465,7 +479,9 @@ class MainOperation():
             #keyword not match in transform database
             #don't clean and normalize
             if tokenization_dict['transform'] == []:
-                return tokenization_dict['extract']
+                data_dict['transform'] = []
+                data_dict['extract'] = tokenization_dict['extract']
+                return data_dict
             
             #collect tokenize data
             tokenize_data = list(tokenization_dict['transform'].values())
@@ -500,8 +516,11 @@ class MainOperation():
 
                 if not self.IsMatch(collection, check_query):
                     db_action.tweetdb_insert(config.collection_name_2, collection, query_object)
-        
+
             return tokenization_dict['extract'] + transform_date['extract']
+        #need to be extract
+        elif transform_date['extract'] != []:
+            return transform_date['extract']
         #invalid response
         else:
             return 'Invalid response'
@@ -514,7 +533,7 @@ class MainOperation():
         query_object = db_action.tweetdb_create_object(data_field,data_list)
         collection = db_action.tweetdb_object(config.mongo_client, config.database_name, config.collection_name)
 
-        db_action.tweetdb_update(config.collection_name, collection, id)
+        db_action.tweetdb_update(config.collection_name, collection, query_object, 'id', id)
 
     def RemoveTweetsURL(self, cursor):
         all_data = []
@@ -550,9 +569,11 @@ class MainOperation():
 
 
     #can only extract 7 days ago period
+    #search_extract
     def Extract(self, keyword, settings):
         db_action = self.db_action
         db_action.not_print_raw()
+        data_dict = {}
 
         #check if have data of this keyword
         collection_1 = db_action.tweetdb_object(config.mongo_client, config.database_name, config.collection_name)
@@ -583,10 +604,10 @@ class MainOperation():
                 #insert data
                 db_action.tweetdb_insert(config.collection_name, collection_1, query_object_3)
                 return_id.append(id)
-        
-        # print('return_id:',return_id)
 
-        return return_id
+        data_dict['result'] = return_id
+
+        return data_dict
 
     def IsExist(self, keyword):
         db_action = self.db_action
@@ -643,81 +664,107 @@ class MainOperation():
             data_dict['end'] = process[-1]
 
         return data_dict
-            
-    def Perform(self, keyword, settings, extract_type):
-        #database function setup
-        db_action = self.db_action
-        db_action.not_print_raw()
-        start_d = settings['start_d']
-        end_d = settings['end_d']
-        data_dict = {}
 
-        #check keyword in every database
-        if type(keyword) != type(''):
-            return 'Invalid Keyword'
-        #check if the timeline is incorrect
-        elif not self.IsValidDate(start_d, end_d):
-            return 'Invalid Timeline'
+    # def Perform(self, keyword, settings, extract_type):
+    #     #database function setup
+    #     db_action = self.db_action
+    #     db_action.not_print_raw()
+    #     start_d = settings['start_d']
+    #     end_d = settings['end_d']
+    #     perform_dict = {}
+    #     temp_dict = {}
+    #     count = 0
 
-        #extract by time
-        if extract_type == 'time':
+    #     #check keyword in every database
+    #     if type(keyword) != type(''):
+    #         return 'Invalid Keyword'
+    #     #check if the timeline is incorrect
+    #     elif not self.IsValidDate(start_d, end_d):
+    #         return 'Invalid Timeline'
 
-            #if keyword not exist then scarp all data from last 7 days
-            if not self.IsExist(keyword):
-                #check if the timeline match
-                #filter the date
-                filter_date = self.IsLast7Days(start_d, end_d)
+    #     #extract by time
+    #     if extract_type == 'time':
+
+    #         #if keyword not exist then scarp all data from last 7 days
+    #         if not self.IsExist(keyword):
+    #             #check if the timeline match
+    #             #filter the date
+    #             filter_date = self.IsLast7Days(start_d, end_d)
                 
-                #timeline can't be extract
-                if filter_date['start'] == None and filter_date['end'] == None:
-                    return 'Cannot extract'
+    #             #timeline can't be extract
+    #             if filter_date['start'] == None and filter_date['end'] == None:
+    #                 return 'Cannot extract'
 
-                not_process = filter_date['no_extract']
-                start_d = filter_date['start']
-                end_d = filter_date['end']
+    #             not_process = filter_date['no_extract']
+    #             start_d = filter_date['start']
+    #             end_d = filter_date['end']
 
-                #extract
-                process_id = self.Extract(keyword, settings)
-                # print('process_id:', process_id)
-                #transfrom
-                tokened_dict = self.TransformByKeyword(keyword, process_id)
-                # print('transform_dict:', tokened_dict)
-                #sentiment
-                sentiment_dict = self.SentimentByKeyword(keyword, process_id)
-                # print('sentiment_dict:',sentiment_dict)
+    #             #extract
+    #             process_id = self.Extract(keyword, settings)
+    #             print('process_id:', process_id)
+    #             #transfrom
+    #             tokened_dict = self.TransformByKeyword(keyword, process_id)
+    #             print('transform_dict:', tokened_dict)
+    #             return
+    #             #sentiment
+    #             sentiment_dict = self.SentimentByKeyword(keyword, process_id)
+    #             print('sentiment_dict:',sentiment_dict)
 
-                #date of data that can't be process
-                data_dict['no_process_date'] = not_process
-                #id of new data that has been sentiment
-                data_dict['process_id'] = process_id
+    #             #date of data that can't be process
+    #             perform_dict['no_process_date'] = not_process
+    #             #id of new data that has been sentiment
+    #             perform_dict['process_id'] = process_id['result']
 
-                return data_dict 
-            else:
-                #check where the data is
-                pass
-        elif extract_type == 'keyword':
-            #extract
-            process_id = self.Extract(keyword, settings)
-            print('process_id:', process_id)
-            #transfrom
-            tokened_dict = self.TransformByKeyword(keyword, process_id)
-            print('transform_dict:', tokened_dict)
-            #sentiment
-            sentiment_dict = self.SentimentByKeyword(keyword, process_id)
-            print('sentiment_dict:',sentiment_dict)
-        else:
-            return 'Invalid type'
+    #             return perform_dict 
+    #         #keyword exists
+    #         else:
+    #             while True:
+    #                 count+=1
+    #                 print('-',count,'-')
+
+    #                 #perform sentiment
+    #                 perform_dict['transform'] = mainoperation.SentimentByTime(keyword, start_d, end_d)
+    #                 print('sentiment:', perform_dict)
+
+    #                 #perform transformation
+    #                 if perform_dict['transform'] != []:
+    #                     #transform every data that not in sentiment database
+    #                     perform_dict['extract'] = mainoperation.TransformByTime(keyword, sorted(perform_dict['transform']))
+    #                 print('transform:',perform_dict)
+
+    #                 #perform extraction
+    #                 if perform_dict['extract'] != []:
+    #                     perform_dict = mainoperation.Extract(keyword, settings)
+    #                     print('extract:', perform_dict)
+    #                     if perform_dict['result'] == []:
+    #                         return 'Finish'
+                        
+    #                 # if perform_dict['transform'] == [] and perform_dict['extract'] == []:
+    #                 #     return perform_dict['result']
+                
+    #     elif extract_type == 'keyword':
+    #         #extract
+    #         process_id = self.Extract(keyword, settings)
+    #         print('process_id:', process_id)
+    #         #transfrom
+    #         tokened_dict = self.TransformByKeyword(keyword, process_id)
+    #         print('transform_dict:', tokened_dict)
+    #         #sentiment
+    #         sentiment_dict = self.SentimentByKeyword(keyword, process_id)
+    #         print('sentiment_dict:',sentiment_dict)
+    #     else:
+    #         return 'Invalid type'
 
 if __name__ == '__main__':
     mainoperation = MainOperation()
     settings = {
         'search_type' : config.search_type,
         'num_tweet' : config.num_tweet,
-        'start_d' : datetime.date(2023, 1, 17),
-        'end_d': datetime.date(2023, 1, 20)
+        'start_d' : datetime.date(2023, 3, 17),
+        'end_d': datetime.date(2023, 3, 20)
     }
 
-    print(mainoperation.Perform(config.search_word, settings, 'time'))
+    print(mainoperation.Perform('#ยุบสภา', settings, 'time'))
 
     # new_date = mainoperation.IsLast7Days(settings['start_d'], settings['end_d'])
     # check_date = mainoperation.IsValidDate(settings['start_d'], settings['end_d'])
