@@ -4,89 +4,74 @@ import collections
 import cProfile
 
 db_action = database_action.DatabaseAction()
+#turn off printing database status
+db_action.not_print_raw() 
 
 class Ranking():
-
-    def __init__(self, activate_f=True, activate_s=True, activate_w=True):
-        self.activate_f = activate_f
-        self.activate_s = activate_s
-
-    def show_frequency(self):
-        self.activate_f = True
-        return self.activate_f
     
-    def hid_frequency(self):
-        self.activate_f = False
-        return self.activate_f
+    def IsMatch(self, collection, query_object):
+        #no keyword match
+        if collection.count_documents(query_object) == 0:
+            return False
+        #keyword match
+        return True
 
-    def show_sentiment(self):
-        self.activate_s = True
-        return self.activate_s
+    #pull data from cleaned database
+    def PullCleaned(self, keyword):
+        #create collection
+        collection = db_action.tweetdb_object(config.mongo_client, config.database_name, config.collection_name_2)
+        #create query object
+        query_object = db_action.tweetdb_create_object(['keyword'],[keyword])
+        cursor = db_action.tweetdb_find(config.collection_name_2, collection, query_object)
+
+        #check if have the keyword
+        if not self.IsMatch(collection, query_object):
+            return None
+        return cursor
     
-    def hid_sentiment(self):
-        self.activate_s = False
-        return self.activate_s
-    
-    def pull_word(self):
-        cursor = db_action.tweetdb_object(config.mongo_client, config.database_name, config.collection_name_2)
+    # def pull_sentiment(self):
+    #     cursor = db_action.tweetdb_object(config.mongo_client, config.database_name, config.collection_name_5)
+
+    #     data_field = ["_id", "input", "polarity"]
+    #     data_list = [0,1,1]
+
+    #     db_action.not_print_raw()
+
+    #     query_object = db_action.tweetdb_create_object(data_field, data_list)
+    #     show_cursor = db_action.tweetdb_show_collection(config.collection_name_5, cursor, query_object)
+    #     return show_cursor
+
+    # def sentiment_cal(self, rank_dict):
+    #     cursor = self.pull_sentiment()
+
+    #     top_words = list(rank_dict.values())
+
+    #     rank_index = list(rank_dict.keys())
         
-        data_field = ["_id"]
-        data_list = [0]
-        
-        db_action.not_print_raw()
+    #     input_list_text = []
+    #     input_list_polar = []
+    #     polarity = []
 
-        query_object = db_action.tweetdb_create_object(data_field, data_list)
-        show_cursor = db_action.tweetdb_show_collection(config.collection_name_2, cursor, query_object)
+    #     for doc in cursor:
+    #         input_list_text.append(doc['input'])
+    #         input_list_polar.append(doc['polarity']) 
 
-        return show_cursor
-    
-    def pull_sentiment(self):
-        cursor = db_action.tweetdb_object(config.mongo_client, config.database_name, config.collection_name_5)
+    #     print('{:<5}'.format('rank'),'{:<10}'.format('word'), '{:<10}'.format('sentiment'))
 
-        data_field = ["_id", "input", "polarity"]
-        data_list = [0,1,1]
+    #     for i in range(len(top_words)):
+    #         polarity = []
+    #         for j in range(len(input_list_text)):
+    #             if top_words[i] in input_list_text[j]:
+    #                 polarity.append(input_list_polar[j])
 
-        db_action.not_print_raw()
-
-        query_object = db_action.tweetdb_create_object(data_field, data_list)
-        show_cursor = db_action.tweetdb_show_collection(config.collection_name_5, cursor, query_object)
-        return show_cursor
-
-    def sentiment_cal(self, rank_dict):
-        cursor = self.pull_sentiment()
-
-        top_words = list(rank_dict.values())
-
-        rank_index = list(rank_dict.keys())
-        
-        input_list_text = []
-        input_list_polar = []
-        polarity = []
-
-        for doc in cursor:
-            input_list_text.append(doc['input'])
-            input_list_polar.append(doc['polarity']) 
-
-        # test = 'hbo go หนัง ซีรีส์ ทั่วโลก โหลด ดู ออฟ ไลน์ สอบถาม สั่งซื้อ dm line lhrzg หาร hbogo hbogo หาร hbogo ราคาถูก หาร hbo ราคาถูก รีวิว หนัง hbogo หาร hbogo ราคาถูก หาร hbogo hbogo'
-        # print('หนัง ' in test)
-
-        # print(top_words)
-        print('{:<5}'.format('rank'),'{:<10}'.format('word'), '{:<10}'.format('sentiment'))
-
-        for i in range(len(top_words)):
-            polarity = []
-            for j in range(len(input_list_text)):
-                if top_words[i] in input_list_text[j]:
-                    polarity.append(input_list_polar[j])
-
-            if sum(polarity) > 0:
-                sentiment = '+'
-            elif sum(polarity) < 0:
-                sentiment = '-'
-            elif sum(polarity) == 0:
-                sentiment = 'N'
+    #         if sum(polarity) > 0:
+    #             sentiment = '+'
+    #         elif sum(polarity) < 0:
+    #             sentiment = '-'
+    #         elif sum(polarity) == 0:
+    #             sentiment = 'N'
             
-            print('{:<5}'.format(rank_index[i]),'{:<10}'.format(top_words[i]) , '{:<10}'.format(sentiment))
+    #         print('{:<5}'.format(rank_index[i]),'{:<10}'.format(top_words[i]) , '{:<10}'.format(sentiment))
     
     def rank_word(self, rank_set, rank_key, rank_f):
 
@@ -111,10 +96,10 @@ class Ranking():
             top_f.append(temp2)
         return top_dict
         
-    def rank_list(self):
+    def rank_list(self, keyword):
 
         #pull word from tokenization database
-        cursor = self.pull_word()
+        cursor = self.PullCleaned(keyword)
         #turn off printing raw
         db_action.not_print_raw()
 
@@ -122,12 +107,7 @@ class Ranking():
 
         #append all the word from every tweet into total_list
         for doc in cursor:
-            # print(list(doc.values())[3])
-            
-            total_list+= list(doc.values())[3]
-
-        # print(total_list)
-        # return
+            total_list+= list(doc['text'])
         
         #counting the frequency of elements
         rank_dict = dict(collections.Counter(total_list))
@@ -155,4 +135,6 @@ if __name__ == '__main__':
 
     # cProfile.run('Ranking().rank_list()')
     # Ranking().rank_list()
-    top_words, top_frequencies = Ranking().rank_list()
+    top_words, top_frequencies = Ranking().rank_list(config.search_word)
+
+    print(top_words, top_frequencies)
