@@ -19,23 +19,8 @@ class MainOperation():
         self.start_date = start_date
         self.end_date = end_date
         self.db_action = db_action
-
-        self.keyword = config.search_word
-        self.search_type = config.search_type
-        self.search_limit = config.num_tweet
-        # self.start_date = datetime.date(2022, 12, 30) #y m d
-        # self.end_date = datetime.date(2023, 1, 16)
         self.db_action = database_action.DatabaseAction()
-
-    #connect to tweepy
-    def ConnectTweepy(self):
-        
-        auth = tweepy.OAuth1UserHandler(
-            config.consumer_key, config.consumer_secret, config.access_token, config.access_token_secret
-            )
-        api = tweepy.API(auth)
-
-        return api
+    
 
     def CheckConsecutive(self, date_list):
         #return True if differences between consecutive numbers
@@ -665,95 +650,95 @@ class MainOperation():
 
         return data_dict
 
-    # def Perform(self, keyword, settings, extract_type):
-    #     #database function setup
-    #     db_action = self.db_action
-    #     db_action.not_print_raw()
-    #     start_d = settings['start_d']
-    #     end_d = settings['end_d']
-    #     perform_dict = {}
-    #     temp_dict = {}
-    #     count = 0
+    def Perform(self, keyword, settings, extract_type):
+        #database function setup
+        db_action = self.db_action
+        db_action.not_print_raw()
+        start_d = settings['start_d']
+        end_d = settings['end_d']
+        perform_dict = {}
+        temp_dict = {}
+        count = 0
 
-    #     #check keyword in every database
-    #     if type(keyword) != type(''):
-    #         return 'Invalid Keyword'
-    #     #check if the timeline is incorrect
-    #     elif not self.IsValidDate(start_d, end_d):
-    #         return 'Invalid Timeline'
+        #check keyword in every database
+        if type(keyword) != type(''):
+            return 'Invalid Keyword'
+        #check if the timeline is incorrect
+        elif not self.IsValidDate(start_d, end_d):
+            return 'Invalid Timeline'
 
-    #     #extract by time
-    #     if extract_type == 'time':
+        #extract by time
+        if extract_type == 'time':
 
-    #         #if keyword not exist then scarp all data from last 7 days
-    #         if not self.IsExist(keyword):
-    #             #check if the timeline match
-    #             #filter the date
-    #             filter_date = self.IsLast7Days(start_d, end_d)
+            #if keyword not exist then scarp all data from last 7 days
+            if not self.IsExist(keyword):
+                #check if the timeline match
+                #filter the date
+                filter_date = self.IsLast7Days(start_d, end_d)
                 
-    #             #timeline can't be extract
-    #             if filter_date['start'] == None and filter_date['end'] == None:
-    #                 return 'Cannot extract'
+                #timeline can't be extract
+                if filter_date['start'] == None and filter_date['end'] == None:
+                    return 'Cannot extract'
 
-    #             not_process = filter_date['no_extract']
-    #             start_d = filter_date['start']
-    #             end_d = filter_date['end']
+                not_process = filter_date['no_extract']
+                start_d = filter_date['start']
+                end_d = filter_date['end']
 
-    #             #extract
-    #             process_id = self.Extract(keyword, settings)
-    #             print('process_id:', process_id)
-    #             #transfrom
-    #             tokened_dict = self.TransformByKeyword(keyword, process_id)
-    #             print('transform_dict:', tokened_dict)
-    #             return
-    #             #sentiment
-    #             sentiment_dict = self.SentimentByKeyword(keyword, process_id)
-    #             print('sentiment_dict:',sentiment_dict)
+                #extract
+                process_id = self.Extract(keyword, settings)
+                print('process_id:', process_id)
+                #transfrom
+                tokened_dict = self.TransformByKeyword(keyword, process_id)
+                print('transform_dict:', tokened_dict)
+                return
+                #sentiment
+                sentiment_dict = self.SentimentByKeyword(keyword, process_id)
+                print('sentiment_dict:',sentiment_dict)
 
-    #             #date of data that can't be process
-    #             perform_dict['no_process_date'] = not_process
-    #             #id of new data that has been sentiment
-    #             perform_dict['process_id'] = process_id['result']
+                #date of data that can't be process
+                perform_dict['no_process_date'] = not_process
+                #id of new data that has been sentiment
+                perform_dict['process_id'] = process_id['result']
 
-    #             return perform_dict 
-    #         #keyword exists
-    #         else:
-    #             while True:
-    #                 count+=1
-    #                 print('-',count,'-')
+                return perform_dict 
+            #keyword exists
+            else:
+                while True:
+                    count+=1
+                    print('-',count,'-')
 
-    #                 #perform sentiment
-    #                 perform_dict['transform'] = mainoperation.SentimentByTime(keyword, start_d, end_d)
-    #                 print('sentiment:', perform_dict)
+                    #perform sentiment
+                    perform_dict['transform'] = mainoperation.SentimentByTime(keyword, start_d, end_d)
+                    print('sentiment:', perform_dict)
 
-    #                 #perform transformation
-    #                 if perform_dict['transform'] != []:
-    #                     #transform every data that not in sentiment database
-    #                     perform_dict['extract'] = mainoperation.TransformByTime(keyword, sorted(perform_dict['transform']))
-    #                 print('transform:',perform_dict)
+                    #perform transformation
+                    if perform_dict['transform'] != []:
+                        #transform every data that not in sentiment database
+                        perform_dict['extract'] = mainoperation.TransformByTime(keyword, sorted(perform_dict['transform']))
+                    print('transform:',perform_dict)
 
-    #                 #perform extraction
-    #                 if perform_dict['extract'] != []:
-    #                     perform_dict = mainoperation.Extract(keyword, settings)
-    #                     print('extract:', perform_dict)
-    #                     if perform_dict['result'] == []:
-    #                         return 'Finish'
+                    #perform extraction
+                    if perform_dict['extract'] != []:
+                        perform_dict = mainoperation.Extract(keyword, settings)
+                        print('extract:', perform_dict)
+                        if perform_dict['result'] == []:
+                            return 'Finish'
                         
-    #                 # if perform_dict['transform'] == [] and perform_dict['extract'] == []:
-    #                 #     return perform_dict['result']
+                    # if perform_dict['transform'] == [] and perform_dict['extract'] == []:
+                    #     return perform_dict['result']
                 
-    #     elif extract_type == 'keyword':
-    #         #extract
-    #         process_id = self.Extract(keyword, settings)
-    #         print('process_id:', process_id)
-    #         #transfrom
-    #         tokened_dict = self.TransformByKeyword(keyword, process_id)
-    #         print('transform_dict:', tokened_dict)
-    #         #sentiment
-    #         sentiment_dict = self.SentimentByKeyword(keyword, process_id)
-    #         print('sentiment_dict:',sentiment_dict)
-    #     else:
-    #         return 'Invalid type'
+        elif extract_type == 'keyword':
+            #extract
+            process_id = self.Extract(keyword, settings)
+            print('process_id:', process_id)
+            #transfrom
+            tokened_dict = self.TransformByKeyword(keyword, process_id)
+            print('transform_dict:', tokened_dict)
+            #sentiment
+            sentiment_dict = self.SentimentByKeyword(keyword, process_id)
+            print('sentiment_dict:',sentiment_dict)
+        else:
+            return 'Invalid type'
 
 if __name__ == '__main__':
     mainoperation = MainOperation()

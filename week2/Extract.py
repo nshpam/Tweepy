@@ -106,60 +106,6 @@ class ExtractTwitter():
             #collect data
             data_dict[tweet_id] = db_action.tweetdb_create_object(data_field, data_list)
         return data_dict
-    
-    # def IsMatch(self, collection, query_object):
-    #     #no keyword match
-    #     if collection.count_documents(query_object) == 0:
-    #         return False
-    #     #keyword match
-    #     return True
-
-    # def PullTweetsByKeyword(self, keyword):
-    #     db_action.not_print_raw() #turn off priting database status
-
-    #     #create collection
-    #     collection = db_action.tweetdb_object(config.mongo_client, config.database_name, config.collection_name)
-    #     #create query object
-    #     query_object = db_action.tweetdb_create_object(['keyword'], [keyword])
-    #     #query
-    #     cursor = db_action.tweetdb_find(config.collection_name, collection, query_object)
-
-    #     # check if have this id in this keyword
-    #     if not self.IsMatch(collection, query_object):
-    #         return None
-    #     return cursor
-
-    # def PullTweetsByID(self, cursor):
-    #     id_list = []
-    #     for doc in cursor:
-    #         id_list.append(doc['id'])
-        
-    #     return id_list
-
-    # #the id duplicate
-    # def IsDuplicateID(self, check_list, id):
-    #     if id in check_list:
-    #         return True
-    #     return False
-    
-    # def UpdateTweet(self, fav_count, retweet_count):
-    #     data_field = ['favorite_count', 'retweet_count']
-    #     data_list = [fav_count, retweet_count]
-    #     query_object = db_action.tweetdb_create_object(data_field, data_list)
-
-    # def DuplicateFilter(self, keyword, tweet_dict):
-    #     id_list = list(tweet_dict.keys())
-        
-    #     cursor = self.PullTweetsByKeyword(keyword)
-    #     check_list = self.PullTweetsByID(cursor)
-
-    #     for id in id_list:
-    #         #the id duplicate then update the data
-    #         if self.IsDuplicateID:
-    #             pass
-
-                
-
 
 if __name__ == '__main__':
     extract = ExtractTwitter()
