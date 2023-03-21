@@ -342,7 +342,7 @@ class MainOperation():
             
         #sentiment by keyword
         elif settings['mode'] == 'keyword':
-            
+
             #check if keyword exists in cleaned database
             #if keyword not match then extract
             if not self.IsMatch(collection, query_object):
@@ -370,23 +370,23 @@ class MainOperation():
 if __name__ == '__main__':
     mainoperation = MainOperation()
     # settings for sentiment by keyword
-    # settings = {
-    #     'search_type' : config.search_type,
-    #     'num_tweet' : config.num_tweet,
-    #     'start_d' : datetime.date(2023, 3, 15),
-    #     'end_d': datetime.date(2023, 3, 20),
-    #     'mode' : 'keyword'
-    # }
-
-    #settings for sentiment by time
     settings = {
         'search_type' : config.search_type,
         'num_tweet' : config.num_tweet,
         'start_d' : datetime.date(2023, 3, 15),
-        'end_d': datetime.date(2023, 3, 15),
-        'mode' : 'time'
+        'end_d': datetime.date(2023, 3, 20),
+        'mode' : 'keyword'
     }
-    keyword = '#สมัคร'
+
+    #settings for sentiment by time
+    # settings = {
+    #     'search_type' : config.search_type,
+    #     'num_tweet' : config.num_tweet,
+    #     'start_d' : datetime.date(2023, 3, 20),
+    #     'end_d': datetime.date(2023, 3, 21),
+    #     'mode' : 'time'
+    # }
+    keyword = config.search_word
 
     sentiment_dict = mainoperation.Perform(keyword, settings)
     print(sentiment_dict)

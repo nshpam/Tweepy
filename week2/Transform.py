@@ -192,6 +192,7 @@ class Tokenization():
         #iterate all data in cursor
         for doc in cursor:
             if doc['id'] not in id_list and by_id == True:
+                print('here')
                 continue
             #prepare data dict before tokenization
             doc_dict = self.TokenizationPrepare(doc)
