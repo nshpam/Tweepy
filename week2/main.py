@@ -3,7 +3,6 @@ import Sentiment
 import Transform
 import config
 import datetime
-import tweepy
 import database_action
 import numpy as np
 
@@ -156,57 +155,238 @@ class MainOperation():
 
         return True
         
+    def IsValidDate(self, start_d, end_d):
+        today = datetime.date.today()
+        interval = datetime.timedelta(days=1)
+        time_delta = end_d-start_d
+        check_date = start_d
 
+        for i in range(time_delta.days+1):
+            if check_date.day > today.day:
+                return False
+            check_date+=interval
+        return True
+    
+    def IsLast7Days(self, start_d, end_d):
+        last7days = datetime.date.today() - datetime.timedelta(days=7)
+        interval = datetime.timedelta(days=1)
+        time_delta = end_d-start_d
+        check_date = start_d
+
+        for i in range(time_delta.days+1):
+            if check_date.day < last7days.day:
+                return False
+            check_date+=interval
+        return True
+    
+    #create checkpoint based-on timeline
+    def SetContinuousCheckPoint(self, start_d, end_d):
+        #find how many days
+        time_delta = (end_d - start_d)+ datetime.timedelta(days=1)
+        
+        #even day
+        if time_delta.days %2 == 0:
+            interval = datetime.timedelta(days=int(time_delta.days/2)-1)
+            checkpoint = [start_d+interval, end_d-interval, True]
+            
+        #odd day
+        else:
+            interval = datetime.timedelta(days=int((time_delta.days-1)/2))
+            cp_interval = datetime.timedelta(days=1)
+            cp = end_d-interval
+            checkpoint = [cp-cp_interval, cp+cp_interval, False]
+
+        return checkpoint
+    
+    #always continuous timeline
+    #create the date that need to be process
+    def CreateTimeline(self, start_d, end_d, checkpoint, time_list, even):
+        interval = datetime.timedelta(days=1)
+        process_date = []
+        cp1 = checkpoint[0]
+        cp2 = checkpoint[1]
+        date_list = []
+        
+        print(start_d, end_d)
+
+        #odd number
+        if not even:
+            cp = checkpoint[0]+interval
+            date_list.append(cp)
+            #check the first checkpoint
+            if cp not in time_list :
+                process_date.append(cp)
+            
+        while True:
+            #cp1 meet the start point, cp2 meet the end point
+            if cp1 == start_d-interval or cp2 == end_d+interval:
+                break
+            date_list.append(cp1)
+            date_list.append(cp2)
+            #check checkpoint 1
+            if cp1 not in time_list:
+                process_date.append(cp1)
+            cp1 -= interval
+            #check checkpoint 2
+            if cp2 not in time_list:
+                process_date.append(cp2)
+            cp2+=interval
+
+        return process_date
 
     #sentiment by keyword
     def Perform(self, keyword, settings):
 
+        #cleaned database
+        collection = db_action.tweetdb_object(config.mongo_client, config.database_name, config.collection_name_2)
+        query_object = db_action.tweetdb_create_object(['keyword'],[keyword])
+
         #sentiment by time
         if settings['mode'] == 'time':
-            pass
+            start_d = settings['start_d']
+            end_d = settings['end_d']
+            
+            #check if the date valid
+            #if invalid date
+            if not self.IsValidDate(start_d, end_d):
+                return 'Invalid Timeline'
+            
+            #if valid date then check if keyword exists
+            #if keyword not exist
+            if not self.IsMatch(collection, query_object):
+                print('keyword not exist')
+                #check if the date in last 7 days
+                #if the date not in last 7 days period then return no data
+                if not self.IsLast7Days(start_d, end_d):
+                    return 'No data in this period'
+                #if the date is in last 7 days period
+                #extract
+                process_id = self.Extract(keyword, settings)
+                #transform
+                tf = self.TransformByKeyword(keyword, process_id, by_id=True)
+
+                #sentiment
+                sentiment = Sentiment.SentimentAnalysis()
+                sentiment_dict = sentiment.Perform(keyword)
+                if sentiment_dict == None:
+                    return 'No data in this period'
+                return sentiment_dict
+            #if keyword exist then check if have all data for every period
+            #pull all date in cleaned database
+            cursor = db_action.tweetdb_find(config.collection_name_2, collection, query_object)
+            time_list = self.GetAllTimeline(cursor)
+            
+            #one day search
+            #if it is one day search
+            if self.CheckOneDay(start_d, end_d):
+                
+                # this date is exist in cleaned database
+                if start_d in time_list:
+                    print('keyword exist + one day + date exist')
+                    #sentiment
+                    sentiment = Sentiment.SentimentAnalysis()
+                    sentiment_dict = sentiment.Perform(keyword)
+                    if sentiment_dict == None:
+                        return 'No data in this period'
+                    return sentiment_dict
+                print('keyword exist + one day + date not exist')
+                #this date is not exist in cleaned database
+                #check if the date in last 7 days
+                #if the date not in last 7 days period then return no data
+                if not self.IsLast7Days(start_d, end_d):
+                    return 'No data in this period'
+                #if the date is in last 7 days period
+                #extract
+                process_id = self.Extract(keyword, settings)
+                #transform
+                tf = self.TransformByKeyword(keyword, process_id, by_id=True)
+
+                #sentiment
+                sentiment = Sentiment.SentimentAnalysis()
+                sentiment_dict = sentiment.Perform(keyword)
+                if sentiment_dict == None:
+                    return 'No data in this period'
+                return sentiment_dict
+            #period day search
+            else:
+                #create a checkpoint
+                checkpoint = self.SetContinuousCheckPoint(start_d, end_d)
+                #contain the data that identify odd day / even day already
+                check_id = self.CreateTimeline(start_d, end_d, checkpoint, time_list, checkpoint[2])
+
+                #still have data that not been sentiment yet
+                if check_id != []:
+                    #check if the date in last 7 days
+                    #if the date not in last 7 days period then return no data
+                    if not self.IsLast7Days(start_d, end_d):
+                        return 'No data in this period'
+                    #if the date is in last 7 days period
+                    #extract
+                    process_id = self.Extract(keyword, settings)
+                    #transform
+                    tf = self.TransformByKeyword(keyword, process_id, by_id=True)
+                    
+                    #sentiment
+                    sentiment = Sentiment.SentimentAnalysis()
+                    sentiment_dict = sentiment.Perform(keyword)
+                    if sentiment_dict == None:
+                        return 'No data in this period'
+                    return sentiment_dict
+                #all data is in cleaned database
+                #sentiment
+                sentiment = Sentiment.SentimentAnalysis()
+                sentiment_dict = sentiment.Perform(keyword)
+                if sentiment_dict == None:
+                    return 'No data in this period'
+                return sentiment_dict
+            
         #sentiment by keyword
         elif settings['mode'] == 'keyword':
-            #cleaned database
-            collection = db_action.tweetdb_object(config.mongo_client, config.database_name, config.collection_name_2)
-            query_object = db_action.tweetdb_create_object(['keyword'],[keyword])
             
             #check if keyword exists in cleaned database
             #if keyword not match then extract
             if not self.IsMatch(collection, query_object):
-                #extract transform sentiment return data
                 #extract
                 process_id = self.Extract(keyword, settings)
-                # print('process_id:',process_id)
 
                 #transform
                 tf = self.TransformByKeyword(keyword, process_id, by_id=True)
 
-                if tf:
-                    #sentiment
-                    sentiment = Sentiment.SentimentAnalysis()
-                    sentiment_dict = sentiment.Perform(keyword)
-                    return sentiment_dict
+                #sentiment
+                sentiment = Sentiment.SentimentAnalysis()
+                sentiment_dict = sentiment.Perform(keyword)
+                if sentiment_dict == None:
+                    return 'No data in this period'
+                return sentiment_dict 
             #if keyword match then sentiment
             sentiment = Sentiment.SentimentAnalysis()
             sentiment_dict = sentiment.Perform(keyword)
             if sentiment_dict == None:
                 return 'No data in this period'
-            return sentiment_dict
-
-                
-            #if keyword match then transform
+            return sentiment_dict                
         else:
             return 'Invalid perform mode'
         
 if __name__ == '__main__':
     mainoperation = MainOperation()
+    # settings for sentiment by keyword
+    # settings = {
+    #     'search_type' : config.search_type,
+    #     'num_tweet' : config.num_tweet,
+    #     'start_d' : datetime.date(2023, 3, 15),
+    #     'end_d': datetime.date(2023, 3, 20),
+    #     'mode' : 'keyword'
+    # }
+
+    #settings for sentiment by time
     settings = {
         'search_type' : config.search_type,
         'num_tweet' : config.num_tweet,
-        'start_d' : datetime.date(2023, 3, 17),
-        'end_d': datetime.date(2023, 3, 20),
-        'mode' : 'keyword'
+        'start_d' : datetime.date(2023, 3, 15),
+        'end_d': datetime.date(2023, 3, 15),
+        'mode' : 'time'
     }
-    keyword = '#โยชิ'
+    keyword = '#สมัคร'
+
     sentiment_dict = mainoperation.Perform(keyword, settings)
     print(sentiment_dict)
