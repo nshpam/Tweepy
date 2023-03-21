@@ -147,7 +147,8 @@ class PullTwitterData(object):
          #get tweet location
          if tweet.place is not None:
             # tweet_location = tweet.place.full_name
-            tweet_location = tweet.place.bounding_box.coordinates[0][0]
+            tweet_location = tweet.place.bounding_box.coordinates[0][0].name
+            
          else:
             tweet_location = None
 

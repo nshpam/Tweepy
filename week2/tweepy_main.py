@@ -1,4 +1,4 @@
-import tweepy_extract
+import Extract
 import twitterDataSentiment
 import twitterDataProcessing
 #import twitterDataRankings
@@ -11,7 +11,7 @@ import numpy as np
 class MainOperation():
 
     #collect user interaction
-    def __init__(self, keyword='', search_type='', search_limit=0, start_date=None, end_date=None, db_action=None):
+    def __init__(self, settings, keyword='', search_type='', search_limit=0, start_date=None, end_date=None, db_action=None):
 
         self.keyword = keyword
         self.search_type = search_type
@@ -20,6 +20,7 @@ class MainOperation():
         self.end_date = end_date
         self.db_action = db_action
         self.db_action = database_action.DatabaseAction()
+        self.settings = settings
     
 
     def CheckConsecutive(self, date_list):
@@ -563,7 +564,7 @@ class MainOperation():
         #check if have data of this keyword
         collection_1 = db_action.tweetdb_object(config.mongo_client, config.database_name, config.collection_name)
 
-        extract = tweepy_extract.ExtractTwitter()
+        extract = Extract.ExtractTwitter()
         #search the twitter
         tweet_list = extract.SearchTwitter(keyword, settings)
         #extract twitter

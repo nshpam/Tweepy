@@ -207,6 +207,6 @@ if __name__ == '__main__':
         'end_d': datetime.date(2023, 3, 20),
         'mode' : 'keyword'
     }
-    keyword = config.search_word
+    keyword = '#โยชิ'
     sentiment_dict = mainoperation.Perform(keyword, settings)
     print(sentiment_dict)

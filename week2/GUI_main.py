@@ -16,7 +16,9 @@ import plotly.express as px
 from ui_gui import Ui_MainWindow
 
 from tweepy_search import *
+
 from twitterDataRankings import *
+from main import *
 
 from pytagcloud import *
 import tempfile
@@ -49,7 +51,7 @@ class SearchThread(QThread):
         
 #main class
 class MainWindow(QMainWindow):
-    def __init__(self):
+    def __init__(self, twitter_data={}):
         QMainWindow.__init__(self)
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
@@ -91,7 +93,7 @@ class MainWindow(QMainWindow):
         search_action = self.ui.lineEdit_search.addAction(QIcon("icon/magnifying-glass.png"),QLineEdit.ActionPosition.TrailingPosition)
         # connection between a search action and a function that will be executed when the action is triggered by the user.
         search_action.triggered.connect(lambda: self.ui.stackedWidget.setCurrentIndex(4))
-        
+        self.twitter_data = twitter_data
         # call the show_trends method to show in Listview
         self.show_trends_word()
         self.show_trends_hashtags()
@@ -99,14 +101,15 @@ class MainWindow(QMainWindow):
         # display a drop-down list containing the three items: "Popular", "Recent", and "Mixed"
         self.ui.comboBox_searchtype.addItems(["Popular","Recent","Mixed"])
         # Add chart view to QFrame (Overview of hashtags)
-        self.create_pie_chart()
-        self.ui.frame_21.layout().addWidget(self.chart_view)
+        
+        # self.create_pie_chart()
+        # self.ui.frame_21.layout().addWidget(self.chart_view)
         
         
         
         # Add world cloud to QFrame 
-        # self.create_word_cloud()
-        # self.ui.frame_24.layout().addWidget(self.wordcloud_label)
+        self.create_word_cloud()
+        self.ui.frame_24.layout().addWidget(self.wordcloud_label)
         
         # Add world cloud to QFrame (Ranking Top 10 Words)
         # self.create_bar_chart()
@@ -122,8 +125,21 @@ class MainWindow(QMainWindow):
             
     # for Overview of hashtags
     def create_pie_chart(self):
-        labels = ['Apple', 'Banana', 'Pear']
-        values = [80, 70, 50]
+        print(self.twitter_data)
+        data = self.twitter_data
+        labels = ['positive','negative','neutral']
+        positive = 0
+        negative = 0
+        neutral = 0
+        for i in data:
+            if data[i]['polar'] == 1:
+                positive += 1
+            elif data[i]['polar'] == -1:
+                negative += 1
+            else:
+                neutral += 1
+        values = [positive,negative,neutral]
+        print(values)
         
         # Define data and layout
         data = go.Pie(
@@ -183,61 +199,62 @@ class MainWindow(QMainWindow):
         self.wordcloud_label.setMinimumSize(1, 1)
         self.wordcloud_label.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
     
-    def create_bar_chart(self):
-        # Load the font file
-        font_id = QFontDatabase.addApplicationFont("FontsFree-Net-SFCompactDisplay-Regular.ttf")
-        # Get the family name of the loaded font
-        font_family = QFontDatabase.applicationFontFamilies(font_id)[0]
-        top_words, top_frequencies = Ranking().rank_list()
+#     def create_bar_chart(self):
+#         # Load the font file
+#         font_id = QFontDatabase.addApplicationFont("FontsFree-Net-SFCompactDisplay-Regular.ttf")
+#         # Get the family name of the loaded font
+#         font_family = QFontDatabase.applicationFontFamilies(font_id)[0]
+#         top_words, top_frequencies = Ranking().rank_list()
 
-        fig = go.Figure()
-        fig.add_trace(go.Bar(
-            x=top_frequencies[::-1],
-            y=top_words[::-1],
-            orientation='h'
-        ))
-        fig.update_layout(
-            title='Top {} Words'.format(len(top_words)),
-            xaxis_title='Frequency',
-            yaxis_title='Word',
-            font=dict(
-                family=font_family,
-                size=20,
-                color='black',
-            ),
-            title_font=dict(
-                family=font_family,
-                size=22,
-                color='black',
-        ))
+#         fig = go.Figure()
+#         fig.add_trace(go.Bar(
+#             x=top_frequencies[::-1],
+#             y=top_words[::-1],
+#             orientation='h'
+#         ))
+#         fig.update_layout(
+#             title='Top {} Words'.format(len(top_words)),
+#             xaxis_title='Frequency',
+#             yaxis_title='Word',
+#             font=dict(
+#                 family=font_family,
+#                 size=20,
+#                 color='black',
+#             ),
+#             title_font=dict(
+#                 family=font_family,
+#                 size=22,
+#                 color='black',
+#         ))
         
-        po.init_notebook_mode(connected=True)
-        plot_html = po.plot(fig, include_plotlyjs=False, output_type='div')
+#         po.init_notebook_mode(connected=True)
+#         plot_html = po.plot(fig, include_plotlyjs=False, output_type='div')
 
-        # Add Plotly library to HTML file
-        html = f"""
-        <html>
-        <head>
-            <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
-        </head>
-        <body>
-            {plot_html}
-        </body>
-        </html>
-        """
+#         # Add Plotly library to HTML file
+#         html = f"""
+#         <html>
+#         <head>
+#             <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+#         </head>
+#         <body>
+#             {plot_html}
+#         </body>
+#         </html>
+#         """
 
         
-        self.horizontalbar_chart_view = QWebEngineView()
-        self.horizontalbar_chart_view.setHtml(html)
-        self.horizontalbar_chart_view.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-    def plot_spatial_chart(self):
+#         self.horizontalbar_chart_view = QWebEngineView()
+#         self.horizontalbar_chart_view.setHtml(html)
+#         self.horizontalbar_chart_view.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+
+    def plot_spatial_chart(self, keyword):
         # Connect to the database and get the tweets with non-null locations
         collection = db_action.tweetdb_object(
             config.mongo_client,
             config.database_name,
             config.collection_name
         )
-        query = db_action.tweetdb_create_object(["location"], [{"$ne": None}])
+        query = db_action.tweetdb_create_object(["location", "keyword"], [{"$ne": None}, {"$eq": keyword}])
         cursor = db_action.tweetdb_find(config.collection_name, collection, query)
 
         # Create a dataframe from the cursor
@@ -246,15 +263,22 @@ class MainWindow(QMainWindow):
         # Extract the latitude and longitude values from the location array
         data_frame["longitude"] = data_frame["location"].apply(lambda x: x[0])
         data_frame["latitude"] = data_frame["location"].apply(lambda x: x[1])
-
+        data_frame["text"] = "@"+data_frame["username"] + "<br>" + data_frame["keyword"]
         # Plot the map
         fig = px.scatter_mapbox(
             data_frame,
             lat="latitude",
             lon="longitude",
-            zoom=3
+            zoom=8,
+            text=("text"),  
+            size_max=15,
+            center=dict(lat=13.75, lon=100.5) # set the map center to Thailand
         )
-        fig.update_layout(mapbox_style="open-street-map")
+        fig.update_layout(mapbox_style="carto-darkmatter",
+            font=dict(
+                family="sans-serif",
+                size=20
+            ))
         
         # create a QWebEngineView widget to display the HTML chart
         self.spatial_chart_view = QWebEngineView()
@@ -276,19 +300,33 @@ class MainWindow(QMainWindow):
         search_type = self.ui.comboBox_searchtype.currentText()
         # get the selected search limit from the spin box
         num_tweet = self.ui.spinBox_searchlimit.value()
-        
-        # set the text of the labels to the search parameters
-        self.ui.label_26.setText(search_word)
-        self.ui.label_28.setText(search_type)
-        self.ui.label_30.setText(str(num_tweet))
-        # create an instance of the Twitter API
-        auth = tweepy.OAuthHandler(config.consumer_key, config.consumer_secret)
-        auth.set_access_token(config.access_token, config.access_token_secret)
-        api = tweepy.API(auth)
+        # get the start and end date from the date pickers
+        start_d = self.ui.dateEdit.date().toPyDate()
+        end_d = self.ui.dateEdit_2.date().toPyDate()
         # create an instance of PullTwitterData
         self.twitter_data = PullTwitterData()
         # set the maximum value for the progress bar
         self.ui.progressBar.setMaximum(num_tweet)
+        # create the settings dictionary
+        settings = {
+            'search_type': search_type,
+            'num_tweet': num_tweet,
+            'start_d': start_d,
+            'end_d': end_d,
+            'mode': 'keyword'
+        }
+        # set the text of the labels to the search parameters
+        self.ui.label_26.setText(search_word)
+        self.ui.label_28.setText(search_type)
+        self.ui.label_30.setText(str(num_tweet))
+        
+        # create an instance of the Twitter API
+        auth = tweepy.OAuthHandler(config.consumer_key, config.consumer_secret)
+        auth.set_access_token(config.access_token, config.access_token_secret)
+        api = tweepy.API(auth)
+        
+        # create an instance of PullTwitterData
+        self.twitter_data = MainOperation().Perform(search_word,settings)
 
         # create a thread to run the search_twitter function
         self.thread = SearchThread(api, search_word, search_type, num_tweet)
@@ -302,6 +340,13 @@ class MainWindow(QMainWindow):
         
         # connect the cancel button to the slot function
         self.ui.pushButton_2.clicked.connect(self.cancel_search)
+        
+        self.create_pie_chart()
+        self.ui.frame_21.layout().addWidget(self.chart_view)
+        
+        self.plot_spatial_chart(search_word)
+        self.ui.frame_23.layout().addWidget(self.spatial_chart_view)
+        
         
     def cancel_search(self):
         # stop the timer
