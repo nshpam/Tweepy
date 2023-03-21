@@ -363,7 +363,8 @@ class MainOperation():
             sentiment_dict = sentiment.Perform(keyword)
             if sentiment_dict == None:
                 return 'No data in this period'
-            return sentiment_dict                
+            return sentiment_dict              
+             
         else:
             return 'Invalid perform mode'
         

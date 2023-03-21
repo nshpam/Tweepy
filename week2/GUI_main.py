@@ -11,8 +11,8 @@ import plotly.graph_objs as go
 import plotly.offline as po
 import pandas as pd
 import plotly
-
-
+import tweepy
+import Extract
 import plotly.express as px
 from ui_gui import Ui_MainWindow
 
@@ -27,19 +27,18 @@ class SearchThread(QThread):
     progress_changed = pyqtSignal(int)
     finished = pyqtSignal(object)
 
-    def __init__(self, api, search_word, search_type, num_tweet, parent=None):
+    def __init__(self, search_word,settings,num_tweet, parent=None):
         super().__init__(parent)
-        self.api = api
         self.search_word = search_word
-        self.search_type = search_type
+        self.settings = settings
         self.num_tweet = num_tweet
 
     def run(self):
-        twitter_data = PullTwitterData()
+        twitter_data = MainOperation()
         tweets = []
         total_tweets = self.num_tweet
         progress = 0
-        for i, tweet in enumerate(twitter_data.search_twitter(self.api, self.search_word, self.search_type, self.num_tweet)):
+        for i, tweet in enumerate(twitter_data.Perform(self.search_word,self.settings)):
             tweets.append(tweet)
             i += 1
             if i % 10 == 0 or total_tweets >= 10 or total_tweets <= 10:
@@ -198,61 +197,54 @@ class MainWindow(QMainWindow):
         self.wordcloud_label.setMinimumSize(1, 1)
         self.wordcloud_label.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
     
-    # def ranking_bar_chart(self):
-    #     collection = db_action.tweetdb_object(
-    #         config.mongo_client,
-    #         config.database_name,
-    #         config.collection_name_2
-    #     )
-    #     # Load the font file
-    #     font_id = QFontDatabase.addApplicationFont("FontsFree-Net-SFCompactDisplay-Regular.ttf")
-    #     # Get the family name of the loaded font
-    #     font_family = QFontDatabase.applicationFontFamilies(font_id)[0]
-    #     # Search for tweets with the keyword in the database
-    #     results = collection.find({"keyword": keyword})
-    #     tweets = [tweet["text"] for tweet in results]
-    #     top_words, top_frequencies = Ranking().rank_list(tweets)
+    def ranking_bar_chart(self,keyword):
+        # Load the font file
+        font_id = QFontDatabase.addApplicationFont("FontsFree-Net-SFCompactDisplay-Regular.ttf")
+        # Get the family name of the loaded font
+        font_family = QFontDatabase.applicationFontFamilies(font_id)[0]
+        # Search for tweets with the keyword in the database
+        top_words, top_frequencies = Ranking().rank_list(keyword)
 
-    #     fig = go.Figure()
-    #     fig.add_trace(go.Bar(
-    #         x=top_frequencies[::-1],
-    #         y=top_words[::-1],
-    #         orientation='h'
-    #     ))
-    #     fig.update_layout(
-    #         title='Top {} Words'.format(len(top_words)),
-    #         xaxis_title='Frequency',
-    #         yaxis_title='Word',
-    #         font=dict(
-    #             family=font_family,
-    #             size=20,
-    #             color='black',
-    #         ),
-    #         title_font=dict(
-    #             family=font_family,
-    #             size=22,
-    #             color='black',
-    #     ))
+        fig = go.Figure()
+        fig.add_trace(go.Bar(
+            x=top_frequencies[::-1],
+            y=top_words[::-1],
+            orientation='h'
+        ))
+        fig.update_layout(
+            title='Top {} Words'.format(len(top_words)),
+            xaxis_title='Frequency',
+            yaxis_title='Word',
+            font=dict(
+                family=font_family,
+                size=20,
+                color='black',
+            ),
+            title_font=dict(
+                family=font_family,
+                size=22,
+                color='black',
+        ))
         
-    #     po.init_notebook_mode(connected=True)
-    #     plot_html = po.plot(fig, include_plotlyjs=False, output_type='div')
+        po.init_notebook_mode(connected=True)
+        plot_html = po.plot(fig, include_plotlyjs=False, output_type='div')
 
-    #     # Add Plotly library to HTML file
-    #     html = f"""
-    #     <html>
-    #     <head>
-    #         <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
-    #     </head>
-    #     <body>
-    #         {plot_html}
-    #     </body>
-    #     </html>
-    #     """
+        # Add Plotly library to HTML file
+        html = f"""
+        <html>
+        <head>
+            <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+        </head>
+        <body>
+            {plot_html}
+        </body>
+        </html>
+        """
 
         
-    #     self.horizontalbar_chart_view = QWebEngineView()
-    #     self.horizontalbar_chart_view.setHtml(html)
-    #     self.horizontalbar_chart_view.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        self.horizontalbar_chart_view = QWebEngineView()
+        self.horizontalbar_chart_view.setHtml(html)
+        self.horizontalbar_chart_view.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
 
     def plot_spatial_chart(self, keyword):
         # Connect to the database and get the tweets with non-null locations
@@ -351,8 +343,12 @@ class MainWindow(QMainWindow):
         # get the start and end date from the date pickers
         start_d = self.ui.dateEdit.date().toPyDate()
         end_d = self.ui.dateEdit_2.date().toPyDate()
+        check = self.ui.checkBox.isChecked()
+        mode = 'time'
+        if check:
+            mode = 'keyword'
         # create an instance of PullTwitterData
-        self.twitter_data = PullTwitterData()
+        self.twitter_data = MainOperation()
         # set the maximum value for the progress bar
         self.ui.progressBar.setMaximum(num_tweet)
         # create the settings dictionary
@@ -361,7 +357,7 @@ class MainWindow(QMainWindow):
             'num_tweet': num_tweet,
             'start_d': start_d,
             'end_d': end_d,
-            'mode': 'keyword'
+            'mode': mode
         }
         # set the text of the labels to the search parameters
         self.ui.label_26.setText(search_word)
@@ -377,7 +373,7 @@ class MainWindow(QMainWindow):
         self.twitter_data = MainOperation().Perform(search_word,settings)
 
         # create a thread to run the search_twitter function
-        self.thread = SearchThread(api, search_word, search_type, num_tweet)
+        self.thread = SearchThread(search_word, settings, num_tweet)
         self.thread.progress_changed.connect(self.ui.progressBar.setValue)
         self.thread.finished.connect(self.on_search_finished)
         self.thread.start()
@@ -394,6 +390,9 @@ class MainWindow(QMainWindow):
         
         self.plot_spatial_chart(search_word)
         self.ui.frame_23.layout().addWidget(self.spatial_chart_view)
+        
+        self.ranking_bar_chart(search_word)
+        self.ui.frame_33.layout().addWidget(self.horizontalbar_chart_view)
         
         # # Add world cloud to QFrame (Ranking Top 10 Words)
         # self.ranking_bar_chart()
@@ -499,7 +498,7 @@ class MainWindow(QMainWindow):
         # make requests to the Twitter API
         api = tweepy.API(auth)
         # calls the pull_trends_hashtags method from the PullTwitterData class
-        trends_keyword = PullTwitterData().pull_trends(api, config.WOEid)
+        trends_keyword = Extract.ExtractTwitter().PullTrends(api, config.WOEid)
         trends_keyword = trends_keyword["words"]
         # Qt model used to display data in a QListView widget
         model = QStandardItemModel()
@@ -554,7 +553,7 @@ class MainWindow(QMainWindow):
         # make requests to the Twitter API
         api = tweepy.API(auth)
         # calls the pull_trends_hashtags method from the PullTwitterData class
-        trends_keyword = PullTwitterData().pull_trends(api, config.WOEid)
+        trends_keyword = Extract.ExtractTwitter().PullTrends(api, config.WOEid)
         trends_keyword = trends_keyword["hashtags"]
         # Qt model used to display data in a QListView widget
         model = QStandardItemModel()
