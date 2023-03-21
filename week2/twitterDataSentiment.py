@@ -3,7 +3,7 @@ import database_action
 import requests
 import time
 #for testing
-# import datetime
+import datetime
 
 #initialize database action function
 db_action = database_action.DatabaseAction()
@@ -222,7 +222,7 @@ class SentimentAnalysis():
         
         return sentiment_dict
 
-# if __name__ == '__main__':
+if __name__ == '__main__':
 
     #all sentiment (date_list = [])
     #no such a case date_list will only be the date that need to be process only
@@ -231,13 +231,13 @@ class SentimentAnalysis():
     #all not sentiment but all have in cleaned database [FINISH]
     #all not sentiment but some have in cleaned database [FINISH]
     #all not sentiment but none have in cleaned database [FINISH]
-    # date_list = [datetime.datetime(2023, 1, 15).date(),
-    #          datetime.datetime(2023, 1, 16).date(),
-    #          datetime.datetime(2023, 1, 17).date(),
-    #          datetime.datetime(2023, 1, 18).date()]
+    date_list = [datetime.datetime(2023, 1, 15).date(),
+             datetime.datetime(2023, 1, 16).date(),
+             datetime.datetime(2023, 1, 17).date(),
+             datetime.datetime(2023, 1, 18).date()]
 
-    # sentiment_dict = SentimentAnalysis().Perform(config.search_word, date_list, 'time')
-    # print('sentiment :', sentiment_dict['sentiment'])
+    sentiment_dict = SentimentAnalysis().Perform(config.search_word, date_list, 'time')
+    print('sentiment :', sentiment_dict['sentiment'])
     # print('extract :', sentiment_dict['extract'])
     
     

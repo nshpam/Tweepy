@@ -725,17 +725,17 @@ if __name__ == '__main__':
     # print(mainoperation.Extract(config.search_word, settings))
     # print(mainoperation.IsExist('#รีวิวหนัง'))
 
-    # start_date = datetime.date(2023, 1, 14) #y m d
-    # end_date = datetime.date(2023, 1, 16)
+    start_date = datetime.date(2023, 1, 14) #y m d
+    end_date = datetime.date(2023, 1, 16)
 
-    # date_list = [datetime.datetime(2023, 1, 14).date(),
-    #          datetime.datetime(2023, 1, 15).date(),
-    #          datetime.datetime(2023, 1, 17).date()]
+    date_list = [datetime.datetime(2023, 1, 14).date(),
+             datetime.datetime(2023, 1, 15).date(),
+             datetime.datetime(2023, 1, 17).date()]
     
-    # # transform = mainoperation.SentimentByKeyword(config.search_word)
-    # transform = mainoperation.SentimentByTime(config.search_word, start_date, end_date)
+    # transform = mainoperation.SentimentByKeyword(config.search_word)
+    transform = mainoperation.SentimentByTime(config.search_word, start_date, end_date)
     
-    # print('transform', transform)
+    print('transform', transform)
 
     # # extract = mainoperation.TransformByKeyword(config.search_word)
     # extract = mainoperation.TransformByTime(config.search_word, transform)

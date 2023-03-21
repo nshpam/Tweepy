@@ -60,19 +60,26 @@ class MainWindow(QMainWindow):
         self.ui.pushButton_sentimeny.clicked.connect(lambda: self.ui.stackedWidget.setCurrentIndex(0))
         # navigate to Rankings page
         self.ui.pushButton_rankings.clicked.connect(lambda: self.ui.stackedWidget.setCurrentIndex(2))
+        # navigate to library page
+        self.ui.pushButton_8.clicked.connect(lambda: self.ui.stackedWidget.setCurrentIndex(5))
         # Click the navigation icon to go to the Home page.
         self.ui.pushButton_iconhome.clicked.connect(lambda: self.ui.stackedWidget.setCurrentIndex(3))
         # Click the navigation icon to go to the Extract page.
         self.ui.pushButton_iconextract.clicked.connect(lambda: self.ui.stackedWidget.setCurrentIndex(4))
         # Click the navigation icon to go to the Sentiment page.
         self.ui.pushButton_iconsentiment.clicked.connect(lambda: self.ui.stackedWidget.setCurrentIndex(0))
-        # Click the navigation icon to go to the Home page.
+        # Click the navigation icon to go to the ranking page.
         self.ui.pushButton_iconrankings.clicked.connect(lambda: self.ui.stackedWidget.setCurrentIndex(2))
+        # Click the navigation icon to go to the library page.
+        self.ui.pushButton_9.clicked.connect(lambda: self.ui.stackedWidget.setCurrentIndex(5))
         # when click extract botton will show input user in terminal
         self.ui.pushButton_extract_2.clicked.connect(lambda: self.print_search_params())
         
         self.ui.pushButton_4.clicked.connect(lambda: self.ui.stackedWidget_2.setCurrentIndex(0))
         self.ui.pushButton_5.clicked.connect(lambda: self.ui.stackedWidget_2.setCurrentIndex(1))
+        
+        self.ui.pushButton_7.clicked.connect(lambda: self.ui.stackedWidget_3.setCurrentIndex(0))
+        self.ui.pushButton_6.clicked.connect(lambda: self.ui.stackedWidget_3.setCurrentIndex(1))
         # Click botton to scrap tweets.
         self.ui.pushButton_extract_2.clicked.connect(lambda: self.search_twitter())
         # link the textChanged signal of the search lineEdit object to a function
