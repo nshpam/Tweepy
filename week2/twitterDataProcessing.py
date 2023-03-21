@@ -326,10 +326,11 @@ class Tokenization():
 
             #no keyword match
             if cursor == None:
+                print('no keyword match')
                 tokened_dict['transform'] = []
                 tokened_dict['extract'] = [keyword]
                 return tokened_dict
-            
+            print('keyword match')
             #perform the tokenization by keyword
             tokened_dict['transform'] = self.TokenizationByKeyword(cursor, id_list)
             tokened_dict['extract'] = []
