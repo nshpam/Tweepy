@@ -21,6 +21,7 @@ from twitterDataRankings import *
 from pytagcloud import *
 import tempfile
 
+#class for progressbar
 class SearchThread(QThread):
     progress_changed = pyqtSignal(int)
     finished = pyqtSignal(object)
@@ -45,6 +46,8 @@ class SearchThread(QThread):
                 self.progress_changed.emit(progress)
         self.progress_changed.emit(100)
         self.finished.emit(tweets)
+        
+#main class
 class MainWindow(QMainWindow):
     def __init__(self):
         QMainWindow.__init__(self)
@@ -92,12 +95,14 @@ class MainWindow(QMainWindow):
         # call the show_trends method to show in Listview
         self.show_trends_word()
         self.show_trends_hashtags()
-        
+        self.show_keywords_database()
         # display a drop-down list containing the three items: "Popular", "Recent", and "Mixed"
         self.ui.comboBox_searchtype.addItems(["Popular","Recent","Mixed"])
         # Add chart view to QFrame (Overview of hashtags)
         self.create_pie_chart()
         self.ui.frame_21.layout().addWidget(self.chart_view)
+        
+        
         
         # Add world cloud to QFrame 
         # self.create_word_cloud()
@@ -114,7 +119,7 @@ class MainWindow(QMainWindow):
         # show window
         self.show()
         
-        
+            
     # for Overview of hashtags
     def create_pie_chart(self):
         labels = ['Apple', 'Banana', 'Pear']
@@ -331,6 +336,62 @@ class MainWindow(QMainWindow):
         print("Search Word:", search_word)
         print("Search Type:", search_type)
         print("Number of Tweets:", num_tweet)
+
+            
+        
+    def show_keywords_database(self):
+        # Connect to the database
+        collection = db_action.tweetdb_object(
+            config.mongo_client,
+            config.database_name,
+            config.collection_name
+        )
+
+        # Fetch the keywords from the database
+        keywords = collection.distinct('keyword')
+
+        # Qt model used to display data in a QListView widget
+        model_3 = QStandardItemModel()
+        model_5 = QStandardItemModel()
+
+        # create a custom font
+        # Load the font file
+        font_id = QFontDatabase.addApplicationFont("FontsFree-Net-SFCompactDisplay-Regular.ttf")
+        # Get the family name of the loaded font
+        font_family = QFontDatabase.applicationFontFamilies(font_id)[0]
+        # Create a QFont object using the loaded font
+        font = QFont(font_family)
+        font.setPointSize(14)
+        font.setBold(True)
+
+        # Add the keywords to the list models
+        count_3 = 0
+        count_5 = 0
+        for i, keyword in enumerate(keywords):
+            count = collection.count_documents({'keyword': keyword})
+            text = f"{keyword}\n"
+            if count > 0:
+                text += f"{count} tweets\n"
+            item = QStandardItem(text)
+            item.setFont(font)
+            if "#" in keyword:
+                count_3 += 1
+                item.setText(f"{count_3}. " + item.text())
+                model_3.appendRow(item)
+            else:
+                count_5 += 1
+                item.setText(f"{count_5}. " + item.text())
+                model_5.appendRow(item)
+
+        # set the font for the list view widgets
+        self.ui.listView_3.setFont(font)
+        self.ui.listView_5.setFont(font)
+
+        # display the list of trends in the widgets
+        self.ui.listView_3.setModel(model_3)
+        self.ui.listView_5.setModel(model_5)
+
+
 
             
     def show_trends_word(self):

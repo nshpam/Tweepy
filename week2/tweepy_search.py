@@ -212,8 +212,7 @@ class PullTwitterData(object):
       print(len(list(words_dict.values())))
       trends_dict["hashtags"]=hashtags_dict
       trends_dict["words"]=words_dict
-      return trends_dict
- 
+      return trends_dict    
 
 if __name__ == '__main__':
    
