@@ -105,9 +105,9 @@ class MainWindow(QMainWindow):
         
         
         
-        # Add world cloud to QFrame 
-        self.create_word_cloud()
-        self.ui.frame_24.layout().addWidget(self.wordcloud_label)
+        # # Add world cloud to QFrame 
+        # self.create_word_cloud()
+        # self.ui.frame_24.layout().addWidget(self.wordcloud_label)
         
         # # Add world cloud to QFrame (Ranking Top 10 Words)
         # self.create_bar_chart()
