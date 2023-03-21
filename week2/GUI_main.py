@@ -111,7 +111,7 @@ class MainWindow(QMainWindow):
         self.create_word_cloud()
         self.ui.frame_24.layout().addWidget(self.wordcloud_label)
         
-        # Add world cloud to QFrame (Ranking Top 10 Words)
+        # # Add world cloud to QFrame (Ranking Top 10 Words)
         # self.create_bar_chart()
         # self.ui.frame_33.layout().addWidget(self.horizontalbar_chart_view)
         
@@ -199,53 +199,61 @@ class MainWindow(QMainWindow):
         self.wordcloud_label.setMinimumSize(1, 1)
         self.wordcloud_label.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
     
-#     def create_bar_chart(self):
-#         # Load the font file
-#         font_id = QFontDatabase.addApplicationFont("FontsFree-Net-SFCompactDisplay-Regular.ttf")
-#         # Get the family name of the loaded font
-#         font_family = QFontDatabase.applicationFontFamilies(font_id)[0]
-#         top_words, top_frequencies = Ranking().rank_list()
+    # def ranking_bar_chart(self):
+    #     collection = db_action.tweetdb_object(
+    #         config.mongo_client,
+    #         config.database_name,
+    #         config.collection_name_2
+    #     )
+    #     # Load the font file
+    #     font_id = QFontDatabase.addApplicationFont("FontsFree-Net-SFCompactDisplay-Regular.ttf")
+    #     # Get the family name of the loaded font
+    #     font_family = QFontDatabase.applicationFontFamilies(font_id)[0]
+    #     # Search for tweets with the keyword in the database
+    #     results = collection.find({"keyword": keyword})
+    #     tweets = [tweet["text"] for tweet in results]
+    #     top_words, top_frequencies = Ranking().rank_list(tweets)
 
-#         fig = go.Figure()
-#         fig.add_trace(go.Bar(
-#             x=top_frequencies[::-1],
-#             y=top_words[::-1],
-#             orientation='h'
-#         ))
-#         fig.update_layout(
-#             title='Top {} Words'.format(len(top_words)),
-#             xaxis_title='Frequency',
-#             yaxis_title='Word',
-#             font=dict(
-#                 family=font_family,
-#                 size=20,
-#                 color='black',
-#             ),
-#             title_font=dict(
-#                 family=font_family,
-#                 size=22,
-#                 color='black',
-#         ))
+    #     fig = go.Figure()
+    #     fig.add_trace(go.Bar(
+    #         x=top_frequencies[::-1],
+    #         y=top_words[::-1],
+    #         orientation='h'
+    #     ))
+    #     fig.update_layout(
+    #         title='Top {} Words'.format(len(top_words)),
+    #         xaxis_title='Frequency',
+    #         yaxis_title='Word',
+    #         font=dict(
+    #             family=font_family,
+    #             size=20,
+    #             color='black',
+    #         ),
+    #         title_font=dict(
+    #             family=font_family,
+    #             size=22,
+    #             color='black',
+    #     ))
         
-#         po.init_notebook_mode(connected=True)
-#         plot_html = po.plot(fig, include_plotlyjs=False, output_type='div')
+    #     po.init_notebook_mode(connected=True)
+    #     plot_html = po.plot(fig, include_plotlyjs=False, output_type='div')
 
-#         # Add Plotly library to HTML file
-#         html = f"""
-#         <html>
-#         <head>
-#             <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
-#         </head>
-#         <body>
-#             {plot_html}
-#         </body>
-#         </html>
-#         """
+    #     # Add Plotly library to HTML file
+    #     html = f"""
+    #     <html>
+    #     <head>
+    #         <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    #     </head>
+    #     <body>
+    #         {plot_html}
+    #     </body>
+    #     </html>
+    #     """
 
         
-#         self.horizontalbar_chart_view = QWebEngineView()
-#         self.horizontalbar_chart_view.setHtml(html)
-#         self.horizontalbar_chart_view.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+    #     self.horizontalbar_chart_view = QWebEngineView()
+    #     self.horizontalbar_chart_view.setHtml(html)
+    #     self.horizontalbar_chart_view.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
 
     def plot_spatial_chart(self, keyword):
         # Connect to the database and get the tweets with non-null locations
@@ -260,25 +268,66 @@ class MainWindow(QMainWindow):
         # Create a dataframe from the cursor
         data_frame = pd.DataFrame(list(cursor))
 
-        # Extract the latitude and longitude values from the location array
-        data_frame["longitude"] = data_frame["location"].apply(lambda x: x[0])
-        data_frame["latitude"] = data_frame["location"].apply(lambda x: x[1])
-        data_frame["text"] = "@"+data_frame["username"] + "<br>" + data_frame["keyword"]
-        # Plot the map
-        fig = px.scatter_mapbox(
-            data_frame,
-            lat="latitude",
-            lon="longitude",
-            zoom=8,
-            text=("text"),  
-            size_max=15,
-            center=dict(lat=13.75, lon=100.5) # set the map center to Thailand
-        )
-        fig.update_layout(mapbox_style="carto-darkmatter",
-            font=dict(
-                family="sans-serif",
-                size=20
-            ))
+        # Check if there are any tweets with locations for the given keyword
+        if data_frame.empty:
+            # Create a spatial chart without plotting any positions
+            fig = px.scatter_mapbox(
+                zoom=8,
+                center=dict(lat=13.75, lon=100.5) # set the map center to Thailand
+            )
+        else:
+            # Extract the latitude and longitude values from the location array
+            data_frame["longitude"] = data_frame["location"].apply(lambda x: x[0])
+            data_frame["latitude"] = data_frame["location"].apply(lambda x: x[1])
+            data_frame["text"] = "@"+data_frame["username"] + "<br>" + data_frame["keyword"]
+            # Plot the map
+            fig = px.scatter_mapbox(
+                data_frame,
+                lat="latitude",
+                lon="longitude",
+                zoom=8,
+                text=("text"),  
+                size_max=15,
+                center=dict(lat=13.75, lon=100.5) # set the map center to Thailand
+            )
+            fig.update_layout(mapbox_style="carto-darkmatter",
+                font=dict(
+                    family="sans-serif",
+                    size=20
+                ))
+            
+            
+        # # Connect to the database and get the tweets with non-null locations
+        # collection = db_action.tweetdb_object(
+        #     config.mongo_client,
+        #     config.database_name,
+        #     config.collection_name
+        # )
+        # query = db_action.tweetdb_create_object(["location", "keyword"], [{"$ne": None}, {"$eq": keyword}])
+        # cursor = db_action.tweetdb_find(config.collection_name, collection, query)
+
+        # # Create a dataframe from the cursor
+        # data_frame = pd.DataFrame(list(cursor))
+
+        # # Extract the latitude and longitude values from the location array
+        # data_frame["longitude"] = data_frame["location"].apply(lambda x: x[0])
+        # data_frame["latitude"] = data_frame["location"].apply(lambda x: x[1])
+        # data_frame["text"] = "@"+data_frame["username"] + "<br>" + data_frame["keyword"]
+        # # Plot the map
+        # fig = px.scatter_mapbox(
+        #     data_frame,
+        #     lat="latitude",
+        #     lon="longitude",
+        #     zoom=8,
+        #     text=("text"),  
+        #     size_max=15,
+        #     center=dict(lat=13.75, lon=100.5) # set the map center to Thailand
+        # )
+        # fig.update_layout(mapbox_style="carto-darkmatter",
+        #     font=dict(
+        #         family="sans-serif",
+        #         size=20
+        #     ))
         
         # create a QWebEngineView widget to display the HTML chart
         self.spatial_chart_view = QWebEngineView()
@@ -346,6 +395,10 @@ class MainWindow(QMainWindow):
         
         self.plot_spatial_chart(search_word)
         self.ui.frame_23.layout().addWidget(self.spatial_chart_view)
+        
+        # # Add world cloud to QFrame (Ranking Top 10 Words)
+        # self.ranking_bar_chart()
+        # self.ui.frame_33.layout().addWidget(self.horizontalbar_chart_view)
         
         
     def cancel_search(self):
