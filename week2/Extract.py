@@ -4,7 +4,6 @@ import database_action
 import tweepy
 from dateutil import tz
 import datetime
-from twitterDataProcessing import FilterData, Tokenization
 
 db_action = database_action.DatabaseAction()
 
@@ -80,6 +79,23 @@ class ExtractTwitter():
         except:
             tweet_text = tweet.full_text
         return tweet_text
+    
+    def PullTrends(self, api, woeid):
+        trends = api.get_place_trends(woeid)
+        trends_list = trends[0]['trends']
+        hashtags_dict = {}
+        words_dict = {}
+        trends_dict = {}
+        
+        for trend in trends_list:
+            if trend["name"][0] == "#" and len(hashtags_dict) < 10:
+                hashtags_dict[trend["name"]] = trend["tweet_volume"]
+            elif trend["name"][0] != "#" and len(words_dict) < 10:
+                words_dict[trend["name"]] = trend["tweet_volume"]
+        
+        trends_dict["hashtags"]=hashtags_dict
+        trends_dict["words"]=words_dict
+        return trends_dict 
 
     def Perform(self, keyword, tweet_data):
         #timezone settings

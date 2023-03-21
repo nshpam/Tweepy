@@ -12,10 +12,9 @@ import plotly.offline as po
 import pandas as pd
 import plotly
 
+
 import plotly.express as px
 from ui_gui import Ui_MainWindow
-
-from tweepy_search import *
 
 from twitterDataRankings import *
 from main import *

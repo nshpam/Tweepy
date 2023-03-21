@@ -5,15 +5,15 @@ from dateutil import tz
 import sys
 
 sys.path.insert(0, '../')
-from tweepy_main import PullTwitterData
+from Extract import ExtractTwitter
 
-convert = PullTwitterData()
+convert = ExtractTwitter()
 
-class  ConvertTimezoneTest(unittest.TestCase):
+class ConvertTimezoneTest(unittest.TestCase):
     
     #test input is empty 
     def test_InputNull(self):
-        check = convert.convert_timezone(None,None,None)
+        check = convert.ConvertTimezone(None,None,None)
         assert check == 'Timezone type is not datetime'
         
     #UTC is not Date/Time
@@ -26,7 +26,7 @@ class  ConvertTimezoneTest(unittest.TestCase):
         
         toZoneDate = fromZoneDate.replace(tzinfo=fromZoneUTC)
         convert_time = toZoneDate.astimezone(toZoneUTC).strftime('%d-%m-%Y | %H:%M')
-        check = convert.convert_timezone(fromZoneUTC, toZoneUTC, convert_time)
+        check = convert.ConvertTimezone(fromZoneUTC, toZoneUTC, convert_time)
         assert check == 'Timezone type is not datetime'
 
     #fix this
@@ -34,13 +34,13 @@ class  ConvertTimezoneTest(unittest.TestCase):
         fromZoneUTC = tz.gettz('UTC')
         toZoneUTC = tz.gettz('Thailand/Bangkok')
         fromZoneDate = datetime.utcnow()
-        check = convert.convert_timezone(fromZoneUTC, toZoneUTC, fromZoneDate)
+        check = convert.ConvertTimezone(fromZoneUTC, toZoneUTC, fromZoneDate)
         assert check == fromZoneDate.replace(tzinfo=fromZoneUTC).astimezone(toZoneUTC)
         
     def test_ConvertDateInputTypeInt(self):
         fromZoneUTC = tz.gettz('UTC')
         toZoneUTC = tz.gettz('Asia/Bangkok')
-        check = convert.convert_timezone(fromZoneUTC, toZoneUTC,1)
+        check = convert.ConvertTimezone(fromZoneUTC, toZoneUTC,1)
         assert check == 'Timezone type is not datetime'
         
     #test argrument 'from_zone' / test input type
@@ -48,21 +48,21 @@ class  ConvertTimezoneTest(unittest.TestCase):
         toZoneUTC = tz.gettz('Asia/Bangkok')
         fromZoneDate = datetime.utcnow()
         # fromZoneStr = fromZoneDate.strftime('%d-%m-%Y | %H:%M')
-        check = convert.convert_timezone('String', toZoneUTC, fromZoneDate)
+        check = convert.ConvertTimezone('String', toZoneUTC, fromZoneDate)
         assert check == 'Timezone type is not timezone'
         
     def test_From_zoneInputTypeDatetime(self):
         fromZoneUTC = tz.gettz('UTC')
         toZoneUTC = tz.gettz('Asia/Bangkok')
         fromZoneDate = datetime.utcnow()
-        check = convert.convert_timezone(fromZoneUTC, toZoneUTC, fromZoneDate)
+        check = convert.ConvertTimezone(fromZoneUTC, toZoneUTC, fromZoneDate)
         assert check == 'Timezone type is not timezone'
         
     def test_From_zoneInputTypeInt(self):
         fromZoneUTC = tz.gettz('UTC')
         toZoneUTC = tz.gettz('Asia/Bangkok')
         fromZoneDate = datetime.utcnow()
-        check = convert.convert_timezone(1, toZoneUTC, fromZoneDate)
+        check = convert.ConvertTimezone(1, toZoneUTC, fromZoneDate)
         assert check == 'Timezone type is not timezone'
         
         
@@ -70,20 +70,20 @@ class  ConvertTimezoneTest(unittest.TestCase):
     def test_To_zoneInputTypeString(self):
         fromZoneUTC = tz.gettz('UTC')
         fromZoneDate = datetime.utcnow()
-        check = convert.convert_timezone(fromZoneUTC, 'String', fromZoneDate)
+        check = convert.ConvertTimezone(fromZoneUTC, 'String', fromZoneDate)
         assert check == 'Timezone type is not timezone'
         
     def test_To_zoneInputTypeDatetime(self):
         fromZoneUTC = tz.gettz('UTC')
         toZoneUTC = tz.gettz('Asia/Bangkok')
         fromZoneDate = datetime.utcnow()
-        check = convert.convert_timezone(fromZoneUTC, toZoneUTC, fromZoneDate)
+        check = convert.ConvertTimezone(fromZoneUTC, toZoneUTC, fromZoneDate)
         assert check == 'Timezone type is not timezone'
         
     def test_To_zoneInputTypeInt(self):
         fromZoneUTC = tz.gettz('UTC')
         fromZoneDate = datetime.utcnow()
-        check = convert.convert_timezone(fromZoneUTC, 1, fromZoneDate)
+        check = convert.ConvertTimezone(fromZoneUTC, 1, fromZoneDate)
         assert check == 'Timezone type is not timezone'
 
 #run this code if and only if it's the main file
