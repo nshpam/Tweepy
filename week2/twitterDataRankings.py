@@ -118,9 +118,8 @@ class Ranking():
         #create a list from word frequency
         ranking_frequency = list(rank_dict.values())
         #ranking by frequency
-        rank_set = list(enumerate(sorted(set(ranking_frequency), reverse=True), start=1))
-
-        # print(rank_set)
+        # rank_set = list(enumerate(sorted(set(ranking_frequency), reverse=True), start=1))
+        
         #ranking by key
         # print(self.rank_word(rank_set, ranking_key, ranking_frequency))
         # return the top words and their frequencies
