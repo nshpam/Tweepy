@@ -84,6 +84,7 @@ class MainWindow(QMainWindow):
         self.ui.pushButton_7.clicked.connect(lambda: self.ui.stackedWidget_3.setCurrentIndex(0))
         self.ui.pushButton_6.clicked.connect(lambda: self.ui.stackedWidget_3.setCurrentIndex(1))
         # Click botton to scrap tweets.
+        self.ui.pushButton_extract_2.clicked.connect(lambda: self.clearWidgets())
         self.ui.pushButton_extract_2.clicked.connect(lambda: self.search_twitter())
         # link the textChanged signal of the search lineEdit object to a function
         self.ui.lineEdit_search.textChanged.connect(self.auto_fill)
@@ -120,7 +121,18 @@ class MainWindow(QMainWindow):
         # show window
         self.show()
         
-            
+    
+    def clearWidgets(self):
+        if hasattr(MainWindow, 'chart_view'):
+            self.ui.frame_21.layout().removeWidget(self.chart_view)
+            self.chart_view.hide()
+        if hasattr(MainWindow, 'spatial_chart_view'):
+            self.ui.frame_23.layout().removeWidget(self.spatial_chart_view)
+            self.spatial_chart_view.hide()
+        if hasattr(MainWindow, 'horizontalbar_chart_view'):
+            self.ui.frame_33.layout().removeWidget(self.horizontalbar_chart_view)
+            self.horizontalbar_chart_view.hide()
+
     # for Overview of hashtags
     def create_pie_chart(self):
         print(self.twitter_data)
@@ -330,6 +342,10 @@ class MainWindow(QMainWindow):
         self.ui.lineEdit_keyword.setText(text)
     
     def search_twitter(self):
+            
+
+        
+
         # switch to the progress page
         self.ui.stackedWidget.setCurrentIndex(1)
        

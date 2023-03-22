@@ -92,6 +92,7 @@ class MainOperation():
         tweet_dict = extract.Perform(keyword, tweet_list)
         #all extract id
         extract_id = list(tweet_dict.keys())
+        
         #filtered extract id
         return_id = []
 

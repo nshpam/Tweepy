@@ -21,7 +21,7 @@ class ExtractTwitter():
         elif type(settings) != type({}):
             return 'Invalid settings'
         
-        if settings['search_type'] not in ['recent', 'popular', 'mixed']:
+        if settings['search_type'] not in ["Popular","Recent","Mixed"]:
             return 'Invalid search_type'
         elif type(settings['num_tweet']) != type(0):
             return 'Invalid num_tweet'
