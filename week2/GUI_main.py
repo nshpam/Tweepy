@@ -138,7 +138,7 @@ class MainWindow(QMainWindow):
         data = go.Pie(
                         labels=labels,
                         values=values,
-                        marker=dict(colors=['#FF3B30', '#4CD964', '#007AFF']),
+                        marker=dict(colors=['#4CD964','#FF3B30', '#007AFF']),
                         hole=0.3  # set the size of the center hole
     )
         
