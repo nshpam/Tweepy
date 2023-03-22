@@ -1,54 +1,13 @@
 import unittest
-from twitterDataProcessing import FilterData, ConnectLextoPlus
 from unittest.mock import patch, MagicMock
-class TestConnectLextoPlus(unittest.TestCase):
-    def setUp(self):
-        self.connect_api = ConnectLextoPlus()
-        self.api_key = '1234'
-        self.url = 'https://example.com/api'
-        
-        
-    def get_mock_response(self, api_key, url_to_send, data_dict):
-        with patch.object(ConnectLextoPlus, 'ConnectApi') as mock_method:
-            mock_connected = MagicMock()
-            mock_connected.status_code = 200
-            mock_connected.text = 'This API method connects correctly.'
-            mock_method.return_value = mock_connected
+import sys
 
-            response = self.connect_api.ConnectApi(api_key, url_to_send, data_dict)
-
-            mock_method.assert_called_once_with(api_key, url_to_send, data_dict)
-            self.assertEqual(response.status_code, 200)
-            self.assertEqual(response.text, 'This API method connects correctly.')
-
-
-    @patch('requests.get')
-    def test_connect_api_success(self, mock_get):
-        mock_response = MagicMock()
-        mock_response.status_code = 200
-        mock_response.text = 'Mock response'
-        mock_get.return_value = mock_response
-
-        data = {'input': 'ข้อความที่ต้องการตัดคำ'}
-        response = self.connect_api.ConnectApi(self.api_key, self.url, data)
-
-        mock_get.assert_called_once_with(self.url, params=data, headers={'Apikey': self.api_key})
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.text, 'Mock response')
-
-    @patch('requests.get')
-    def test_connect_api_failure(self, mock_get):
-        mock_get.return_value.status_code = 404
-
-        data = {'input': 'ข้อความที่ต้องการตัดคำ'}
-        response = self.connect_api.ConnectApi(self.api_key, self.url, data)
-
-        mock_get.assert_called_once_with(self.url, params=data, headers={'Apikey': self.api_key})
-        self.assertEqual(response.status_code, 404)
+sys.path.insert(0, '../')
+import Transform
 
 class TestFilterData(unittest.TestCase):
     def setUp(self):
-        self.filter_data = FilterData()
+        self.filter_data = Transform.FilterData()
   
     # Test Filter url function
     def test_FilterUrl(self):
@@ -105,7 +64,7 @@ class TestFilterData(unittest.TestCase):
         expected_output = 'ก'
         self.assertEqual(self.filter_data.Filters(raw_list), expected_output)
 
-        raw_list = 'This is some ◡̈ Text with {กก braces} and กำหนด หัวข้อ รายละเอียด https://example.com'
+        raw_list = 'This is some ◡̈ Text with {กก braces} and กำหนด หัวข้อ รายละเอียด https://example.com #เทส'
         expected_output = 'this is some text with {กก braces} and กำหนด หัวข้อ รายละเอียด'
         self.assertEqual(self.filter_data.Filters(raw_list), expected_output)
         

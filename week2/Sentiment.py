@@ -36,6 +36,10 @@ class SentimentAnalysis():
     
     #convert polarity of the data
     def ConvertPolar(self, polar):
+
+        if type(polar) != type(''):
+            return 'Invalid polar'
+
         converted_polar = 0
 
         #converting polarity into integers
@@ -87,6 +91,7 @@ class SentimentAnalysis():
             #delay for SSense API
             time.sleep(0.5)
         return sentiment_dict
+        
 
 
         

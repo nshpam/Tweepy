@@ -51,6 +51,7 @@ class SearchThread(QThread):
 class MainWindow(QMainWindow):
     def __init__(self, twitter_data={}):
         QMainWindow.__init__(self)
+        self.treeView = QTreeView()
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
         # hides the menu icon bar by default
@@ -281,39 +282,6 @@ class MainWindow(QMainWindow):
                     family="sans-serif",
                     size=20
                 ))
-            
-            
-        # # Connect to the database and get the tweets with non-null locations
-        # collection = db_action.tweetdb_object(
-        #     config.mongo_client,
-        #     config.database_name,
-        #     config.collection_name
-        # )
-        # query = db_action.tweetdb_create_object(["location", "keyword"], [{"$ne": None}, {"$eq": keyword}])
-        # cursor = db_action.tweetdb_find(config.collection_name, collection, query)
-
-        # # Create a dataframe from the cursor
-        # data_frame = pd.DataFrame(list(cursor))
-
-        # # Extract the latitude and longitude values from the location array
-        # data_frame["longitude"] = data_frame["location"].apply(lambda x: x[0])
-        # data_frame["latitude"] = data_frame["location"].apply(lambda x: x[1])
-        # data_frame["text"] = "@"+data_frame["username"] + "<br>" + data_frame["keyword"]
-        # # Plot the map
-        # fig = px.scatter_mapbox(
-        #     data_frame,
-        #     lat="latitude",
-        #     lon="longitude",
-        #     zoom=8,
-        #     text=("text"),  
-        #     size_max=15,
-        #     center=dict(lat=13.75, lon=100.5) # set the map center to Thailand
-        # )
-        # fig.update_layout(mapbox_style="carto-darkmatter",
-        #     font=dict(
-        #         family="sans-serif",
-        #         size=20
-        #     ))
         
         # create a QWebEngineView widget to display the HTML chart
         self.spatial_chart_view = QWebEngineView()
@@ -325,9 +293,6 @@ class MainWindow(QMainWindow):
         self.ui.lineEdit_keyword.setText(text)
     
     def search_twitter(self):
-            
-
-        
 
         # switch to the progress page
         self.ui.stackedWidget.setCurrentIndex(1)
@@ -523,6 +488,7 @@ class MainWindow(QMainWindow):
             item.setFont(font)  # set the custom font to the QStandardItem
 
             # adds a new row of items to the model
+            # model.appendRow(item)
             model.appendRow(item)
             # create a new QStandardItem for the trend volume
             if volume is not None:
