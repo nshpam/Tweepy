@@ -115,6 +115,12 @@ class ExtractTwitter():
         return trends_dict 
 
     def Perform(self, keyword, tweet_data):
+
+        if type(keyword) != type('a'):
+            return 'Invalid keyword'
+        elif type(tweet_data) != type([]):
+            return 'Invalid tweet_data'
+
         #timezone settings
         tz_settings = self.SettingTimeZone()
         data_dict = {}

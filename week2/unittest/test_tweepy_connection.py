@@ -98,7 +98,29 @@ class TweepyConnectionTest(unittest.TestCase):
         trends_dict = extract.PullTrends(api, 'a')
         assert trends_dict == 'Invalid woeid'
 
+    def test_extract_perform(self):
+        extract = Extract.ExtractTwitter()
+        keyword = '#รีวิวหนัง'
+        settings = {
+        'search_type' : config.search_type,
+        'num_tweet' : 1,
+        'start_d' : datetime.date(2023, 3, 15),
+        'end_d': datetime.date(2023, 3, 20),
+        'mode' : 'keyword'
+        }
+        tweet_list = extract.SearchTwitter(config.search_word, settings)
+        
+        #test correct perform
+        tweet_dict = extract.Perform(keyword, tweet_list)
+        assert tweet_dict != {}
 
+        #test incorrect keyword
+        tweet_dict = extract.Perform(0, tweet_list)
+        assert tweet_dict != 'Invalid keyword'
+
+        #test incorrect tweet_data
+        tweet_dict = extract.Perform(keyword, 0)
+        assert tweet_dict != 'Invalid tweet_data'
 
 if __name__ == '__main__':
     unittest.main()
