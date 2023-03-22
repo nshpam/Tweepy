@@ -486,9 +486,6 @@ class MainWindow(QMainWindow):
         # display the list of trends in the widgets
         self.ui.listView_3.setModel(model_3)
         self.ui.listView_5.setModel(model_5)
-
-
-
             
     def show_trends_word(self):
         # authenticate the Twitter API requests with the Twitter API keys and access tokens
@@ -525,6 +522,7 @@ class MainWindow(QMainWindow):
             # representation of the form "trend_name (trend_volume)" for each trend in the trends_keyword list
             item = QStandardItem(f"{i+1}. {name}")
             item.setFont(font)  # set the custom font to the QStandardItem
+
             # adds a new row of items to the model
             model.appendRow(item)
             # create a new QStandardItem for the trend volume
@@ -538,8 +536,6 @@ class MainWindow(QMainWindow):
                 placeholder_item = QStandardItem(volume_str)
                 placeholder_item.setFont(volume_font)
                 model.appendRow(placeholder_item)
-
-
         
         # display the list of trends in the widget.
         self.ui.listView_4.setModel(model)

@@ -15,6 +15,17 @@ class ExtractTwitter():
         return tweepy.API(auth)
 
     def SearchTwitter(self, keyword, settings):
+
+        if type(keyword) != type(''):
+            return 'Invalid keyword'
+        elif type(settings) != type({}):
+            return 'Invalid settings'
+        
+        if settings['search_type'] not in ['recent', 'popular', 'mixed']:
+            return 'Invalid search_type'
+        elif type(settings['num_tweet']) != type(0):
+            return 'Invalid num_tweet'
+
         #collect settings data
         search_type = settings['search_type']
         num_tweet = settings['num_tweet']
@@ -81,6 +92,12 @@ class ExtractTwitter():
         return tweet_text
     
     def PullTrends(self, api, woeid):
+
+        if api == None:
+            return 'Cannot connect to tweepy API please try again.'
+        elif type(woeid) != type(0):
+            return 'Invalid woeid'
+
         trends = api.get_place_trends(woeid)
         trends_list = trends[0]['trends']
         hashtags_dict = {}
