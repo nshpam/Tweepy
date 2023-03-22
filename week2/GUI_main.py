@@ -101,23 +101,6 @@ class MainWindow(QMainWindow):
         self.ui.comboBox_searchtype.addItems(["Popular","Recent","Mixed"])
         # Add chart view to QFrame (Overview of hashtags)
         
-        # self.create_pie_chart()
-        # self.ui.frame_21.layout().addWidget(self.chart_view)
-        
-        
-        
-        # # Add world cloud to QFrame 
-        # self.create_word_cloud()
-        # self.ui.frame_24.layout().addWidget(self.wordcloud_label)
-        
-        # # Add world cloud to QFrame (Ranking Top 10 Words)
-        # self.create_bar_chart()
-        # self.ui.frame_33.layout().addWidget(self.horizontalbar_chart_view)
-        
-        # Call spatial_chart method and add it to the layout
-        # self.plot_spatial_chart()
-        # self.ui.frame_23.layout().addWidget(self.spatial_chart_view)
-        
         # show window
         self.show()
         
