@@ -1,27 +1,47 @@
-# Software-Dev2
+# 📊 Tweepy – Your Twitterverse ✨📲
 
-About
+In our Software Developer coursework, we utilized the Twitter API to collect tweet data and employed Natural Language Processing (NLP) for in-depth analysis. The program, designed with user-friendly principles, seamlessly integrates Python, Unittest for rigorous testing, and an Extract, Load, Transform (ELT) pipeline for efficient data processing. With a strong emphasis on data visualization techniques, we've created a versatile tool that not only collects Twitter data but also employs NLP for insightful analysis. The program doesn't just gather information; it transforms raw data into meaningful visualizations, showcasing trends and patterns derived from the Twitterverse. This project highlights our collaborative synergy in developing a comprehensive and effective computer program for Twitter data analysis and visualization. We store the data securely in MongoDB.
 
-This project is a part of software development II subject. The main objective is to use the data from twitter to do a sentiment and apply the data visualization.
+## Lessons Learned 🎓 
 
-by  
+#### NLP
+- [Description]
 
-    Jarawee Trongsiriwut 6401012630035 [Front-End]
-    Sirapa Sangna 6401012620218 [Back-End]
+#### Python Programming
+- [Description]
 
-Assignment
-- Exercise week 1 [ FINISH ]
-- Twitter Scraping API [ 80% ]
-    - Extract Twitter Data [ FINISH ]
-    - Clean the data [ FINISH ]
-    - Ranking top 10 keyword [ IN PROGRESS ]
-    - Ranking top 10 key [ IN PROGRESS ]
-    - Sentiment [ FINISH ]
-    - Update engine [ FINISH ]
-    - Remove engine [ FINISH ]
-    - Search engine [ FINISH ]
-    - Tableau data visulization [ FINISH ]
-    - Data visulization from tweets [ IN PROGRESS ]
-    - Unit test case [ IN PROGRESS ]
-    - ELT pipeline [ FINISH ]
-    - Database Schema [ FINISH ]
+#### Twitter API
+- [Description]
+
+#### GUI
+- [Description]
+
+#### Unittest
+- [Description]
+
+#### Data Visualization
+- [Description]
+
+#### ELT pipeline
+- [Description]
+
+## Screenshots 📷
+
+## Contributor 👩‍💻👨‍💻
+- [@nshpam](https://github.com/nshpam) [Back-End]
+- [@tw94sh](https://github.com/tw94sh) [Front-End]
+
+Features
+- Extract Twitter Data
+- Clean the data
+- Ranking top 10 keyword
+- Ranking top 10 key
+- Sentiment
+- Update engine
+- Remove engine
+- Search engine
+- Tableau data visulization
+- Data visulization from tweets
+- Unit test case
+- ELT pipeline
+- Database Schema
