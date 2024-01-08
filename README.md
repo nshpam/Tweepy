@@ -81,15 +81,21 @@ This is our second design. We created a rough draft of the GUI in a low-fidelity
 | ![prototype2](https://github.com/nshpam/Tweepy/assets/97942535/0dd149d8-1d86-438b-a258-d78a5ad00e06) |
 | ![prototype2](https://github.com/nshpam/Tweepy/assets/97942535/a682bb45-3b51-43e6-872d-00ddb636c9c4) |
 | ![prototype2](https://github.com/nshpam/Tweepy/assets/97942535/4bbabb69-0e48-4c64-98d0-f27f8b047681) |
+| ![prototype2](https://github.com/nshpam/Tweepy/assets/97942535/0c119b90-da8e-40d9-abb4-b04eb6eb1d3b) |
+| ![prototype2](https://github.com/nshpam/Tweepy/assets/97942535/4167519a-72c8-49ba-a336-6a87287c45c7) |
 
 Description of prototype 3
 ### 
 | **🗜️🧩 Prototype 3 🧩🗜️** |
 |:--:|
-| ![prototype2](https://github.com/nshpam/Tweepy/assets/97942535/b6205ebc-2d51-4467-ac77-c40fa90de506) |
-| ![prototype2](https://github.com/nshpam/Tweepy/assets/97942535/0dd149d8-1d86-438b-a258-d78a5ad00e06) |
-| ![prototype2](https://github.com/nshpam/Tweepy/assets/97942535/a682bb45-3b51-43e6-872d-00ddb636c9c4) |
-| ![prototype2](https://github.com/nshpam/Tweepy/assets/97942535/4bbabb69-0e48-4c64-98d0-f27f8b047681) |
+| ![prototype3](https://github.com/nshpam/Tweepy/assets/97942535/33730fbc-6612-4598-9c00-0e512134500e) |
+| ![prototype3](https://github.com/nshpam/Tweepy/assets/97942535/9a9d3df6-1a6e-426c-9afa-4041930ee1e1) | 
+| ![prototype3](https://github.com/nshpam/Tweepy/assets/97942535/37c87d6d-1696-47bf-8116-7a6f63ee9f24) |
+| ![prototype3](https://github.com/nshpam/Tweepy/assets/97942535/7bf4372c-6416-471d-bce1-ad8465afd585) |
+| ![prototype3](https://github.com/nshpam/Tweepy/assets/97942535/8446e361-be86-49c2-9c74-95ebf2eb07e9) |
+| ![prototype3](https://github.com/nshpam/Tweepy/assets/97942535/af2afb7e-284f-4e98-9c07-573dad61c1f4) |
+|  |
+
 
 ## Contributor 👩‍💻👨‍💻
 - [@nshpam](https://github.com/nshpam) [Back-End]
