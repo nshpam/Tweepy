@@ -67,8 +67,6 @@ This is our initial design, sketched by hand. We created a rough draft of the GU
 | ![GUI1](https://github.com/nshpam/Tweepy/assets/97942535/27408cee-97b3-4c11-b263-93da344bdf82) |
 | ![GUI1](https://github.com/nshpam/Tweepy/assets/97942535/78de45f8-46ef-435c-a029-9135e44a8cd7) |
 
-
-
 This is our second design. We created a rough draft of the GUI in a low-fidelity (Lofi) format and transform it into GUI using pyqt5. This time we named the program as Twitter Harvest and recolor it into darkmode. The disadvantage of this design is...
 - There is an unnecessary push button.
 - Too many separate pages make it difficult for users to use.
@@ -94,7 +92,17 @@ Description of prototype 3
 | ![prototype3](https://github.com/nshpam/Tweepy/assets/97942535/7bf4372c-6416-471d-bce1-ad8465afd585) |
 | ![prototype3](https://github.com/nshpam/Tweepy/assets/97942535/8446e361-be86-49c2-9c74-95ebf2eb07e9) |
 | ![prototype3](https://github.com/nshpam/Tweepy/assets/97942535/af2afb7e-284f-4e98-9c07-573dad61c1f4) |
-|  |
+| ![prototype3](https://github.com/nshpam/Twitisen/assets/97942535/ee2b0186-5d71-47c0-9890-3b4855885092) |
+| ![prototype3](https://github.com/nshpam/Twitisen/assets/97942535/16040b85-13f2-4028-9b1e-96277388ac2a) |
+
+Description of version 1.0
+### 
+| **🎉🚀 Version 1.0 🎉🚀** |
+|:--:|
+| ![image](https://github.com/nshpam/Twitisen/assets/97942535/376ed73e-85e9-4742-ac44-99b14f4f66d1) |
+| ![image](https://github.com/nshpam/Twitisen/assets/97942535/8af1e118-7524-4fed-b123-72ace78ab302) |
+| ![image](https://github.com/nshpam/Twitisen/assets/97942535/ebba16ac-97d0-4b04-ab7b-60c567f6bd0e) |
+| ![image](https://github.com/nshpam/Twitisen/assets/97942535/9da36b3f-f306-414f-ae5b-91cbeeb2a3cc) |
 
 
 ## Contributor 👩‍💻👨‍💻
