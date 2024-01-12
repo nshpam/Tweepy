@@ -1,4 +1,4 @@
-![extract_2](https://github.com/nshpam/Twitisen/assets/97942535/092b0e8e-3c4d-42bc-a3ef-5285e5ae76a7)# 📊 Twitisen – Your Twitterverse ✨📲
+# 📊 Twitisen – Your Twitterverse ✨📲
 
 In our Software Developer coursework, we utilized the Twitter API to collect tweet data and employed Natural Language Processing (NLP) for in-depth analysis. The program, designed with user-friendly principles, seamlessly integrates Python, Unittest for rigorous testing, and an Extract, Load, Transform (ELT) pipeline for efficient data processing. With a strong emphasis on data visualization techniques, we've created a versatile tool that not only collects Twitter data but also employs NLP for insightful analysis. The program doesn't just gather information; it transforms raw data into meaningful visualizations, showcasing trends and patterns derived from the Twitterverse. This project highlights our collaborative synergy in developing a comprehensive and effective computer program for Twitter data analysis and visualization. We store the data securely in MongoDB.
 
@@ -72,6 +72,7 @@ In our Software Developer coursework, we utilized the Twitter API to collect twe
 | Description |
 | ![extract](https://github.com/nshpam/Twitisen/assets/97942535/3314fbee-e9ce-4e22-9c5f-c8f431ffe9e0) |
 | Description |
+
 
 ###
 | **📅🕑 Timeline Classification 🕑📅** |
@@ -155,6 +156,7 @@ Description of version 1.0
 | ![ver1](https://github.com/nshpam/Twitisen/assets/97942535/4570e905-6886-430e-9832-2a234ec93fc9) |
 | ![ver1](https://github.com/nshpam/Twitisen/assets/97942535/76be9ac5-ebc4-4efd-9ed6-586d89fb86a2) |
 | ![ver1](https://github.com/nshpam/Twitisen/assets/97942535/fe03b3c5-3088-4f4d-becc-a987b3047359) |
+| ![ver1](https://github.com/nshpam/Twitisen/assets/97942535/092b0e8e-3c4d-42bc-a3ef-5285e5ae76a7) |
 
 ## Contributor 👩‍💻👨‍💻
 - [@nshpam](https://github.com/nshpam) [Back-End]
