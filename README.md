@@ -1,4 +1,4 @@
-# 📊 Twitisen – Your Twitterverse ✨📲
+![extract_2](https://github.com/nshpam/Twitisen/assets/97942535/092b0e8e-3c4d-42bc-a3ef-5285e5ae76a7)# 📊 Twitisen – Your Twitterverse ✨📲
 
 In our Software Developer coursework, we utilized the Twitter API to collect tweet data and employed Natural Language Processing (NLP) for in-depth analysis. The program, designed with user-friendly principles, seamlessly integrates Python, Unittest for rigorous testing, and an Extract, Load, Transform (ELT) pipeline for efficient data processing. With a strong emphasis on data visualization techniques, we've created a versatile tool that not only collects Twitter data but also employs NLP for insightful analysis. The program doesn't just gather information; it transforms raw data into meaningful visualizations, showcasing trends and patterns derived from the Twitterverse. This project highlights our collaborative synergy in developing a comprehensive and effective computer program for Twitter data analysis and visualization. We store the data securely in MongoDB.
 
@@ -48,6 +48,38 @@ In our Software Developer coursework, we utilized the Twitter API to collect twe
 |:--:|
 | ![](https://github.com/nshpam/Tweepy/assets/97942535/8b424da2-23d6-4738-b834-0f814d7b1297) |
 | _Before creating our pipeline, we conducted research on other competitors. We aimed to merge the strengths and improve the weaknesses identified during the analysis._ |
+
+###
+| **🤖📥 Extracting Algorithm 📥🤖** |
+|:--:|
+| ![extract](https://github.com/nshpam/Twitisen/assets/97942535/588c6f1c-0e39-48aa-a1a7-b2c8e4c749d1) |
+| Description |
+| ![extract](https://github.com/nshpam/Twitisen/assets/97942535/3314fbee-e9ce-4e22-9c5f-c8f431ffe9e0) |
+| Description |
+
+###
+| **📅🕑 Timeline Classification 🕑📅** |
+|:--:|
+| ![timeline](https://github.com/nshpam/Twitisen/assets/97942535/0b81fcb3-2d63-4626-8e0b-a25435e68df9) |
+| Description |
+| ![timeline](https://github.com/nshpam/Twitisen/assets/97942535/f505b253-7cb0-47c3-924a-cd549c4f3d9a) |
+| Description |
+| ![timeline](https://github.com/nshpam/Twitisen/assets/97942535/9e833cea-7db0-4ea2-85cd-d75a72c05abf) |
+| Description |
+| ![timeline](https://github.com/nshpam/Twitisen/assets/97942535/b335c54f-e441-4300-a8b7-7f881fc81e09) |
+| Description |
+| ![timeline](https://github.com/nshpam/Twitisen/assets/97942535/82be072d-5eab-4207-b18f-ae6b110120c9) |
+| Description |
+| ![timeline](https://github.com/nshpam/Twitisen/assets/97942535/5de089e7-fc07-4311-b4e5-ee221af37d28) |
+| Description |
+| ![timeline](https://github.com/nshpam/Twitisen/assets/97942535/b4639189-32f8-4448-ae7b-8a2b1f1cdbc3) |
+| Description |
+| ![timeline](https://github.com/nshpam/Twitisen/assets/97942535/7e44bdcc-080b-45ed-ac6e-b40168a2314c) |
+| Description |
+| ![timeline](https://github.com/nshpam/Twitisen/assets/97942535/7e618d7a-e0e9-4b2c-b2c6-7be3f31fc18b) |
+| Description |
+| ![timeline](https://github.com/nshpam/Twitisen/assets/97942535/7639f957-64b7-46b7-a577-72348ff54e7e) |
+| Description |
 
 ## 📐🎨 GUI Designing 🎨📐
 
@@ -99,11 +131,14 @@ Description of version 1.0
 ### 
 | **🎉🚀 Version 1.0 🎉🚀** |
 |:--:|
-| ![image](https://github.com/nshpam/Twitisen/assets/97942535/376ed73e-85e9-4742-ac44-99b14f4f66d1) |
-| ![image](https://github.com/nshpam/Twitisen/assets/97942535/8af1e118-7524-4fed-b123-72ace78ab302) |
-| ![image](https://github.com/nshpam/Twitisen/assets/97942535/ebba16ac-97d0-4b04-ab7b-60c567f6bd0e) |
-| ![image](https://github.com/nshpam/Twitisen/assets/97942535/9da36b3f-f306-414f-ae5b-91cbeeb2a3cc) |
-
+| ![ver1](https://github.com/nshpam/Twitisen/assets/97942535/376ed73e-85e9-4742-ac44-99b14f4f66d1) |
+| ![ver1](https://github.com/nshpam/Twitisen/assets/97942535/8af1e118-7524-4fed-b123-72ace78ab302) |
+| ![ver1](https://github.com/nshpam/Twitisen/assets/97942535/ebba16ac-97d0-4b04-ab7b-60c567f6bd0e) |
+| ![ver1](https://github.com/nshpam/Twitisen/assets/97942535/9da36b3f-f306-414f-ae5b-91cbeeb2a3cc) |
+| ![ver1](https://github.com/nshpam/Twitisen/assets/97942535/7fda138a-3677-411b-8df1-f0b3c704ff0a) |
+| ![ver1](https://github.com/nshpam/Twitisen/assets/97942535/4570e905-6886-430e-9832-2a234ec93fc9) |
+| ![ver1](https://github.com/nshpam/Twitisen/assets/97942535/76be9ac5-ebc4-4efd-9ed6-586d89fb86a2) |
+| ![ver1](https://github.com/nshpam/Twitisen/assets/97942535/fe03b3c5-3088-4f4d-becc-a987b3047359) |
 
 ## Contributor 👩‍💻👨‍💻
 - [@nshpam](https://github.com/nshpam) [Back-End]
