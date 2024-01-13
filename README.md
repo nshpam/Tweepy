@@ -2,6 +2,11 @@
 
 In our Software Developer coursework, we utilized the Twitter API to collect tweet data and employed Natural Language Processing (NLP) for in-depth analysis. The program, designed with user-friendly principles, seamlessly integrates Python, Unittest for rigorous testing, and an Extract, Load, Transform (ELT) pipeline for efficient data processing. With a strong emphasis on data visualization techniques, we've created a versatile tool that not only collects Twitter data but also employs NLP for insightful analysis. The program doesn't just gather information; it transforms raw data into meaningful visualizations, showcasing trends and patterns derived from the Twitterverse. This project highlights our collaborative synergy in developing a comprehensive and effective computer program for Twitter data analysis and visualization. We store the data securely in MongoDB.
 
+# Table of Contents
+- [Lessons Learned 🎓](#lessons-learned-) <br>
+- [Screenshots 📷](#screenshots-) <br>
+- [GUI Designing 🎨](#gui-designing-) <br>
+
 ## Lessons Learned 🎓  
 
 ### 🧠 NLP (Natural Language Processing) 🧠
@@ -86,7 +91,7 @@ In our Software Developer coursework, we utilized the Twitter API to collect twe
 | ![timeline](https://github.com/nshpam/Twitisen/assets/97942535/7e618d7a-e0e9-4b2c-b2c6-7be3f31fc18b) |
 | ![timeline](https://github.com/nshpam/Twitisen/assets/97942535/7639f957-64b7-46b7-a577-72348ff54e7e) |
 
-## 📐🎨 GUI Designing 🎨📐
+## GUI Designing 🎨
 
 This is our initial design, sketched by hand. We created a rough draft of the GUI in a low-fidelity (Lofi) format and transform it into GUI using pyqt5. The disadvantage of this design is...
 - No spatial chart
@@ -149,18 +154,3 @@ Description of version 1.0
 ## Contributor 👩‍💻👨‍💻
 - [@nshpam](https://github.com/nshpam) [Back-End]
 - [@tw94sh](https://github.com/tw94sh) [Front-End]
-
-Features
-- Extract Twitter Data
-- Clean the data
-- Ranking top 10 keyword
-- Ranking top 10 key
-- Sentiment
-- Update engine
-- Remove engine
-- Search engine
-- Tableau data visulization
-- Data visulization from tweets
-- Unit test case
-- ELT pipeline
-- Database Schema
