@@ -69,34 +69,22 @@ In our Software Developer coursework, we utilized the Twitter API to collect twe
 | **🤖📥 Extracting Algorithm 📥🤖** |
 |:--:|
 | ![extract](https://github.com/nshpam/Twitisen/assets/97942535/588c6f1c-0e39-48aa-a1a7-b2c8e4c749d1) |
-| Description |
 | ![extract](https://github.com/nshpam/Twitisen/assets/97942535/3314fbee-e9ce-4e22-9c5f-c8f431ffe9e0) |
-| Description |
 
 
 ###
 | **📅🕑 Timeline Classification 🕑📅** |
 |:--:|
 | ![timeline](https://github.com/nshpam/Twitisen/assets/97942535/0b81fcb3-2d63-4626-8e0b-a25435e68df9) |
-| Description |
 | ![timeline](https://github.com/nshpam/Twitisen/assets/97942535/f505b253-7cb0-47c3-924a-cd549c4f3d9a) |
-| Description |
 | ![timeline](https://github.com/nshpam/Twitisen/assets/97942535/9e833cea-7db0-4ea2-85cd-d75a72c05abf) |
-| Description |
 | ![timeline](https://github.com/nshpam/Twitisen/assets/97942535/b335c54f-e441-4300-a8b7-7f881fc81e09) |
-| Description |
 | ![timeline](https://github.com/nshpam/Twitisen/assets/97942535/82be072d-5eab-4207-b18f-ae6b110120c9) |
-| Description |
 | ![timeline](https://github.com/nshpam/Twitisen/assets/97942535/5de089e7-fc07-4311-b4e5-ee221af37d28) |
-| Description |
 | ![timeline](https://github.com/nshpam/Twitisen/assets/97942535/b4639189-32f8-4448-ae7b-8a2b1f1cdbc3) |
-| Description |
 | ![timeline](https://github.com/nshpam/Twitisen/assets/97942535/7e44bdcc-080b-45ed-ac6e-b40168a2314c) |
-| Description |
 | ![timeline](https://github.com/nshpam/Twitisen/assets/97942535/7e618d7a-e0e9-4b2c-b2c6-7be3f31fc18b) |
-| Description |
 | ![timeline](https://github.com/nshpam/Twitisen/assets/97942535/7639f957-64b7-46b7-a577-72348ff54e7e) |
-| Description |
 
 ## 📐🎨 GUI Designing 🎨📐
 
