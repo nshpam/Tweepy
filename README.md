@@ -83,7 +83,7 @@ In our Software Developer coursework, we utilized the Twitter API to collect twe
 | **📅🕑 Timeline Classification 🕑📅** |
 |:--:|
 | ![timeline](https://github.com/nshpam/Twitisen/assets/97942535/0b81fcb3-2d63-4626-8e0b-a25435e68df9) |
-| This is an example of how it actually works: the green line represents the checkpoints. |
+| This is an example of how it actually works: the green line represents the checkpoints, This is a continuous timeline where each day is consecutive. |
 | ![timeline](https://github.com/nshpam/Twitisen/assets/97942535/f505b253-7cb0-47c3-924a-cd549c4f3d9a) |
 | I've implemented a binary search for timeline classification, making it faster than the regular approach. |
 | ![timeline](https://github.com/nshpam/Twitisen/assets/97942535/9e833cea-7db0-4ea2-85cd-d75a72c05abf) |
@@ -93,10 +93,15 @@ In our Software Developer coursework, we utilized the Twitter API to collect twe
 | ![timeline](https://github.com/nshpam/Twitisen/assets/97942535/82be072d-5eab-4207-b18f-ae6b110120c9) |
 | If the time period is an even number of days, we will calculate the checkpoint using the following formula, as shown. In this process we will extract the checkpoints at the same time. |
 | ![timeline](https://github.com/nshpam/Twitisen/assets/97942535/5de089e7-fc07-4311-b4e5-ee221af37d28) |
+| Like the previous one, from the checkpoint we will extract two date at the same time. |
 | ![timeline](https://github.com/nshpam/Twitisen/assets/97942535/b4639189-32f8-4448-ae7b-8a2b1f1cdbc3) |
+| This is an example of how it actually works: the green line represents the checkpoints, This is a discrete timeline where each day is non-consecutive. We will calculate the checkpoint using the following formula, as shown.|
 | ![timeline](https://github.com/nshpam/Twitisen/assets/97942535/7e44bdcc-080b-45ed-ac6e-b40168a2314c) |
+| Since we have two types of timelines—continuous and discrete. We use an algorithm to identify them. First, we sort the timeline, and then we check if the dates are consecutive. If they are, it's a continuous timeline; if not, it's a discrete timeline. |
 | ![timeline](https://github.com/nshpam/Twitisen/assets/97942535/7e618d7a-e0e9-4b2c-b2c6-7be3f31fc18b) |
+| If the date difference is 1, it is considered consecutive. However, if it is not, the sum of consecutive differentials will be less than the length of the timeline. |
 | ![timeline](https://github.com/nshpam/Twitisen/assets/97942535/7639f957-64b7-46b7-a577-72348ff54e7e) |
+| Lastly, this is the difference between two timelines. |
 
 ## GUI Designing 🎨
 
