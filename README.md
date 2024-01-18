@@ -74,17 +74,24 @@ In our Software Developer coursework, we utilized the Twitter API to collect twe
 | **🤖📥 Extracting Algorithm 📥🤖** |
 |:--:|
 | ![extract](https://github.com/nshpam/Twitisen/assets/97942535/588c6f1c-0e39-48aa-a1a7-b2c8e4c749d1) |
+| _The algorithm will sweep the timeline in periods of 14 days, creating a checkpoint. The extraction area will cover 7 days before the checkpoint and 7 days after the checkpoint._ |
 | ![extract](https://github.com/nshpam/Twitisen/assets/97942535/3314fbee-e9ce-4e22-9c5f-c8f431ffe9e0) |
+| _If it reaches the end of the timeline, the checkpoint will be set as the end date. In some cases, this may result in a duplicate extraction. However, there is no need to worry because we have an algorithm that checks whether the data has already been extracted. The algorithm compares the tweet ID of the desired tweet with the tweet ID in ypur database._ |
 
 
 ###
 | **📅🕑 Timeline Classification 🕑📅** |
 |:--:|
 | ![timeline](https://github.com/nshpam/Twitisen/assets/97942535/0b81fcb3-2d63-4626-8e0b-a25435e68df9) |
+| This is an example of how it actually works: the green line represents the checkpoints. |
 | ![timeline](https://github.com/nshpam/Twitisen/assets/97942535/f505b253-7cb0-47c3-924a-cd549c4f3d9a) |
+| I've implemented a binary search for timeline classification, making it faster than the regular approach. |
 | ![timeline](https://github.com/nshpam/Twitisen/assets/97942535/9e833cea-7db0-4ea2-85cd-d75a72c05abf) |
+| If the time period is an odd number of days, we will calculate the checkpoint using the following formula, as shown. In this process we will extract the checkpoint first. |
 | ![timeline](https://github.com/nshpam/Twitisen/assets/97942535/b335c54f-e441-4300-a8b7-7f881fc81e09) |
+| From the checkpoint we will extract two date at the same time. |
 | ![timeline](https://github.com/nshpam/Twitisen/assets/97942535/82be072d-5eab-4207-b18f-ae6b110120c9) |
+| If the time period is an even number of days, we will calculate the checkpoint using the following formula, as shown. In this process we will extract the checkpoints at the same time. |
 | ![timeline](https://github.com/nshpam/Twitisen/assets/97942535/5de089e7-fc07-4311-b4e5-ee221af37d28) |
 | ![timeline](https://github.com/nshpam/Twitisen/assets/97942535/b4639189-32f8-4448-ae7b-8a2b1f1cdbc3) |
 | ![timeline](https://github.com/nshpam/Twitisen/assets/97942535/7e44bdcc-080b-45ed-ac6e-b40168a2314c) |
