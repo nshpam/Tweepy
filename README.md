@@ -53,7 +53,7 @@ In our Software Developer coursework, we utilized the Twitter API to collect twe
 
 ### 
 | **🛢️🔗 ELT Pipeline 🔗🛢️** |
-|:---| 
+|:--:| 
 | ![Exclusive Summary](https://github.com/nshpam/Tweepy/assets/97942535/5eb17cf8-64fd-432e-b80e-204c3b4959e5) |
 |**Firstly,** we extract tweets from the Twitter API. The API provides information such as id, username, datetime, text, favorite count, retweet count, and location.<br>**Secondly,** we store the extracted data in MongoDB, referring to this dataset as raw data.<br>**Thirdly,** we apply a complex algorithm to transform the data. We filter out URL symbols, numeric symbols, emojis, and special characters using our custom implementation and Lexto+. Given the dataset's diverse language composition, our focus is solely on Thai and English. For Thai language, we tokenize and normalize using Lexto+, while for English, we utilize NLTK. We clean Thai stop words with PythaiNLP and English stop words with NLTK.<br>**Fourthly,** we store the cleaned data in MongoDB, naming this dataset as clean data.<br>**Lastly,** we utilize the cleaned data for data visualization. The visualization includes sentiments, a donut chart, word cloud, bar chart, and spatial chart, all of which are presented on the GUI.|
 
