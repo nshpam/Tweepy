@@ -5,7 +5,6 @@ In our Software Developer coursework, we utilized the Twitter API to collect twe
 # Table of Contents
 - [Lessons Learned 🎓](#lessons-learned-) <br>
 - [Screenshots 📷](#screenshots-) <br>
-- [🛢️🔗 ELT Pipeline 🔗🛢️](#--elt-pipeline--) <br>
 - [GUI Designing 🎨](#gui-designing-) <br>
 - [Contributor 👩‍💻👨‍💻](#contributor-) <br>
 
