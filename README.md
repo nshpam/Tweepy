@@ -6,6 +6,7 @@ In our Software Developer coursework, we utilized the Twitter API to collect twe
 - [Lessons Learned 🎓](#lessons-learned-) <br>
 - [Screenshots 📷](#screenshots-) <br>
 - [GUI Designing 🎨](#gui-designing-) <br>
+- [Contributor 👩‍💻👨‍💻](#contributor-) <br>
 
 ## Lessons Learned 🎓  
 
@@ -164,5 +165,6 @@ Description of version 1.0
 | ![ver1](https://github.com/nshpam/Twitisen/assets/97942535/092b0e8e-3c4d-42bc-a3ef-5285e5ae76a7) |
 
 ## Contributor 👩‍💻👨‍💻
+[Back to top](#table-of-contents) <br>
 - [@nshpam](https://github.com/nshpam) [Back-End]
 - [@tw94sh](https://github.com/tw94sh) [Front-End]
