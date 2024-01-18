@@ -9,6 +9,7 @@ In our Software Developer coursework, we utilized the Twitter API to collect twe
 - [Contributor 👩‍💻👨‍💻](#contributor-) <br>
 
 ## Lessons Learned 🎓  
+[Back to top](#table-of-contents) <br>
 
 ### 🧠 NLP (Natural Language Processing) 🧠
 - 📈 Implementing NLP techniques for sentiment analysis to gauge user opinions.
@@ -48,16 +49,19 @@ In our Software Developer coursework, we utilized the Twitter API to collect twe
 - 🔐 Ensuring data security and scalability.
 
 ## Screenshots 📷
+[Back to top](#table-of-contents) <br>
 
 ### 
 | **🛢️🔗 ELT Pipeline 🔗🛢️** |
 |:---| 
+| [Back to top](#table-of-contents) |
 | ![Exclusive Summary](https://github.com/nshpam/Tweepy/assets/97942535/5eb17cf8-64fd-432e-b80e-204c3b4959e5) |
 |**Firstly,** we extract tweets from the Twitter API. The API provides information such as id, username, datetime, text, favorite count, retweet count, and location.<br>**Secondly,** we store the extracted data in MongoDB, referring to this dataset as raw data.<br>**Thirdly,** we apply a complex algorithm to transform the data. We filter out URL symbols, numeric symbols, emojis, and special characters using our custom implementation and Lexto+. Given the dataset's diverse language composition, our focus is solely on Thai and English. For Thai language, we tokenize and normalize using Lexto+, while for English, we utilize NLTK. We clean Thai stop words with PythaiNLP and English stop words with NLTK.<br>**Fourthly,** we store the cleaned data in MongoDB, naming this dataset as clean data.<br>**Lastly,** we utilize the cleaned data for data visualization. The visualization includes sentiments, a donut chart, word cloud, bar chart, and spatial chart, all of which are presented on the GUI.|
 
 ### 
 | **🗂️💽 Database Schema 💽🗂️** |
 |:--:| 
+| [Back to top](#table-of-contents) |
 | ![](https://github.com/nshpam/Tweepy/assets/97942535/e8189a5d-6c9c-49d9-b71c-8321f7402025) |
 |_We have four independent databases. The **'tweets'** database will contain raw data collected from the Twitter API. The **'cleaned_data'** database will store transformed or cleaned data. The **'locations'** database will include the location and coordinates of tweets. The **'sentiments'** database will house keywords that users use for searching in the Twitter search bar and the corresponding ranked results._|
 
@@ -68,12 +72,14 @@ In our Software Developer coursework, we utilized the Twitter API to collect twe
 ### 
 | **🔍🧐 Competitor Analysis 🧐🔍** |
 |:--:|
+| [Back to top](#table-of-contents) |
 | ![](https://github.com/nshpam/Tweepy/assets/97942535/8b424da2-23d6-4738-b834-0f814d7b1297) |
 | _Before creating our pipeline, we conducted research on other competitors. We aimed to merge the strengths and improve the weaknesses identified during the analysis._ |
 
 ###
 | **🤖📥 Extracting Algorithm 📥🤖** |
 |:--:|
+| [Back to top](#table-of-contents) |
 | ![extract](https://github.com/nshpam/Twitisen/assets/97942535/588c6f1c-0e39-48aa-a1a7-b2c8e4c749d1) |
 | _The algorithm will sweep the timeline in periods of 14 days, creating a checkpoint. The extraction area will cover 7 days before the checkpoint and 7 days after the checkpoint._ |
 | ![extract](https://github.com/nshpam/Twitisen/assets/97942535/3314fbee-e9ce-4e22-9c5f-c8f431ffe9e0) |
@@ -83,6 +89,7 @@ In our Software Developer coursework, we utilized the Twitter API to collect twe
 ###
 | **📅🕑 Timeline Classification 🕑📅** |
 |:--:|
+| [Back to top](#table-of-contents) |
 | ![timeline](https://github.com/nshpam/Twitisen/assets/97942535/0b81fcb3-2d63-4626-8e0b-a25435e68df9) |
 | This is an example of how it actually works: the green line represents the checkpoints, This is a continuous timeline where each day is consecutive. |
 | ![timeline](https://github.com/nshpam/Twitisen/assets/97942535/f505b253-7cb0-47c3-924a-cd549c4f3d9a) |
@@ -105,7 +112,7 @@ In our Software Developer coursework, we utilized the Twitter API to collect twe
 | Lastly, this is the difference between two timelines. |
 
 ## GUI Designing 🎨
-
+[Back to top](#table-of-contents) <br>
 This is our initial design, sketched by hand. We created a rough draft of the GUI in a low-fidelity (Lofi) format and transform it into GUI using pyqt5. The disadvantage of this design is...
 - No spatial chart
 - Few options to extract data
@@ -115,6 +122,7 @@ This is our initial design, sketched by hand. We created a rough draft of the GU
 ### 
 | **🗜️🧩 Prototype 1 🧩🗜️** |
 |:--:|
+| [Back to top](#table-of-contents) |
 | ![prototype1](https://github.com/nshpam/Tweepy/assets/97942535/e70f31bd-9882-443d-9c76-c957cfde9929) |
 | ![prototype1](https://github.com/nshpam/Tweepy/assets/97942535/0315c207-2eb3-4cfd-b24a-7ad7b4df383b) |
 | ![prototype1](https://github.com/nshpam/Tweepy/assets/97942535/56ff2128-7225-40e8-913b-a3b10f280921) |
@@ -130,6 +138,7 @@ This is our second design. We created a rough draft of the GUI in a low-fidelity
 ### 
 | **🗜️🧩 Prototype 2 🧩🗜️** |
 |:--:|
+| [Back to top](#table-of-contents) |
 | ![prototype2](https://github.com/nshpam/Tweepy/assets/97942535/b6205ebc-2d51-4467-ac77-c40fa90de506) |
 | ![prototype2](https://github.com/nshpam/Tweepy/assets/97942535/0dd149d8-1d86-438b-a258-d78a5ad00e06) |
 | ![prototype2](https://github.com/nshpam/Tweepy/assets/97942535/a682bb45-3b51-43e6-872d-00ddb636c9c4) |
@@ -141,6 +150,7 @@ Description of prototype 3
 ### 
 | **🗜️🧩 Prototype 3 🧩🗜️** |
 |:--:|
+| [Back to top](#table-of-contents) |
 | ![prototype3](https://github.com/nshpam/Tweepy/assets/97942535/33730fbc-6612-4598-9c00-0e512134500e) |
 | ![prototype3](https://github.com/nshpam/Tweepy/assets/97942535/9a9d3df6-1a6e-426c-9afa-4041930ee1e1) | 
 | ![prototype3](https://github.com/nshpam/Tweepy/assets/97942535/37c87d6d-1696-47bf-8116-7a6f63ee9f24) |
@@ -154,6 +164,7 @@ Description of version 1.0
 ### 
 | **🎉🚀 Version 1.0 🎉🚀** |
 |:--:|
+| [Back to top](#table-of-contents) |
 | ![ver1](https://github.com/nshpam/Twitisen/assets/97942535/376ed73e-85e9-4742-ac44-99b14f4f66d1) |
 | ![ver1](https://github.com/nshpam/Twitisen/assets/97942535/8af1e118-7524-4fed-b123-72ace78ab302) |
 | ![ver1](https://github.com/nshpam/Twitisen/assets/97942535/ebba16ac-97d0-4b04-ab7b-60c567f6bd0e) |
