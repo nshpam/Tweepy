@@ -172,7 +172,6 @@ Description of version 1.0
 | ![ver1](https://github.com/nshpam/Twitisen/assets/97942535/4570e905-6886-430e-9832-2a234ec93fc9) |
 | ![ver1](https://github.com/nshpam/Twitisen/assets/97942535/76be9ac5-ebc4-4efd-9ed6-586d89fb86a2) |
 | ![ver1](https://github.com/nshpam/Twitisen/assets/97942535/fe03b3c5-3088-4f4d-becc-a987b3047359) |
-| ![ver1](https://github.com/nshpam/Twitisen/assets/97942535/092b0e8e-3c4d-42bc-a3ef-5285e5ae76a7) |
 
 ## Contributor 👩‍💻👨‍💻
 [Back to top](#table-of-contents) <br>
